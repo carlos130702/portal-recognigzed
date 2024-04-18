@@ -1,0 +1,65 @@
+<div class="title-container text-center">
+  <h2>Listado de Trabajadores</h2>
+</div>
+<div class="grid justify-content-center ">
+  <div class="col-xs-12 col-sm-6 search-container">
+    <span class="p-input-icon-left">
+      <i class="pi pi-search"></i>
+      <input pInputText type="text" (input)="buscarTrabajadores($event)" placeholder="Buscar por nombre...">
+    </span>
+  </div>
+  <div class="col-xs-12 col-sm-6 text-right button-container">
+    <button pButton label="Registrar Trabajador" icon="pi pi-plus" routerLink="/admin/registro-trabajador"></button>
+  </div>
+</div>
+<div class="table-container">
+  <p-table [value]="trabajadoresFiltrados" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[5,10,20]" responsiveLayout="scroll">
+  <ng-template pTemplate="header">
+    <tr>
+      <th>Nombre</th>
+      <th>Acciones</th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-trabajador>
+    <tr>
+      <td>{{ trabajador.Nombre }} {{ trabajador.Apellidos }}</td>
+      <td class="text-center">
+        <button pButton icon="pi pi-eye" class="p-button-rounded p-button-success mr-2" (click)="visualizar(trabajador)"></button>
+        <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-primary mr-2" (click)="editar(trabajador)"></button>
+        <button pButton icon="pi pi-trash" class="p-button-rounded p-button-danger" (click)="eliminar(trabajador)"></button>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>
+</div>
+
+<p-dialog header="Detalle del Trabajador" [(visible)]="displayDialog" [modal]="true" [style]="{width: '50vw'}">
+  <ng-container *ngIf="trabajadorSeleccionado">
+    <div class="flex align-items-center">
+      <img [src]="trabajadorSeleccionado.Foto" alt="Imagen de perfil" class="mr-2 trabajador-imagen" style="width: 100px; height: 100px; border-radius: 50%;">
+      <div>
+        <h4>{{ trabajadorSeleccionado.Nombre }} {{ trabajadorSeleccionado.Apellidos }}</h4>
+      </div>
+    </div>
+    <div *ngIf="resultadosEvaluacion.length > 0; else noEvaluaciones">
+      <p-table [value]="resultadosEvaluacion" [autoLayout]="true" responsiveLayout="scroll">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Título de Evaluación</th>
+            <th>Puntuación</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-resultado>
+          <tr>
+            <td>{{ getEvaluacionTitulo(resultado.ID_Evaluacion) }}</td>
+            <td>{{ resultado.Puntuacion }}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+    <ng-template #noEvaluaciones>
+      <p class="no-evaluaciones">Aún no tiene evaluaciones rendidas este trabajador.</p>
+    </ng-template>
+  </ng-container>
+</p-dialog>
+<p-toast></p-toast>

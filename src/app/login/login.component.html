@@ -1,0 +1,20 @@
+<div class="flex align-items-center justify-content-center" style="height: 100vh;">
+  <div class="surface-card p-4 shadow-2 border-round" style="max-width: 400px; width: 90%;">
+    <h1>Login</h1>
+    <p>Bienvenido! Porfavor accede con tus credenciales de administrador o trabajador.</p>
+    <form (ngSubmit)="onSubmit()" class="flex flex-column">
+    <div class="field">
+      <label for="username" [class.active]="usernameFocused || username">Username</label>
+      <i class="fa fa-user"></i>
+      <input type="text" [(ngModel)]="username" (focus)="usernameFocused=true" (blur)="usernameFocused=false" id="username" name="username" required pInputText>
+    </div>
+    <div class="field">
+      <label for="password" [class.active]="passwordFocused || password">Contraseña</label>
+      <i class="fa fa-lock"></i>
+      <input type="password" [(ngModel)]="password" (focus)="passwordFocused=true" (blur)="passwordFocused=false" id="password" name="password" required pInputText [type]="mostrar ? 'text' : 'password'">
+      <i class="fa" [ngClass]="mostrar ? 'fa-eye' : 'fa-eye-slash'" (click)="toggleMostrar()"></i>
+    </div>
+    <button type="submit">LOGIN</button>
+  </form>
+  </div>
+</div>

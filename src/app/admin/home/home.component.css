@@ -1,0 +1,73 @@
+.p-menubar {
+  border: 1px solid green;
+  border-radius: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+}
+
+.p-menubar .p-menuitem-link {
+  color: #333;
+  transition: color 0.2s ease, background-color 0.2s ease, text-decoration 0.2s ease;
+  padding: 10px 20px;
+  font-size: 16px;
+}
+
+.p-menubar .p-menuitem-link:hover {
+  background-color: #e9ecef;
+  color: #0056b3;
+}
+
+.p-menubar .p-menuitem-link:active {
+  background-color: #ddeeff;
+  color: #004488;
+}
+
+.p-menubar .p-menuitem-link:hover,
+.p-menubar .p-menuitem-link.p-highlight {
+  color: #0056b3;
+  text-decoration: underline;
+  background-color: #e9ecef;
+}
+
+.p-menubar .p-menuitem-link:active {
+  background-color: #ddeeff;
+  color: #004488;
+}
+.p-menubar .p-submenu-list > .p-menuitem > .p-menuitem-link {
+  color: #333;
+}
+
+.p-menubar .p-submenu-list > .p-menuitem > .p-menuitem-link:hover {
+  background-color: #e9ecef;
+  color: #0056b3;
+}
+.p-menubar .p-menuitem .pi {
+  margin-right: .5em;
+}
+@media (max-width: 768px) {
+  .p-menubar .p-menuitem-link {
+    font-size: 14px;
+    padding: 8px 15px;
+  }
+  .p-button-logout {
+    padding: 8px 15px;
+  }
+}
+.p-button-logout {
+  color: #fff;
+  background-color: #dc3545;
+  border-color: #dc3545;
+  border-radius: 10px;
+  transition: background-color 0.2s, box-shadow 0.2s;
+  padding: 10px 20px;
+}
+
+.p-button-logout:hover {
+  background-color: #bd2130;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+.p-button-logout:active {
+  background-color: #a71d2a;
+}
+

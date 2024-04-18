@@ -1,83 +1,32 @@
-import { inject } from '@angular/core';
-import {ActivatedRouteSnapshot, CanActivateFn, Router} from '@angular/router';
-import { AuthService } from '../services/auth.service';
+import {Injectable} from '@angular/core';
+import {
+  Router,
+  CanActivateFn
+} from '@angular/router';
+import { AuthService, User } from '../services/auth.service';
+import {Observable} from "rxjs";
 
-import { map } from 'rxjs';
-import {MatSnackBar} from "@angular/material/snack-bar";
-import Swal from "sweetalert2";
 
-export const routerInjection = () => inject(Router);
-export const authStateObs$ = () => inject(AuthService).authState$;
+@Injectable({
+  providedIn: 'root'
+})
 
-export const authGuard: CanActivateFn = () => {
-  const router = routerInjection();
+export class AuthGuard {
+  constructor(private authService: AuthService, private router: Router) {}
 
-  return authStateObs$().pipe(
-    map((user) => {
-      if (!user) {
-        router.navigateByUrl('/').then(r =>
-          console.log(r)
-        );
-        return false;
-      }
+  canActivate(): Observable<boolean> | Promise<boolean> | boolean {
+    const currentUser = this.authService.getCurrentUser();
+
+    if (currentUser && (currentUser.role === 'administrador' || currentUser.role === 'trabajador')) {
       return true;
-    })
-  );
-};
-
-export const publicGuard: CanActivateFn = () => {
-  const router = routerInjection();
-
-  return authStateObs$().pipe(
-    map((user) => {
-      if (user) {
-        router.navigateByUrl('/home').then(r =>
-          console.log(r));
-        return false;
-      }
-      return true;
-    })
-  );
-};
-export const roleBasedGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
-  const authService = inject(AuthService);
-  const router = inject(Router);
-  const snackBar = inject(MatSnackBar);
-
-  return authService.authState$.pipe(
-    map(user => {
-      if (!user) {
-        router.navigate(['/login']).then(r =>  console.log(r));
-        return false;
-      }
-      type AllowedEmails = {
-        [key: string]: string[];
-      };
-
-      const allowedEmails: AllowedEmails = {
-        'cliente': ['carlos.leon@bluetab.net','belkys.rumbos@bluetab.net','jorge.arevalo@bluetab.net','carlos.leon.rupay.contractor@bbva.com'],
-        'people': ['jorge.arevalo@bluetab.net','belkys.rumbos@bluetab.net','carlos.leon@bluetab.net'],
-        'gestion': ['carlos.leon.rupay.contractor@bbva.com','jorge.arevalo@bluetab.net','belkys.rumbos@bluetab.net','carlos.leon@bluetab.net'],
-        'lideres': ['carlos.leon@bluetab.net','jorge.arevalo@bluetab.net','belkys.rumbos@bluetab.net']
-      };
-
-      const mainPath = route.pathFromRoot
-        .map(snapshot => snapshot.url.map(segment => segment.path).join('/'))
-        .filter(path => path)
-        .join('/');
-
-
-      if (mainPath && allowedEmails[mainPath]?.includes(<string>user.email)) {
-        return true;
-      } Swal.fire({
-        title: 'Acceso Denegado',
-        text: 'No tienes permiso para acceder a esta página.',
-        icon: 'error',
-        confirmButtonText: 'Entendido'
-      }).then((result) => {
-        router.navigate(['/']).then(r => console.log('Redirect after alert'));
+    } else if (!this.authService.isAuthenticated()) {
+      this.router.navigate(['/login']).catch(err => {
+        console.error('Error during navigation to /login:', err);
       });
       return false;
-    })
-  );
-};
+    } else {
+      this.router.navigate(['/unauthorized']);
+      return false;
+    }
+  }
+}

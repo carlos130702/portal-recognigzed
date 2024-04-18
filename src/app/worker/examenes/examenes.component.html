@@ -1,0 +1,25 @@
+<div class="container">
+  <div class="text-center mb-4">
+    <h1>Exámenes Disponibles</h1>
+  </div>
+  <p-table [value]="evaluaciones" [rows]="10" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[5,10,20]" responsiveLayout="scroll">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Título</th>
+        <th>Descripción</th>
+        <th>Calificación</th>
+        <th>Acciones</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-evaluacion>
+      <tr>
+        <td>{{ evaluacion.titulo }}</td>
+        <td>{{ evaluacion.descripcion }}</td>
+        <td>{{ obtenerCalificacion(evaluacion.id) || '-' }}</td>
+        <td>
+          <button type="button" pButton icon="pi pi-pencil" *ngIf="!tieneCalificacion(evaluacion.id)" (click)="rendirEvaluacion(evaluacion.id)" class="p-button-rounded p-button-success" label="Rendir"></button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

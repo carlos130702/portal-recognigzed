@@ -1,0 +1,98 @@
+* {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+.registro-evaluacion {
+  max-width: 600px;
+  margin: auto;
+}
+
+.registro-evaluacion h2 {
+  margin-bottom: 20px;
+}
+
+.field {
+  margin-bottom: 20px;
+}
+
+.field label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.field input[type="text"],
+.field textarea,
+.field input[type="number"] {
+  width: 100%;
+  padding: 8px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.field-checkbox {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.field-checkbox label {
+  margin-left: 5px;
+}
+
+.button-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.p-button {
+  padding: 10px 20px;
+}
+
+.p-button:not(:last-child) {
+  margin-right: 10px;
+}
+.option-container {
+  margin-bottom: 20px;
+}
+
+.option-title {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.option-inputs {
+  display: flex;
+  align-items: center;
+}
+
+.option-radio {
+  margin-right: 10px;
+}
+
+.option-text {
+  flex-grow: 1;
+}
+
+.center-button {
+  display: block;
+  margin: 20px auto;
+  width: 50%;
+}
+
+.distinct-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 1.2em;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.error-message {
+  color: #ff3333;
+  display: block;
+  margin-top: 5px;
+}

@@ -1,61 +1,248 @@
 {
   "trabajadores": [
     {
-      "ID": 1,
+      "id": "1",
       "Nombre": "Juan",
       "Apellidos": "Pérez",
       "Foto": "url_to_image",
       "Usuario": "juanp",
-      "Contraseña": "juanpass"
+      "password": "juanpass"
+    },
+    {
+      "id": "2",
+      "Nombre": "María",
+      "Apellidos": "González",
+      "Foto": "url_to_image",
+      "Usuario": "mariag",
+      "password": "mariapass"
+    },
+    {
+      "id": "3",
+      "Nombre": "Pedro",
+      "Apellidos": "Martínez",
+      "Foto": "url_to_image",
+      "Usuario": "pedrom",
+      "password": "pedropass"
+    },
+    {
+      "id": "4",
+      "Nombre": "Ana",
+      "Apellidos": "Sánchez",
+      "Foto": "url_to_image",
+      "Usuario": "anas",
+      "password": "anapass"
+    },
+    {
+      "id": "d210",
+      "Nombre": "carlos",
+      "Apellidos": "leon",
+      "Foto": "",
+      "Usuario": "carlosl",
+      "password": "carlos"
+    },
+    {
+      "id": "205c",
+      "Nombre": "ca",
+      "Apellidos": "ca",
+      "Foto": "",
+      "Usuario": "ca",
+      "password": "ca"
     }
   ],
   "administradores": [
     {
-      "ID": 1,
+      "id": "1",
       "Usuario": "admin",
-      "Contraseña": "adminpass"
+      "password": "adminpass"
     }
   ],
   "evaluaciones": [
     {
-      "ID": 1,
-      "Título": "Evaluación de Seguridad",
-      "Descripción": "Evaluación sobre normas de seguridad en el trabajo."
+      "id": "76fe",
+      "titulo": "Evaluación de Seguridad",
+      "descripcion": "Evaluación sobre normas de seguridad en el trabajo",
+      "preguntas": [
+        {
+          "enunciado": "¿Cuál es el procedimiento en caso de incendio?",
+          "opciones": [
+            {
+              "texto": "Usar el extintor más cercano",
+              "esCorrecta": true
+            },
+            {
+              "texto": "Correr hacia la salida más cercana",
+              "esCorrecta": false
+            },
+            {
+              "texto": "No hacer nada",
+              "esCorrecta": false
+            },
+            {
+              "texto": "Sentarse",
+              "esCorrecta": false
+            }
+          ],
+          "valor": 10
+        },
+        {
+          "enunciado": "¿Qué hacer si se detecta una fuga de gas?",
+          "opciones": [
+            {
+              "texto": "Cerrar la llave de paso y ventilar el lugar",
+              "esCorrecta": true
+            },
+            {
+              "texto": "Encender un fósforo para ver si hay gas",
+              "esCorrecta": false
+            },
+            {
+              "texto": "Abrir mas la llave",
+              "esCorrecta": false
+            },
+            {
+              "texto": "Nada",
+              "esCorrecta": false
+            }
+          ],
+          "valor": 10
+        }
+      ]
+    },
+    {
+      "id": "2aeb",
+      "titulo": "angular",
+      "descripcion": "examen de angular",
+      "preguntas": [
+        {
+          "enunciado": "1+1",
+          "opciones": [
+            {
+              "texto": "2",
+              "esCorrecta": true
+            },
+            {
+              "texto": "3",
+              "esCorrecta": false
+            },
+            {
+              "texto": "4",
+              "esCorrecta": false
+            },
+            {
+              "texto": "5",
+              "esCorrecta": false
+            }
+          ],
+          "valor": 10
+        },
+        {
+          "enunciado": "2+2",
+          "opciones": [
+            {
+              "texto": "4",
+              "esCorrecta": true
+            },
+            {
+              "texto": "5",
+              "esCorrecta": false
+            },
+            {
+              "texto": "6",
+              "esCorrecta": false
+            },
+            {
+              "texto": "7",
+              "esCorrecta": false
+            }
+          ],
+          "valor": 10
+        }
+      ]
+    },
+    {
+      "id": "f00a",
+      "titulo": "cascsa",
+      "descripcion": "cscsaca",
+      "preguntas": [
+        {
+          "enunciado": "cascsac",
+          "opciones": [
+            {
+              "texto": "csac",
+              "esCorrecta": false
+            },
+            {
+              "texto": "csacas",
+              "esCorrecta": false
+            },
+            {
+              "texto": "casca",
+              "esCorrecta": true
+            },
+            {
+              "texto": "cascac",
+              "esCorrecta": false
+            }
+          ],
+          "valor": 10
+        },
+        {
+          "enunciado": "csacsacasc",
+          "opciones": [
+            {
+              "texto": "casc",
+              "esCorrecta": false
+            },
+            {
+              "texto": "cwq",
+              "esCorrecta": true
+            },
+            {
+              "texto": "cwc",
+              "esCorrecta": false
+            },
+            {
+              "texto": "cwcqwcq",
+              "esCorrecta": false
+            }
+          ],
+          "valor": 10
+        }
+      ]
     }
   ],
   "sesionesDeEvaluacion": [
     {
-      "ID": 1,
-      "ID_Evaluacion": 1,
-      "ID_Trabajador": 1,
+      "id": "1",
+      "ID_Evaluacion": "1",
+      "ID_Trabajador": "1",
       "Estado_Verificacion": false
     }
   ],
   "resultadosDeEvaluacion": [
     {
-      "ID": 1,
-      "ID_Trabajador": 1,
-      "ID_Evaluacion": 1,
-      "Puntuacion": 80
+      "id": "47f8",
+      "ID_Trabajador": "3",
+      "ID_Evaluacion": "76fe",
+      "Puntuacion": 20
     },
-  ],
-  "preguntas": [
     {
-      "ID": 1,
-      "ID_Evaluacion": 1,
-      "Enunciado": "¿Cuál es el procedimiento en caso de incendio?",
-      "Opciones": [
-        {
-          "ID_Opcion": 1,
-          "Texto": "Usar el extintor más cercano",
-          "Es_Correcta": true
-        },
-        {
-          "ID_Opcion": 2,
-          "Texto": "Correr hacia la salida más cercana",
-          "Es_Correcta": false
-        }
-      ]
+      "id": "d085",
+      "ID_Trabajador": "2",
+      "ID_Evaluacion": "76fe",
+      "Puntuacion": 10
+    },
+    {
+      "id": "0ed0",
+      "ID_Trabajador": "205c",
+      "ID_Evaluacion": "76fe",
+      "Puntuacion": 20
+    },
+    {
+      "id": "7a89",
+      "ID_Trabajador": "205c",
+      "ID_Evaluacion": "2aeb",
+      "Puntuacion": 20
     }
   ]
 }

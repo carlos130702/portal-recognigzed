@@ -1,0 +1,61 @@
+{
+  "trabajadores": [
+    {
+      "ID": 1,
+      "Nombre": "Juan",
+      "Apellidos": "Pérez",
+      "Foto": "url_to_image",
+      "Usuario": "juanp",
+      "Contraseña": "juanpass"
+    }
+  ],
+  "administradores": [
+    {
+      "ID": 1,
+      "Usuario": "admin",
+      "Contraseña": "adminpass"
+    }
+  ],
+  "evaluaciones": [
+    {
+      "ID": 1,
+      "Título": "Evaluación de Seguridad",
+      "Descripción": "Evaluación sobre normas de seguridad en el trabajo."
+    }
+  ],
+  "sesionesDeEvaluacion": [
+    {
+      "ID": 1,
+      "ID_Evaluacion": 1,
+      "ID_Trabajador": 1,
+      "Estado_Verificacion": false
+    }
+  ],
+  "resultadosDeEvaluacion": [
+    {
+      "ID": 1,
+      "ID_Trabajador": 1,
+      "ID_Evaluacion": 1,
+      "Puntuacion": 80
+    },
+  ],
+  "preguntas": [
+    {
+      "ID": 1,
+      "ID_Evaluacion": 1,
+      "Enunciado": "¿Cuál es el procedimiento en caso de incendio?",
+      "Opciones": [
+        {
+          "ID_Opcion": 1,
+          "Texto": "Usar el extintor más cercano",
+          "Es_Correcta": true
+        },
+        {
+          "ID_Opcion": 2,
+          "Texto": "Correr hacia la salida más cercana",
+          "Es_Correcta": false
+        }
+      ]
+    }
+  ]
+}

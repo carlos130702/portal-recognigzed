@@ -135,7 +135,7 @@ button:active {
 }
 
 .field label.active {
-  top: 0px;
+  top: 0;
   font-size: 12px;
   color: #333;
 }

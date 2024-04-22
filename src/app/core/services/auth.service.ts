@@ -5,11 +5,11 @@ import { catchError, map } from 'rxjs/operators';
 
 export interface User {
   id: number;
-  Usuario: string;
+  user: string;
   password: string;
-  Nombre?: string;
-  Apellidos?: string;
-  Foto?: string;
+  name?: string;
+  lastName?: string;
+  photo?: string;
   role?: string;
 }
 
@@ -25,7 +25,7 @@ export class AuthService {
   login(username: string, password: string): Observable<User | null> {
     return this.http.get<User[]>(`${this.apiUrl}/administradores`).pipe(
       map(admins => {
-        const admin = admins.find(a => a.Usuario === username && a.password === password);
+        const admin = admins.find(a => a.user === username && a.password === password);
         if (admin) {
           const userToStore = { ...admin, role: 'administrador' };
           sessionStorage.setItem('currentUser', JSON.stringify(userToStore));
@@ -36,7 +36,7 @@ export class AuthService {
       catchError(err =>
         err.message === 'Not admin' ? this.http.get<User[]>(`${this.apiUrl}/trabajadores`).pipe(
           map(workers => {
-            const worker = workers.find(w => w.Usuario === username && w.password === password);
+            const worker = workers.find(w => w.user === username && w.password === password);
             if (worker) {
               const userToStore = { ...worker, role: 'trabajador' };
               sessionStorage.setItem('currentUser', JSON.stringify(userToStore));

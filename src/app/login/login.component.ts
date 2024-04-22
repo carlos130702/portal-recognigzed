@@ -8,7 +8,7 @@ import {Router} from "@angular/router";
   styleUrl: './login.component.css'
 })
 export class LoginComponent {
-  username: string = '';
+  user: string = '';
   password: string = '';
   mostrar: boolean = false;
   usernameFocused: boolean = false;
@@ -16,8 +16,8 @@ export class LoginComponent {
   constructor(private authService: AuthService, private router: Router) { }
 
   onSubmit(): void {
-    console.log('Intentando iniciar sesión con:', this.username);
-    this.authService.login(this.username, this.password).subscribe((user: User | null) => {
+    console.log('Intentando iniciar sesión con:', this.user);
+    this.authService.login(this.user, this.password).subscribe((user: User | null) => {
       console.log('Respuesta de login:', user);
       if (user && user.role === 'administrador') {
         console.log('Navegando a admin');

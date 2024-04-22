@@ -3,7 +3,6 @@ import {Evaluacion, Pregunta} from "../../interfaces/Evaluacion";
 import {MessageService} from "primeng/api";
 import {Router} from "@angular/router";
 import {EvaluacionesService} from "../../services/evaluaciones.service";
-import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'app-registro-examen',
@@ -26,11 +25,35 @@ export class RegistroExamenComponent {
   maxOpciones: number = 4;
   mostrarFormulario: boolean = true;
   preguntaActualIndex: number = 0;
+  opcionDuplicada: boolean = false;
 
   siguientePregunta(): void {
-    if (this.preguntaActualIndex < this.evaluacion.preguntas.length - 1) {
-      this.preguntaActualIndex++;
+    if (this.validarPreguntaActual()) {
+      if (this.preguntaActualIndex < this.evaluacion.preguntas.length - 1) {
+        this.preguntaActualIndex++;
+      }
     }
+  }
+
+  tieneOpcionesDuplicadas(pregunta: Pregunta): boolean {
+    let textoOpciones = pregunta.opciones.map(opcion => opcion.texto.trim().toLowerCase());
+    let unicos = new Set(textoOpciones);
+    return unicos.size !== textoOpciones.length;
+  }
+  validarPreguntaActual(): boolean {
+    // Obtener la pregunta actual
+    const preguntaActual = this.evaluacion.preguntas[this.preguntaActualIndex];
+
+    // Verificar que las opciones no sean duplicadas
+    if (this.tieneOpcionesDuplicadas(preguntaActual)) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'No puede haber opciones duplicadas.'
+      });
+      return false; // Retorna false si hay duplicados
+    }
+    return true; // Retorna true si la validación es exitosa
   }
 
   anteriorPregunta(): void {
@@ -60,29 +83,40 @@ export class RegistroExamenComponent {
 
 
   guardarEvaluacionCompleta() {
-    if (!this.evaluacion || !this.evaluacion.titulo || !this.evaluacion.descripcion || !this.evaluacion.preguntas || this.evaluacion.preguntas.length === 0) {
-      this.messageService.add({ severity: 'warn', summary: 'Atención', detail: 'Debe completar la evaluación antes de guardarla.' });
-      return;
-    }
+    if (this.todasLasPreguntasCompletas() && this.validarPreguntaActual()) {
 
-    this.evaluacionesService.deleteEvaluacion(this.evaluacion.id).subscribe(() => {
-      this.evaluacionesService.addEvaluacion(this.evaluacion).subscribe({
-        next: (evaluacionGuardada: Evaluacion) => {
-          this.evaluacion = evaluacionGuardada;
+      if (!this.evaluacion || !this.evaluacion.titulo || !this.evaluacion.descripcion || !this.evaluacion.preguntas || this.evaluacion.preguntas.length === 0) {
           this.messageService.add({
-            severity: 'success',
-            summary: 'Evaluación Guardada',
-            detail: 'La evaluación se ha guardado correctamente.'
+            severity: 'warn',
+            summary: 'Atención',
+            detail: 'Debe completar la evaluación antes de guardarla.'
           });
-          setTimeout(() => {
-            this.router.navigate(['/admin/trabajadores']);
-          }, 1000);
-        },
-        error: () => {
-          this.messageService.add({severity: 'error', summary: 'Error', detail: 'No se pudo guardar la evaluación.'});
+          return;
         }
-      });
-    });
+
+        this.evaluacionesService.deleteEvaluacion(this.evaluacion.id).subscribe(() => {
+          this.evaluacionesService.addEvaluacion(this.evaluacion).subscribe({
+            next: (evaluacionGuardada: Evaluacion) => {
+              this.evaluacion = evaluacionGuardada;
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Evaluación Guardada',
+                detail: 'La evaluación se ha guardado correctamente.'
+              });
+              setTimeout(() => {
+                this.router.navigate(['/admin/trabajadores']);
+              }, 1000);
+            },
+            error: () => {
+              this.messageService.add({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'No se pudo guardar la evaluación.'
+              });
+            }
+          });
+        });
+    }
   }
 
 
@@ -144,18 +178,17 @@ export class RegistroExamenComponent {
     const opcionesCorrectas = ultimaPregunta.opciones.filter(opcion => opcion.esCorrecta);
     return opcionesCorrectas.length > 0 && ultimaPregunta.opciones.length === this.maxOpciones;
   }
+  nuevaOpcion: string = "";
 
   agregarOpciones(pregunta: Pregunta) {
     const idPregunta = pregunta.id ?? 0;
     while (pregunta.opciones.length < this.maxOpciones) {
       pregunta.opciones.push({
-
         texto: '',
         esCorrecta: false
       });
     }
   }
-
 
   seleccionarOpcion(pregunta: Pregunta, opcionSeleccionada: any) {
     pregunta.opciones.forEach((op: { esCorrecta: boolean; }) => {
@@ -163,7 +196,20 @@ export class RegistroExamenComponent {
     });
     opcionSeleccionada.esCorrecta = true;
   }
-
+  verificarTituloUnico() {
+    try {
+      const existeEvaluacion = this.evaluacionesService.verificarTituloUnico(this.evaluacion.titulo);
+      if (existeEvaluacion) {
+        this.messageService.add({severity: 'error', summary: 'Error', detail: 'Ya existe una evaluación con el mismo título.'});
+        return false;
+      } else {
+        return true;
+      }
+    } catch (error) {
+      console.error('Error al verificar el título de la evaluación:', error);
+      return false;
+    }
+  }
   todasLasPreguntasCompletas(): boolean {
     if (this.evaluacion.preguntas.length === 0) {
       return false;
@@ -176,6 +222,7 @@ export class RegistroExamenComponent {
     }
     return true;
   }
+
 
 
   preguntaCompleta(pregunta: Pregunta): boolean {

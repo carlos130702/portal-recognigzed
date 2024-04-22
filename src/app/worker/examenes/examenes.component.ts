@@ -58,8 +58,7 @@ export class ExamenesComponent implements OnInit {
     this.resultadosService.getEvaluacionResultados().subscribe(resultados => {
       this.resultadosEvaluaciones = resultados.filter(resultado => {
         if(this.idUsuarioActual === undefined) { return false; }
-        const esElUsuario = resultado.ID_Trabajador.toString() === this.idUsuarioActual.toString();
-        return esElUsuario;
+        return resultado.ID_Trabajador.toString() === this.idUsuarioActual.toString();
       });
     });
   }

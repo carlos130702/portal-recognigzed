@@ -3,23 +3,25 @@
   <form #trabajadorForm="ngForm" (ngSubmit)="registrarTrabajador()" class="trabajador-form">
     <div class="field">
       <label for="nombre">Nombre</label>
-      <input type="text" pInputText id="nombre" [(ngModel)]="trabajador.Nombre" name="nombre" required>
+      <input type="text" pInputText id="nombre" [(ngModel)]="trabajador.name" name="nombre" required autocomplete="off">
     </div>
     <div class="field">
       <label for="apellidos">Apellidos</label>
-      <input type="text" pInputText id="apellidos" [(ngModel)]="trabajador.Apellidos" name="apellidos" required>
+      <input type="text" pInputText id="apellidos" [(ngModel)]="trabajador.lastName" name="apellidos" required autocomplete="off">
     </div>
     <div class="field">
       <label for="foto">Foto</label>
-      <input type="file" pInputText id="foto" name="foto">
+      <input type="file" (change)="onFileSelected($event)" id="foto" name="foto">
+      <img *ngIf="selectedFile" [src]="selectedFileUrl" alt="Foto seleccionada">
     </div>
+
     <div class="field">
       <label for="usuario">Usuario</label>
-      <input type="text" pInputText id="usuario" [(ngModel)]="trabajador.Usuario" name="usuario" required>
+      <input type="text" pInputText id="usuario" [(ngModel)]="trabajador.user" name="usuario" required autocomplete="off">
     </div>
     <div class="field">
       <label for="contrasena">Contraseña</label>
-      <input type="password" pInputText id="contrasena" [(ngModel)]="trabajador.password" name="contrasena" required>
+      <input type="password" pInputText id="contrasena" [(ngModel)]="trabajador.password" name="contrasena" required autocomplete="off">
     </div>
     <button type="submit" pButton label="Registrar" [disabled]="!trabajadorForm.form.valid"></button>
   </form>

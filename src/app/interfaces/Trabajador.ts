@@ -1,8 +1,8 @@
 export interface Trabajador {
   id?: number;
-  Nombre: string;
-  Apellidos: string;
-  Foto: string;
-  Usuario: string;
+  name: string;
+  lastName: string;
+  photo: string;
+  user: string;
   password: string;
 }

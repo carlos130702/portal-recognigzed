@@ -21,9 +21,10 @@ export class EvaluacionesService {
     const url = `${this.apiUrl}/${id}`;
     return this.http.get<Evaluacion>(url);
   }
-
-  // Añadir una nueva evaluación
-
+  verificarTituloUnico(titulo: string): Observable<boolean> {
+    const url = `${this.apiUrl}/verificarTituloUnico`;
+    return this.http.post<boolean>(url, { titulo });
+  }
   addEvaluacion(evaluacion: Evaluacion): Observable<Evaluacion> {
     return this.http.post<Evaluacion>(this.apiUrl, evaluacion);
   }
@@ -32,7 +33,6 @@ export class EvaluacionesService {
     return this.http.post<Evaluacion>(this.apiUrl, evaluacion);
   }
 
-  // Actualizar una evaluación existente
   updateEvaluacion(evaluacion: Evaluacion): Observable<Evaluacion> {
     const url = `${this.apiUrl}/${evaluacion.id}`;
     return this.http.put<Evaluacion>(url, evaluacion);

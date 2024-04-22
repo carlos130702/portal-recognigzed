@@ -10,7 +10,9 @@ import {ButtonModule} from "primeng/button";
 import { VistaExamenComponent } from './vista-examen/vista-examen.component';
 import {FormsModule} from "@angular/forms";
 import {RadioButtonModule} from "primeng/radiobutton";
-
+import {MessageService} from "primeng/api";
+import {ToastModule} from "primeng/toast";
+import {ProgressSpinnerModule} from "primeng/progressspinner";
 
 @NgModule({
   declarations: [
@@ -25,7 +27,12 @@ import {RadioButtonModule} from "primeng/radiobutton";
     TableModule,
     ButtonModule,
     FormsModule,
-    RadioButtonModule
+    RadioButtonModule,
+    ToastModule,
+    ProgressSpinnerModule
+  ],
+  providers: [
+    MessageService
   ]
 })
 export class WorkerModule { }

@@ -2,57 +2,57 @@
   "trabajadores": [
     {
       "id": "1",
-      "Nombre": "Juan",
-      "Apellidos": "Pérez",
-      "Foto": "url_to_image",
-      "Usuario": "juanp",
+      "name": "Juan",
+      "lastName": "Pérez",
+      "photo": "/assets/papa.png",
+      "user": "juanp",
       "password": "juanpass"
     },
     {
       "id": "2",
-      "Nombre": "María",
-      "Apellidos": "González",
-      "Foto": "url_to_image",
-      "Usuario": "mariag",
+      "name": "María",
+      "lastName": "González",
+      "photo": "url_to_image",
+      "user": "mariag",
       "password": "mariapass"
     },
     {
       "id": "3",
-      "Nombre": "Pedro",
-      "Apellidos": "Martínez",
-      "Foto": "url_to_image",
-      "Usuario": "pedrom",
+      "name": "Pedro",
+      "lastName": "Martínez",
+      "photo": "https://i.postimg.cc/gxGtCZ8b/piedra.jpg",
+      "user": "pedrom",
       "password": "pedropass"
     },
     {
       "id": "4",
-      "Nombre": "Ana",
-      "Apellidos": "Sánchez",
-      "Foto": "url_to_image",
-      "Usuario": "anas",
+      "name": "Ana",
+      "lastName": "Sánchez",
+      "photo": "/assets/carlos.png",
+      "user": "anas",
       "password": "anapass"
     },
     {
-      "id": "d210",
-      "Nombre": "carlos",
-      "Apellidos": "leon",
-      "Foto": "",
-      "Usuario": "carlosl",
-      "password": "carlos"
+      "id": "205c",
+      "name": "ca",
+      "lastName": "ca",
+      "photo": "/assets/XP51205.png",
+      "user": "ca",
+      "password": "ca"
     },
     {
-      "id": "205c",
-      "Nombre": "ca",
-      "Apellidos": "ca",
-      "Foto": "",
-      "Usuario": "ca",
-      "password": "ca"
+      "id": "945e",
+      "name": "fsaf",
+      "lastName": "fsafas",
+      "photo": "",
+      "user": "asf",
+      "password": "fsa"
     }
   ],
   "administradores": [
     {
       "id": "1",
-      "Usuario": "admin",
+      "user": "admin",
       "password": "adminpass"
     }
   ],
@@ -209,6 +209,341 @@
           "valor": 10
         }
       ]
+    },
+    {
+      "id": "810b",
+      "titulo": "resta",
+      "descripcion": "resta",
+      "preguntas": [
+        {
+          "enunciado": "2-1",
+          "opciones": [
+            {
+              "texto": "1",
+              "esCorrecta": false
+            },
+            {
+              "texto": "1",
+              "esCorrecta": true
+            },
+            {
+              "texto": "3",
+              "esCorrecta": false
+            },
+            {
+              "texto": "4",
+              "esCorrecta": false
+            }
+          ],
+          "valor": 10
+        },
+        {
+          "enunciado": "4-5",
+          "opciones": [
+            {
+              "texto": "-1",
+              "esCorrecta": true
+            },
+            {
+              "texto": "2",
+              "esCorrecta": false
+            },
+            {
+              "texto": "3",
+              "esCorrecta": false
+            },
+            {
+              "texto": "4",
+              "esCorrecta": false
+            }
+          ],
+          "valor": 10
+        }
+      ]
+    },
+    {
+      "id": "f59e",
+      "titulo": "hfdh",
+      "descripcion": "hfdhfd",
+      "preguntas": [
+        {
+          "enunciado": "dhsdh",
+          "opciones": [
+            {
+              "texto": "twq",
+              "esCorrecta": false
+            },
+            {
+              "texto": "tqwtq",
+              "esCorrecta": false
+            },
+            {
+              "texto": "twqtq",
+              "esCorrecta": true
+            },
+            {
+              "texto": "twqtqt",
+              "esCorrecta": false
+            }
+          ],
+          "valor": 10
+        },
+        {
+          "enunciado": "twq",
+          "opciones": [
+            {
+              "texto": "tqw",
+              "esCorrecta": false
+            },
+            {
+              "texto": "tqwt",
+              "esCorrecta": false
+            },
+            {
+              "texto": "twtwqt",
+              "esCorrecta": true
+            },
+            {
+              "texto": "twqttq",
+              "esCorrecta": false
+            }
+          ],
+          "valor": 10
+        }
+      ]
+    },
+    {
+      "id": "0893",
+      "titulo": "asgsag",
+      "descripcion": "gsag",
+      "preguntas": [
+        {
+          "enunciado": "wgqwg",
+          "opciones": [
+            {
+              "texto": "gwqg",
+              "esCorrecta": false
+            },
+            {
+              "texto": "gwqg",
+              "esCorrecta": false
+            },
+            {
+              "texto": "gwgq",
+              "esCorrecta": true
+            },
+            {
+              "texto": "gwqgqwgw",
+              "esCorrecta": false
+            }
+          ],
+          "valor": 20
+        }
+      ]
+    },
+    {
+      "id": "bd5c",
+      "titulo": "asga",
+      "descripcion": "gsag",
+      "preguntas": [
+        {
+          "enunciado": "gsagas",
+          "opciones": [
+            {
+              "texto": "gasg",
+              "esCorrecta": false
+            },
+            {
+              "texto": "gasgs",
+              "esCorrecta": false
+            },
+            {
+              "texto": "gwqw",
+              "esCorrecta": true
+            },
+            {
+              "texto": "gwqghr",
+              "esCorrecta": false
+            }
+          ],
+          "valor": 10
+        },
+        {
+          "enunciado": "hwhr",
+          "opciones": [
+            {
+              "texto": "1",
+              "esCorrecta": false
+            },
+            {
+              "texto": "1",
+              "esCorrecta": false
+            },
+            {
+              "texto": "2",
+              "esCorrecta": true
+            },
+            {
+              "texto": "3",
+              "esCorrecta": false
+            }
+          ],
+          "valor": 10
+        }
+      ]
+    },
+    {
+      "id": "75e1",
+      "titulo": "gsag",
+      "descripcion": "gasga",
+      "preguntas": [
+        {
+          "enunciado": "1",
+          "opciones": [
+            {
+              "texto": "1",
+              "esCorrecta": false
+            },
+            {
+              "texto": "4",
+              "esCorrecta": false
+            },
+            {
+              "texto": "2",
+              "esCorrecta": true
+            },
+            {
+              "texto": "3",
+              "esCorrecta": false
+            }
+          ],
+          "valor": 10
+        },
+        {
+          "enunciado": "4",
+          "opciones": [
+            {
+              "texto": "2",
+              "esCorrecta": false
+            },
+            {
+              "texto": "2",
+              "esCorrecta": false
+            },
+            {
+              "texto": "3",
+              "esCorrecta": true
+            },
+            {
+              "texto": "4",
+              "esCorrecta": false
+            }
+          ],
+          "valor": 10
+        }
+      ]
+    },
+    {
+      "id": "b73c",
+      "titulo": "ga",
+      "descripcion": "ga",
+      "preguntas": [
+        {
+          "enunciado": "1",
+          "opciones": [
+            {
+              "texto": "1",
+              "esCorrecta": false
+            },
+            {
+              "texto": "4",
+              "esCorrecta": false
+            },
+            {
+              "texto": "2",
+              "esCorrecta": true
+            },
+            {
+              "texto": "3",
+              "esCorrecta": false
+            }
+          ],
+          "valor": 10
+        },
+        {
+          "enunciado": "2",
+          "opciones": [
+            {
+              "texto": "2",
+              "esCorrecta": false
+            },
+            {
+              "texto": "3",
+              "esCorrecta": true
+            },
+            {
+              "texto": "4",
+              "esCorrecta": false
+            },
+            {
+              "texto": "5",
+              "esCorrecta": false
+            }
+          ],
+          "valor": 10
+        }
+      ]
+    },
+    {
+      "id": "3568",
+      "titulo": "kirby",
+      "descripcion": "dgsdgsdg",
+      "preguntas": [
+        {
+          "enunciado": "hfhdfh",
+          "opciones": [
+            {
+              "texto": "hdfhd",
+              "esCorrecta": false
+            },
+            {
+              "texto": "hfdh",
+              "esCorrecta": false
+            },
+            {
+              "texto": "hfdhd",
+              "esCorrecta": true
+            },
+            {
+              "texto": "hfdhdagas",
+              "esCorrecta": false
+            }
+          ],
+          "valor": 10
+        },
+        {
+          "enunciado": "hfhdh",
+          "opciones": [
+            {
+              "texto": "fdhdf",
+              "esCorrecta": false
+            },
+            {
+              "texto": "hfdhasdas",
+              "esCorrecta": false
+            },
+            {
+              "texto": "hfdh",
+              "esCorrecta": false
+            },
+            {
+              "texto": "hfdhdfh",
+              "esCorrecta": true
+            }
+          ],
+          "valor": 10
+        }
+      ]
     }
   ],
   "sesionesDeEvaluacion": [
@@ -243,6 +578,30 @@
       "ID_Trabajador": "205c",
       "ID_Evaluacion": "2aeb",
       "Puntuacion": 20
+    },
+    {
+      "id": "4b8f",
+      "ID_Trabajador": "205c",
+      "ID_Evaluacion": "f00a",
+      "Puntuacion": 10
+    },
+    {
+      "id": "59a6",
+      "ID_Trabajador": "4",
+      "ID_Evaluacion": "76fe",
+      "Puntuacion": 20
+    },
+    {
+      "id": "e2cf",
+      "ID_Trabajador": "205c",
+      "ID_Evaluacion": "810b",
+      "Puntuacion": 0
+    },
+    {
+      "id": "22e6",
+      "ID_Trabajador": "205c",
+      "ID_Evaluacion": "f59e",
+      "Puntuacion": 0
     }
   ]
 }

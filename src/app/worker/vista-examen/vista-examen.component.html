@@ -1,20 +1,37 @@
-<div class="flex flex-column align-items-center justify-content-center" *ngIf="exam">
-  <h2>{{ exam.titulo }}</h2>
-  <p>{{ exam.descripcion }}</p>
-
-  <form (ngSubmit)="onSubmit()" class="flex flex-column align-items-center card">
-    <div *ngIf="exam.preguntas[currentQuestionIndex]" class="mb-4">
-      <h3>{{ currentQuestionIndex + 1 }}. {{ exam.preguntas[currentQuestionIndex].enunciado }} ({{ exam.preguntas[currentQuestionIndex].valor }} points)</h3>
-      <div class="flex flex-column">
-        <div *ngFor="let opcion of exam.preguntas[currentQuestionIndex].opciones" class="field-radiobutton">
-          <p-radioButton name="pregunta" [value]="opcion.texto" label="{{ opcion.texto }}" [(ngModel)]="userAnswers[currentQuestionIndex]"></p-radioButton>
-        </div>
-      </div>
+<div class="container" *ngIf="exam">
+  <div class="header-container">
+    <h2>{{ exam.titulo }}</h2>
+    <p>{{ exam.descripcion }}</p>
+  </div>
+  <div class="main-content">
+    <div *ngIf="!cameraLoaded" class="loading-indicator">
+      <p-progressSpinner></p-progressSpinner>
+      <p>Loading camera...</p>
     </div>
+    <video #videoElement width="320" height="160" autoplay muted (loadedmetadata)="onCameraLoad()"></video>
+    <canvas #canvasElement></canvas>
+    <div class="form-container mr-8 ml-8" *ngIf="cameraLoaded">
+      <form (ngSubmit)="onSubmit()" class="flex flex-column align-items-center card">
+        <div *ngIf="exam.preguntas[currentQuestionIndex]" class="mb-4">
+          <h3>{{ currentQuestionIndex + 1 }}. {{ exam.preguntas[currentQuestionIndex].enunciado }}
+            ({{ exam.preguntas[currentQuestionIndex].valor }} points)</h3>
+          <div class="flex flex-column">
+            <div *ngFor="let opcion of exam.preguntas[currentQuestionIndex].opciones" class="field-radiobutton">
+              <p-radioButton name="pregunta" [value]="opcion.texto" label="{{ opcion.texto }}"
+                             [(ngModel)]="userAnswers[currentQuestionIndex]"></p-radioButton>
+            </div>
+          </div>
+        </div>
 
-    <button type="button" pButton label="Previous" (click)="goToPreviousQuestion()" [disabled]="currentQuestionIndex === 0" class="p-button-text mr-2"></button>
-    <button type="button" pButton label="Next" (click)="goToNextQuestion()" [disabled]="currentQuestionIndex === exam.preguntas.length - 1" class="p-button-text ml-2"></button>
-
-    <button type="submit" pButton label="Submit Exam" [disabled]="currentQuestionIndex !== exam.preguntas.length - 1" class="p-button-rounded p-button-success mt-3"></button>
-  </form>
+        <button type="button" pButton label="Previous" (click)="goToPreviousQuestion()"
+                [disabled]="currentQuestionIndex === 0" class="p-button-text mr-2"></button>
+        <button type="button" pButton label="Next" (click)="goToNextQuestion()"
+                [disabled]="currentQuestionIndex === exam.preguntas.length - 1" class="p-button-text ml-2"></button>
+        <button type="submit" pButton label="Submit Exam"
+                [disabled]="currentQuestionIndex !== exam.preguntas.length - 1"
+                class="p-button-rounded p-button-success mt-3"></button>
+      </form>
+    </div>
+  </div>
 </div>
+<p-toast></p-toast>

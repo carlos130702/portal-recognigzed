@@ -71,7 +71,7 @@ export class TrabajadoresComponent implements OnInit {
   buscarTrabajadores(event: Event) {
     const query = (event.target as HTMLInputElement).value.toLowerCase();
     this.trabajadoresFiltrados = this.trabajadores.filter(t =>
-      `${t.Nombre} ${t.Apellidos}`.toLowerCase().includes(query)
+      `${t.name} ${t.lastName}`.toLowerCase().includes(query)
     );
   }
   getEvaluacionTitulo(idEvaluacion: number): string {

@@ -15,7 +15,7 @@
       <tr>
         <td>{{ evaluacion.titulo }}</td>
         <td>{{ evaluacion.descripcion }}</td>
-        <td>{{ obtenerCalificacion(evaluacion.id) || '-' }}</td>
+        <td>{{obtenerCalificacion(evaluacion.id) != null ? obtenerCalificacion(evaluacion.id) : '-' }}</td>
         <td>
           <button type="button" pButton icon="pi pi-pencil" *ngIf="!tieneCalificacion(evaluacion.id)" (click)="rendirEvaluacion(evaluacion.id)" class="p-button-rounded p-button-success" label="Rendir"></button>
         </td>

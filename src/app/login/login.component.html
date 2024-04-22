@@ -4,9 +4,9 @@
     <p>Bienvenido! Porfavor accede con tus credenciales de administrador o trabajador.</p>
     <form (ngSubmit)="onSubmit()" class="flex flex-column">
     <div class="field">
-      <label for="username" [class.active]="usernameFocused || username">Username</label>
+      <label for="username" [class.active]="usernameFocused || user">Username</label>
       <i class="fa fa-user"></i>
-      <input type="text" [(ngModel)]="username" (focus)="usernameFocused=true" (blur)="usernameFocused=false" id="username" name="username" required pInputText>
+      <input type="text" [(ngModel)]="user" (focus)="usernameFocused=true" (blur)="usernameFocused=false" id="username" name="username" required pInputText>
     </div>
     <div class="field">
       <label for="password" [class.active]="passwordFocused || password">Contraseña</label>

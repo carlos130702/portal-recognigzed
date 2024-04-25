@@ -9,14 +9,6 @@
       "password": "juanpass"
     },
     {
-      "id": "2",
-      "name": "María",
-      "lastName": "González",
-      "photo": "url_to_image",
-      "user": "mariag",
-      "password": "mariapass"
-    },
-    {
       "id": "3",
       "name": "Pedro",
       "lastName": "Martínez",
@@ -39,14 +31,6 @@
       "photo": "/assets/XP51205.png",
       "user": "ca",
       "password": "ca"
-    },
-    {
-      "id": "945e",
-      "name": "fsaf",
-      "lastName": "fsafas",
-      "photo": "",
-      "user": "asf",
-      "password": "fsa"
     }
   ],
   "administradores": [
@@ -111,14 +95,14 @@
     {
       "id": "2aeb",
       "titulo": "angular",
-      "descripcion": "examen de angular",
+      "descripcion": "examen de angular version 17 y 18",
       "preguntas": [
         {
-          "enunciado": "1+1",
+          "enunciado": "1+3",
           "opciones": [
             {
               "texto": "2",
-              "esCorrecta": true
+              "esCorrecta": false
             },
             {
               "texto": "3",
@@ -126,7 +110,7 @@
             },
             {
               "texto": "4",
-              "esCorrecta": false
+              "esCorrecta": true
             },
             {
               "texto": "5",
@@ -160,88 +144,15 @@
       ]
     },
     {
-      "id": "f00a",
-      "titulo": "cascsa",
-      "descripcion": "cscsaca",
-      "preguntas": [
-        {
-          "enunciado": "cascsac",
-          "opciones": [
-            {
-              "texto": "csac",
-              "esCorrecta": false
-            },
-            {
-              "texto": "csacas",
-              "esCorrecta": false
-            },
-            {
-              "texto": "casca",
-              "esCorrecta": true
-            },
-            {
-              "texto": "cascac",
-              "esCorrecta": false
-            }
-          ],
-          "valor": 10
-        },
-        {
-          "enunciado": "csacsacasc",
-          "opciones": [
-            {
-              "texto": "casc",
-              "esCorrecta": false
-            },
-            {
-              "texto": "cwq",
-              "esCorrecta": true
-            },
-            {
-              "texto": "cwc",
-              "esCorrecta": false
-            },
-            {
-              "texto": "cwcqwcq",
-              "esCorrecta": false
-            }
-          ],
-          "valor": 10
-        }
-      ]
-    },
-    {
       "id": "810b",
-      "titulo": "resta",
-      "descripcion": "resta",
+      "titulo": "Resta",
+      "descripcion": "resta d",
       "preguntas": [
         {
           "enunciado": "2-1",
           "opciones": [
             {
               "texto": "1",
-              "esCorrecta": false
-            },
-            {
-              "texto": "1",
-              "esCorrecta": true
-            },
-            {
-              "texto": "3",
-              "esCorrecta": false
-            },
-            {
-              "texto": "4",
-              "esCorrecta": false
-            }
-          ],
-          "valor": 10
-        },
-        {
-          "enunciado": "4-5",
-          "opciones": [
-            {
-              "texto": "-1",
               "esCorrecta": true
             },
             {
@@ -258,53 +169,24 @@
             }
           ],
           "valor": 10
-        }
-      ]
-    },
-    {
-      "id": "f59e",
-      "titulo": "hfdh",
-      "descripcion": "hfdhfd",
-      "preguntas": [
-        {
-          "enunciado": "dhsdh",
-          "opciones": [
-            {
-              "texto": "twq",
-              "esCorrecta": false
-            },
-            {
-              "texto": "tqwtq",
-              "esCorrecta": false
-            },
-            {
-              "texto": "twqtq",
-              "esCorrecta": true
-            },
-            {
-              "texto": "twqtqt",
-              "esCorrecta": false
-            }
-          ],
-          "valor": 10
         },
         {
-          "enunciado": "twq",
+          "enunciado": "4-2",
           "opciones": [
             {
-              "texto": "tqw",
+              "texto": "-1",
               "esCorrecta": false
             },
             {
-              "texto": "tqwt",
-              "esCorrecta": false
-            },
-            {
-              "texto": "twtwqt",
+              "texto": "2",
               "esCorrecta": true
             },
             {
-              "texto": "twqttq",
+              "texto": "3",
+              "esCorrecta": false
+            },
+            {
+              "texto": "4",
               "esCorrecta": false
             }
           ],
@@ -313,27 +195,27 @@
       ]
     },
     {
-      "id": "0893",
-      "titulo": "asgsag",
-      "descripcion": "gsag",
+      "id": "4d92",
+      "titulo": "angular2",
+      "descripcion": "asgsags",
       "preguntas": [
         {
-          "enunciado": "wgqwg",
+          "enunciado": "asfsaf",
           "opciones": [
             {
-              "texto": "gwqg",
+              "texto": "fsafs",
               "esCorrecta": false
             },
             {
-              "texto": "gwqg",
-              "esCorrecta": false
-            },
-            {
-              "texto": "gwgq",
+              "texto": "vvds",
               "esCorrecta": true
             },
             {
-              "texto": "gwqgqwgw",
+              "texto": "bdsbsdb",
+              "esCorrecta": false
+            },
+            {
+              "texto": "bdbdsbd",
               "esCorrecta": false
             }
           ],
@@ -342,50 +224,50 @@
       ]
     },
     {
-      "id": "bd5c",
-      "titulo": "asga",
-      "descripcion": "gsag",
+      "id": "04ad",
+      "titulo": "suma",
+      "descripcion": "suma",
       "preguntas": [
         {
-          "enunciado": "gsagas",
+          "enunciado": "2+2",
           "opciones": [
             {
-              "texto": "gasg",
+              "texto": "3",
               "esCorrecta": false
             },
             {
-              "texto": "gasgs",
-              "esCorrecta": false
-            },
-            {
-              "texto": "gwqw",
+              "texto": "4",
               "esCorrecta": true
             },
             {
-              "texto": "gwqghr",
+              "texto": "5",
+              "esCorrecta": false
+            },
+            {
+              "texto": "6",
               "esCorrecta": false
             }
           ],
           "valor": 10
         },
         {
-          "enunciado": "hwhr",
+          "enunciado": "5+5",
           "opciones": [
             {
-              "texto": "1",
+              "texto": "4",
               "esCorrecta": false
             },
             {
-              "texto": "1",
+              "texto": "6",
               "esCorrecta": false
             },
             {
-              "texto": "2",
+              "texto": "8",
+              "esCorrecta": false
+            },
+            {
+              "texto": "10",
               "esCorrecta": true
-            },
-            {
-              "texto": "3",
-              "esCorrecta": false
             }
           ],
           "valor": 10
@@ -393,94 +275,35 @@
       ]
     },
     {
-      "id": "75e1",
-      "titulo": "gsag",
-      "descripcion": "gasga",
+      "id": "a51f",
+      "titulo": "react",
+      "descripcion": "react",
       "preguntas": [
         {
-          "enunciado": "1",
+          "enunciado": "1412",
           "opciones": [
             {
               "texto": "1",
               "esCorrecta": false
             },
             {
-              "texto": "4",
+              "texto": "2",
               "esCorrecta": false
             },
             {
-              "texto": "2",
+              "texto": "3",
               "esCorrecta": true
             },
             {
-              "texto": "3",
+              "texto": "4",
               "esCorrecta": false
             }
           ],
           "valor": 10
         },
         {
-          "enunciado": "4",
+          "enunciado": "getewte",
           "opciones": [
-            {
-              "texto": "2",
-              "esCorrecta": false
-            },
-            {
-              "texto": "2",
-              "esCorrecta": false
-            },
-            {
-              "texto": "3",
-              "esCorrecta": true
-            },
-            {
-              "texto": "4",
-              "esCorrecta": false
-            }
-          ],
-          "valor": 10
-        }
-      ]
-    },
-    {
-      "id": "b73c",
-      "titulo": "ga",
-      "descripcion": "ga",
-      "preguntas": [
-        {
-          "enunciado": "1",
-          "opciones": [
-            {
-              "texto": "1",
-              "esCorrecta": false
-            },
-            {
-              "texto": "4",
-              "esCorrecta": false
-            },
-            {
-              "texto": "2",
-              "esCorrecta": true
-            },
-            {
-              "texto": "3",
-              "esCorrecta": false
-            }
-          ],
-          "valor": 10
-        },
-        {
-          "enunciado": "2",
-          "opciones": [
-            {
-              "texto": "2",
-              "esCorrecta": false
-            },
-            {
-              "texto": "3",
-              "esCorrecta": true
-            },
             {
               "texto": "4",
               "esCorrecta": false
@@ -488,6 +311,14 @@
             {
               "texto": "5",
               "esCorrecta": false
+            },
+            {
+              "texto": "6",
+              "esCorrecta": true
+            },
+            {
+              "texto": "7",
+              "esCorrecta": false
             }
           ],
           "valor": 10
@@ -495,49 +326,49 @@
       ]
     },
     {
-      "id": "3568",
-      "titulo": "kirby",
-      "descripcion": "dgsdgsdg",
+      "id": "ff18",
+      "titulo": "gsdgds",
+      "descripcion": "gdgsg",
       "preguntas": [
         {
-          "enunciado": "hfhdfh",
+          "enunciado": "asgasg",
           "opciones": [
             {
-              "texto": "hdfhd",
+              "texto": "fasfa",
               "esCorrecta": false
             },
             {
-              "texto": "hfdh",
+              "texto": "fasfasf",
               "esCorrecta": false
             },
             {
-              "texto": "hfdhd",
+              "texto": "fsas",
               "esCorrecta": true
             },
             {
-              "texto": "hfdhdagas",
+              "texto": "qw",
               "esCorrecta": false
             }
           ],
           "valor": 10
         },
         {
-          "enunciado": "hfhdh",
+          "enunciado": "fwqf",
           "opciones": [
             {
-              "texto": "fdhdf",
+              "texto": "fqw",
               "esCorrecta": false
             },
             {
-              "texto": "hfdhasdas",
+              "texto": "f",
               "esCorrecta": false
             },
             {
-              "texto": "hfdh",
+              "texto": "w",
               "esCorrecta": false
             },
             {
-              "texto": "hfdhdfh",
+              "texto": "g",
               "esCorrecta": true
             }
           ],
@@ -562,46 +393,52 @@
       "Puntuacion": 20
     },
     {
-      "id": "d085",
-      "ID_Trabajador": "2",
-      "ID_Evaluacion": "76fe",
-      "Puntuacion": 10
-    },
-    {
-      "id": "0ed0",
+      "id": "8ebb",
       "ID_Trabajador": "205c",
       "ID_Evaluacion": "76fe",
-      "Puntuacion": 20
+      "Puntuacion": 0
     },
     {
-      "id": "7a89",
+      "id": "8dbf",
       "ID_Trabajador": "205c",
       "ID_Evaluacion": "2aeb",
-      "Puntuacion": 20
+      "Puntuacion": 0
     },
     {
-      "id": "4b8f",
-      "ID_Trabajador": "205c",
-      "ID_Evaluacion": "f00a",
-      "Puntuacion": 10
-    },
-    {
-      "id": "59a6",
+      "id": "38d6",
       "ID_Trabajador": "4",
       "ID_Evaluacion": "76fe",
-      "Puntuacion": 20
+      "Puntuacion": 0
     },
     {
-      "id": "e2cf",
+      "id": "4f3f",
       "ID_Trabajador": "205c",
       "ID_Evaluacion": "810b",
       "Puntuacion": 0
     },
     {
-      "id": "22e6",
-      "ID_Trabajador": "205c",
-      "ID_Evaluacion": "f59e",
+      "id": "b696",
+      "ID_Trabajador": "4",
+      "ID_Evaluacion": "2aeb",
       "Puntuacion": 0
+    },
+    {
+      "id": "ac38",
+      "ID_Trabajador": "4",
+      "ID_Evaluacion": "810b",
+      "Puntuacion": 20
+    },
+    {
+      "id": "7df0",
+      "ID_Trabajador": "4",
+      "ID_Evaluacion": "4d92",
+      "Puntuacion": 0
+    },
+    {
+      "id": "4650",
+      "ID_Trabajador": "4",
+      "ID_Evaluacion": "04ad",
+      "Puntuacion": 20
     }
   ]
 }

@@ -9,7 +9,7 @@ const routes: Routes = [
   {
     path: 'admin',
     loadChildren: () => import('./admin/admin.module').then(m => m.AdminModule),
-    canActivate: [AuthGuard]  // Usar AuthGuard
+    canActivate: [AuthGuard]
   },
   { path: 'worker', loadChildren: () => import('./worker/worker.module').then(m => m.WorkerModule) },
   { path: '', redirectTo: '/login', pathMatch: 'full' }

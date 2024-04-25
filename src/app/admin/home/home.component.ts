@@ -7,7 +7,7 @@ import {Router} from "@angular/router";
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
-  encapsulation: ViewEncapsulation.None,
+  encapsulation: ViewEncapsulation.None, // Esto desactivará el encapsulamiento
 })
 export class HomeComponent {
   items: MenuItem[];
@@ -17,21 +17,22 @@ export class HomeComponent {
       {
         label: 'Listado de Trabajadores',
         routerLink: ['/admin/trabajadores'],
+        routerLinkActiveOptions : {exact: true}
       },
       {
-        label: 'Registro de Trabajadores',
-        routerLink: ['/admin/registro-trabajador'],
-      },
-      {
-        label: 'Registro de Exámenes',
-        routerLink: ['/admin/registro-examen'],
+        label: 'Exámenes Registrados',
+        routerLink: ['/admin/examenes-registrados'],
+        routerLinkActiveOptions : {exact: true}
       }
     ];
   }
-
   logout() {
     this.authService.logout();
-    this.router.navigate(['/login']).then(r => console.log('Redirección a login:', r));
-
+    this.router.navigate(['/login']).then(r => {
+      console.clear();
+      console.log('Redirección a login:', r);
+      console.log('Usuario ha cerrado sesión correctamente.');
+    });
   }
+
 }

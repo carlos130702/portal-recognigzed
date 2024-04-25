@@ -3,6 +3,8 @@ import {Evaluacion, Pregunta} from "../../interfaces/Evaluacion";
 import {MessageService} from "primeng/api";
 import {Router} from "@angular/router";
 import {EvaluacionesService} from "../../services/evaluaciones.service";
+import {debounceTime, distinctUntilChanged, Observable, startWith, Subject, switchMap} from "rxjs";
+import {map} from "rxjs/operators";
 
 @Component({
   selector: 'app-registro-examen',
@@ -15,17 +17,44 @@ export class RegistroExamenComponent {
     descripcion: '',
     preguntas: []
   };
+  numPreguntas: number = 0;
+  maxOpciones: number = 4;
+  mostrarFormulario: boolean = true;
+  preguntaActualIndex: number = 0;
+  private titleSubject = new Subject<string>();
+  tituloEsUnico: boolean = false;
 
   constructor(
     private evaluacionesService: EvaluacionesService,
     private messageService: MessageService,
     private router: Router
-  ) { }
-  numPreguntas: number = 0;
-  maxOpciones: number = 4;
-  mostrarFormulario: boolean = true;
-  preguntaActualIndex: number = 0;
-  opcionDuplicada: boolean = false;
+  ) {
+    this.titleSubject.pipe(
+      debounceTime(500),
+      distinctUntilChanged(),
+      switchMap(titulo => this.verificarTituloUnico(titulo))
+    ).subscribe(esUnico => {
+      this.tituloEsUnico = esUnico;
+      if (!esUnico) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'El título no es único.'
+        });
+      }
+    });
+  }
+  onTitleChange(value: string): void {
+    this.titleSubject.next(value);
+  }
+
+  verificarTituloUnico(titulo: string): Observable<boolean> {
+    return this.evaluacionesService.getEvaluaciones().pipe(
+      map(evaluaciones => !evaluaciones.some(evaluacion =>
+        evaluacion.titulo.toLowerCase() === titulo.toLowerCase() && evaluacion.id !== this.evaluacion.id
+      ))
+    );
+  }
 
   siguientePregunta(): void {
     if (this.validarPreguntaActual()) {
@@ -41,19 +70,17 @@ export class RegistroExamenComponent {
     return unicos.size !== textoOpciones.length;
   }
   validarPreguntaActual(): boolean {
-    // Obtener la pregunta actual
     const preguntaActual = this.evaluacion.preguntas[this.preguntaActualIndex];
 
-    // Verificar que las opciones no sean duplicadas
     if (this.tieneOpcionesDuplicadas(preguntaActual)) {
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
         detail: 'No puede haber opciones duplicadas.'
       });
-      return false; // Retorna false si hay duplicados
+      return false;
     }
-    return true; // Retorna true si la validación es exitosa
+    return true;
   }
 
   anteriorPregunta(): void {
@@ -80,54 +107,81 @@ export class RegistroExamenComponent {
     }
   }
 
-
-
   guardarEvaluacionCompleta() {
+    if (!this.evaluacion || !this.evaluacion.titulo || !this.evaluacion.descripcion || this.evaluacion.preguntas.length === 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Atención',
+        detail: 'Debe completar la evaluación antes de guardarla.'
+      });
+      return;
+    }
+
     if (this.todasLasPreguntasCompletas() && this.validarPreguntaActual()) {
-
-      if (!this.evaluacion || !this.evaluacion.titulo || !this.evaluacion.descripcion || !this.evaluacion.preguntas || this.evaluacion.preguntas.length === 0) {
+      this.evaluacionesService.getEvaluaciones().subscribe({
+        next: (evaluaciones: Evaluacion[]) => {
+          if (this.evaluacion.id) {
+            this.procesoGuardarEvaluacion();
+          } else {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'Ya existe una evaluación con el mismo título.'
+            });
+          }
+        },
+        error: () => {
           this.messageService.add({
-            severity: 'warn',
-            summary: 'Atención',
-            detail: 'Debe completar la evaluación antes de guardarla.'
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Error al verificar la unicidad del título.'
           });
-          return;
         }
-
-        this.evaluacionesService.deleteEvaluacion(this.evaluacion.id).subscribe(() => {
-          this.evaluacionesService.addEvaluacion(this.evaluacion).subscribe({
-            next: (evaluacionGuardada: Evaluacion) => {
-              this.evaluacion = evaluacionGuardada;
-              this.messageService.add({
-                severity: 'success',
-                summary: 'Evaluación Guardada',
-                detail: 'La evaluación se ha guardado correctamente.'
-              });
-              setTimeout(() => {
-                this.router.navigate(['/admin/trabajadores']);
-              }, 1000);
-            },
-            error: () => {
-              this.messageService.add({
-                severity: 'error',
-                summary: 'Error',
-                detail: 'No se pudo guardar la evaluación.'
-              });
-            }
-          });
-        });
+      });
     }
   }
-
-
-
+  procesoGuardarEvaluacion() {
+    this.evaluacionesService.deleteEvaluacion(this.evaluacion.id).subscribe({
+      next: () => {
+        this.evaluacionesService.addEvaluacion(this.evaluacion).subscribe({
+          next: (evaluacionGuardada: Evaluacion) => {
+            this.evaluacion = evaluacionGuardada;
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Evaluación Guardada',
+              detail: 'La evaluación se ha guardado correctamente.'
+            });
+            setTimeout(() => {
+              this.router.navigate(['/admin/examenes-registrados']);
+            }, 2000);
+          },
+          error: () => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'No se pudo guardar la evaluación.'
+            });
+          }
+        });
+      },
+      error: () => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'No se pudo eliminar la evaluación existente.'
+        });
+      }
+    });
+  }
   numPreguntasInvalido(): boolean {
     return this.numPreguntas < 1 || this.numPreguntas > 20;
   }
 
   botonDeshabilitado(): boolean {
-    return !this.evaluacion.titulo || !this.evaluacion.descripcion || this.numPreguntasInvalido() || this.evaluacion.preguntas.length >= this.numPreguntas;
+    return !this.evaluacion.titulo || !this.evaluacion.descripcion || this.numPreguntasInvalido() || !this.tituloEsUnico || this.evaluacion.preguntas.length >= this.numPreguntas;
   }
+
+
   guardarEvaluacionSinPreguntas() {
     if (!this.evaluacion || !this.evaluacion.titulo || !this.evaluacion.descripcion) {
       this.messageService.add({ severity: 'warn', summary: 'Atención', detail: 'Debe ingresar un título y una descripción.' });
@@ -157,6 +211,19 @@ export class RegistroExamenComponent {
       this.evaluacion.preguntas.push(nuevaPregunta);
     }
 
+    this.evaluacionesService.getEvaluaciones().subscribe(evaluaciones => {
+      const tituloExiste = evaluaciones.some(e => e.titulo.toLowerCase() === this.evaluacion.titulo.toLowerCase());
+      if (tituloExiste) {
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Ya existe una evaluación con el mismo título.' });
+      } else {
+        this.procederConGuardarEvaluacionSinPreguntas();
+      }
+    }, error => {
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al verificar la unicidad del título.' });
+    });
+  }
+
+  procederConGuardarEvaluacionSinPreguntas() {
     this.evaluacionesService.addEvaluacion(this.evaluacion).subscribe({
       next: (evaluacionGuardada: Evaluacion) => {
         this.evaluacion = evaluacionGuardada;
@@ -169,7 +236,6 @@ export class RegistroExamenComponent {
     });
   }
 
-
   preguntaValida(): boolean {
     if (this.evaluacion.preguntas.length === 0) {
       return true;
@@ -178,7 +244,6 @@ export class RegistroExamenComponent {
     const opcionesCorrectas = ultimaPregunta.opciones.filter(opcion => opcion.esCorrecta);
     return opcionesCorrectas.length > 0 && ultimaPregunta.opciones.length === this.maxOpciones;
   }
-  nuevaOpcion: string = "";
 
   agregarOpciones(pregunta: Pregunta) {
     const idPregunta = pregunta.id ?? 0;
@@ -196,20 +261,8 @@ export class RegistroExamenComponent {
     });
     opcionSeleccionada.esCorrecta = true;
   }
-  verificarTituloUnico() {
-    try {
-      const existeEvaluacion = this.evaluacionesService.verificarTituloUnico(this.evaluacion.titulo);
-      if (existeEvaluacion) {
-        this.messageService.add({severity: 'error', summary: 'Error', detail: 'Ya existe una evaluación con el mismo título.'});
-        return false;
-      } else {
-        return true;
-      }
-    } catch (error) {
-      console.error('Error al verificar el título de la evaluación:', error);
-      return false;
-    }
-  }
+
+
   todasLasPreguntasCompletas(): boolean {
     if (this.evaluacion.preguntas.length === 0) {
       return false;

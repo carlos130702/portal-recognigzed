@@ -11,34 +11,23 @@ export class EvaluacionesService {
 
   constructor(private http: HttpClient) { }
 
-  // Obtener todas las evaluaciones con sus preguntas y opciones
   getEvaluaciones(): Observable<Evaluacion[]> {
-    return this.http.get<Evaluacion[]>(this.apiUrl);
+    const url = `${this.apiUrl}`;
+    return this.http.get<Evaluacion[]>(url);
   }
 
-  // Obtener una evaluación específica por ID
   getEvaluacionById(id: string): Observable<Evaluacion> {
     const url = `${this.apiUrl}/${id}`;
     return this.http.get<Evaluacion>(url);
   }
-  verificarTituloUnico(titulo: string): Observable<boolean> {
-    const url = `${this.apiUrl}/verificarTituloUnico`;
-    return this.http.post<boolean>(url, { titulo });
-  }
+
   addEvaluacion(evaluacion: Evaluacion): Observable<Evaluacion> {
     return this.http.post<Evaluacion>(this.apiUrl, evaluacion);
   }
-
-  addEvaluacionSinPreguntas(evaluacion: { descripcion: string; titulo: string }): Observable<Evaluacion> {
-    return this.http.post<Evaluacion>(this.apiUrl, evaluacion);
-  }
-
-  updateEvaluacion(evaluacion: Evaluacion): Observable<Evaluacion> {
+  actualizarEvaluacion(evaluacion: Evaluacion) {
     const url = `${this.apiUrl}/${evaluacion.id}`;
-    return this.http.put<Evaluacion>(url, evaluacion);
+    return this.http.put(url, evaluacion);
   }
-
-  // Eliminar una evaluación
   deleteEvaluacion(id: number | undefined): Observable<any> {
     const url = `${this.apiUrl}/${id}`;
     return this.http.delete(url);

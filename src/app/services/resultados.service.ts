@@ -11,9 +11,7 @@ export class ResultadosService {
 
   constructor(private http: HttpClient) { }
 
-  // Method to submit the evaluation result
   submitEvaluacionResultado(resultado: ResultadoDeEvaluacion): Observable<ResultadoDeEvaluacion> {
-    // Here, we post the resultado to the backend
     return this.http.post<ResultadoDeEvaluacion>(this.apiUrl, resultado);
   }
 
@@ -22,25 +20,8 @@ export class ResultadosService {
     return this.http.get<ResultadoDeEvaluacion[]>(this.apiUrl);
   }
 
-  getEvaluacionResultadoById(id: string): Observable<ResultadoDeEvaluacion[]> {
-    const url = `${this.apiUrl}/${id}`;
-    return this.http.get<ResultadoDeEvaluacion[]>(url);
-  }
-
   getEvaluacionResultadosDeTrabajador(idTrabajador: string): Observable<ResultadoDeEvaluacion[]> {
     const params = new HttpParams().set('ID_Trabajador', idTrabajador);
     return this.http.get<ResultadoDeEvaluacion[]>(`${this.apiUrl}`, { params });
-  }
-
-  // Update an evaluation result
-  updateEvaluacionResultado(resultado: ResultadoDeEvaluacion): Observable<ResultadoDeEvaluacion> {
-    const url = `${this.apiUrl}/${resultado.id}`;
-    return this.http.put<ResultadoDeEvaluacion>(url, resultado);
-  }
-
-  // Delete an evaluation result
-  deleteEvaluacionResultado(id: string): Observable<any> {
-    const url = `${this.apiUrl}/${id}`;
-    return this.http.delete(url);
   }
 }

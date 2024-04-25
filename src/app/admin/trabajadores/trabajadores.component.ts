@@ -13,11 +13,19 @@ import {EvaluacionesService} from "../../services/evaluaciones.service";
 })
 export class TrabajadoresComponent implements OnInit {
   trabajadores: Trabajador[] = [];
-  displayDialog: boolean = false;
-  trabajadorSeleccionado?: Trabajador;
+  displayEditDialog: boolean = false;
+  displayViewDialog: boolean = false;
   trabajadoresFiltrados: Trabajador[] = [];
   resultadosEvaluacion: ResultadoDeEvaluacion[] = [];
   evaluaciones: Evaluacion[] = [];
+  trabajadorSeleccionado: Trabajador = {
+    id: 0,
+    name: '',
+    lastName: '',
+    photo: '',
+    user: '',
+    password: ''
+  };
 
   constructor(  private cd: ChangeDetectorRef,private evaluacionService: EvaluacionesService,private resultadosService: ResultadosService,private trabajadoresService: TrabajadoresService,private messageService: MessageService,) { }
 
@@ -83,13 +91,50 @@ export class TrabajadoresComponent implements OnInit {
   visualizar(trabajador: Trabajador) {
     this.trabajadorSeleccionado = trabajador;
     this.cargarResultados();
-    this.displayDialog = true;
+    this.displayViewDialog = true;
   }
 
   editar(trabajador: Trabajador) {
-    // Lógica para editar el trabajador
+    this.trabajadorSeleccionado = {...trabajador}; // Hace una copia para editar
+    this.displayEditDialog = true; // Muestra el diálogo de edición
   }
 
+  confirmarEdicion(valoresFormulario: any) {
+    if (this.trabajadorSeleccionado && this.trabajadorSeleccionado.id) {
+
+      const datosActualizados: Trabajador = {
+        ...this.trabajadorSeleccionado,
+        photo: this.trabajadorSeleccionado?.photo,
+        user: this.trabajadorSeleccionado?.user,
+        password: this.trabajadorSeleccionado?.password,
+      };
+      this.trabajadoresService.editarTrabajador(datosActualizados).subscribe({
+        next: (trabajadorActualizado: Trabajador) => {
+          const index = this.trabajadores.findIndex(t => t.id === this.trabajadorSeleccionado?.id);
+          if (index !== -1) {
+            this.trabajadores[index] = trabajadorActualizado;
+            this.messageService.add({severity: 'success', summary: 'Éxito', detail: 'Trabajador editado con éxito.'});
+          }
+          this.displayEditDialog = false;
+          this.cd.detectChanges();
+        },
+        error: (error: any) => {
+          this.messageService.add({severity:'error', summary: 'Error', detail: 'Error al editar el trabajador.'});
+          console.error('Error al editar el trabajador', error);
+        }
+      });
+    }
+  }
+
+  onUpload(event: any) {
+    // Aquí manejarías la respuesta del servidor después de cargar la foto,
+    // por ejemplo, actualizando la URL de la foto en trabajadorSeleccionado.photo
+  }
+
+  onBeforeUpload(event: any) {
+    // Aquí puedes manejar la lógica antes de la subida de la foto,
+    // por ejemplo, añadir headers o parametros al request de la subida
+  }
   eliminar(trabajador: Trabajador) {
     console.log('ID del trabajador a eliminar:', trabajador.id);
     if (trabajador.id == null) {

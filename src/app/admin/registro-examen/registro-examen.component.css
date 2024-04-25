@@ -3,32 +3,55 @@
   max-width: 100%;
 }
 .registro-evaluacion {
+  margin: 30px auto;
+  padding: 20px;
   max-width: 600px;
-  margin: auto;
+  border: 1px solid #ccc;
+  transition: transform 0.3s ease-in-out;
+  animation: fadeIn 1s ease-out;
+  background: #fff;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 .registro-evaluacion h2 {
-  margin-bottom: 20px;
+  font-size: 28px;
+  color: #333;
+  text-align: center;
+  margin-bottom: 30px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+.registro-evaluacion:hover {
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+}
+div.field, button {
+  transition: all 0.3s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .field {
-  margin-bottom: 20px;
+  margin-bottom: 30px;
 }
 
 .field label {
   display: block;
   margin-bottom: 5px;
   font-weight: bold;
+  font-size: 18px;
+  color: #555;
 }
 
 .field input[type="text"],
 .field textarea,
 .field input[type="number"] {
   width: 100%;
-  padding: 8px;
   font-size: 16px;
   border: 1px solid #ccc;
   border-radius: 4px;
+  padding: 10px 15px;
 }
 
 .field-checkbox {
@@ -48,6 +71,8 @@
 
 .p-button {
   padding: 10px 20px;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 .p-button:not(:last-child) {

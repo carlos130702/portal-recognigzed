@@ -4,12 +4,11 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {EvaluacionesService} from "../../services/evaluaciones.service";
 import {Trabajador} from "../../interfaces/Trabajador";
 import {ResultadosService} from "../../services/resultados.service";
-import {tap} from "rxjs";
+import {tap, throwError} from "rxjs";
 import {catchError} from "rxjs/operators";
 import {AuthService} from "../../core/services/auth.service";
 import * as faceapi from 'face-api.js';
 import {MessageService} from "primeng/api";
-import {HttpClient} from "@angular/common/http";
 
 @Component({
   selector: 'app-vista-examen',
@@ -26,7 +25,9 @@ export class VistaExamenComponent implements OnInit , OnDestroy{
   @ViewChild('canvasElement') canvasElement!: ElementRef<HTMLCanvasElement>;
   intervalId: number | undefined;
   private isModelLoaded: boolean | undefined;
-  private failedAttempts = 1;
+  private failedNoFaceDetectedAttempts  = 0;
+  private failedIncorrectFaceDetectedAttempts  = 0;
+
   private verificationActive = true;
   cameraLoaded = false;
   onCameraLoad() {
@@ -40,9 +41,10 @@ export class VistaExamenComponent implements OnInit , OnDestroy{
     private resultadosService:ResultadosService,
     private changeDetectorRef: ChangeDetectorRef,
     private authService: AuthService,
-    private messageService: MessageService,
-    private http: HttpClient
-  ) {}
+    private messageService: MessageService
+  ) {
+
+  }
 
   ngOnInit(): void {
     const examId = this.route.snapshot.params['id'];
@@ -135,12 +137,17 @@ export class VistaExamenComponent implements OnInit , OnDestroy{
   }
   onSubmit(puntuacion: number = 0) {
     this.changeDetectorRef.detectChanges();
-    if (!this.exam) return;
-    if (this.trabajadorActual === null) return;
+    if (!this.exam) {
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No hay un examen cargado.' });
+      return;
+    }
+    if (this.trabajadorActual === null) {
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No hay un trabajador activo.' });
+      return;
+    }
     this.exam.preguntas.forEach((pregunta, index) => {
       const selectedOption = this.userAnswers[index];
       const correctOption = pregunta.opciones.find(opcion => opcion.esCorrecta);
-
       if (selectedOption === correctOption?.texto) {
         puntuacion += pregunta.valor;
       }
@@ -154,20 +161,23 @@ export class VistaExamenComponent implements OnInit , OnDestroy{
 
     this.resultadosService.submitEvaluacionResultado(resultado)
       .pipe(
-
         tap((res: any) => {
-          console.log('Evaluation result submitted successfully', res);
         }),
         catchError((error: any) => {
-          console.error('Error submitting evaluation result', error);
-          throw error;
+          this.messageService.add({ severity: 'error', summary: 'Error al enviar', detail: 'Hubo un problema al enviar los resultados del examen.' });
+          return throwError(() => error);
         })
       )
-      .subscribe();
-    this.router.navigate(['/worker/examenes']).then(r => console.log(r)
-    );
-
+      .subscribe({
+        complete: () => {
+          this.messageService.add({severity:'success', summary: 'Success', detail: 'Examen enviado correctamente.'});
+          setTimeout(() => {
+            this.router.navigate(['/worker/examenes']).then(r => console.log(r));
+          }, 2000);
+        }
+      });
   }
+
 
   async loadModels(): Promise<void> {
     try {
@@ -177,7 +187,6 @@ export class VistaExamenComponent implements OnInit , OnDestroy{
         faceapi.nets.faceRecognitionNet.loadFromUri('/assets/models'),
         faceapi.nets.ssdMobilenetv1.loadFromUri('/assets/models')
       ]);
-      console.log('All models loaded successfully');
       this.isModelLoaded = true;
     } catch (err) {
       console.error('Error loading models:', err);
@@ -224,30 +233,48 @@ export class VistaExamenComponent implements OnInit , OnDestroy{
         context.clearRect(0, 0, canvas.width, canvas.height);
         faceapi.draw.drawDetections(canvas, resizedDetections);
 
-        if (this.trabajadorActual) {
+        if (detections.length === 0) {
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se detectó un rostro. Intento ' + (this.failedNoFaceDetectedAttempts + 1) + ' de 3.' });
+          this.handleNoFaceDetected();
+        } else {
           const maxDescriptorDistance = 0.5;
           const faceMatcher = new faceapi.FaceMatcher([this.labeledFaceDescriptors], maxDescriptorDistance);
+          let faceMatched = false;
           resizedDetections.forEach((detection) => {
             const bestMatch = faceMatcher.findBestMatch(detection.descriptor);
-            if (bestMatch && bestMatch.distance < maxDescriptorDistance) {
-              if (this.trabajadorActual && bestMatch.label === this.trabajadorActual.user) {
-                this.failedAttempts = 0;
-              }
-            }else{
-              this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No es la misma persona. Intento ' + this.failedAttempts + ' de 3.' });
-              if (this.verificationActive) {
-                this.failedAttempts++;
-                if (this.failedAttempts >= 4) {
-                  clearInterval(this.intervalId);
-                  this.finishExamWithZero();
-                }
-              }
+            if (bestMatch && bestMatch.distance < maxDescriptorDistance && bestMatch.label === this.trabajadorActual?.user) {
+              faceMatched = true;
             }
           });
+          if (!faceMatched) {
+            this.handleIncorrectFaceDetected();
+          } else {
+            this.failedNoFaceDetectedAttempts = 0;
+            this.failedIncorrectFaceDetectedAttempts = 0;
+          }
         }
       }, 5000);
     });
   }
+
+  handleNoFaceDetected() {
+    this.failedNoFaceDetectedAttempts++;
+    if (this.verificationActive && this.failedNoFaceDetectedAttempts >= 3) {
+      clearInterval(this.intervalId);
+      this.finishExamWithZero();
+    }
+  }
+
+  handleIncorrectFaceDetected() {
+    this.failedIncorrectFaceDetectedAttempts++;
+    this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No es la misma persona. Intento ' + this.failedIncorrectFaceDetectedAttempts + ' de 3.' });
+    if (this.verificationActive && this.failedIncorrectFaceDetectedAttempts >= 3) {
+      clearInterval(this.intervalId);
+      this.finishExamWithZero();
+    }
+  }
+
+
 /*
   async finishExamWithZero() {
     this.verificationActive = false;

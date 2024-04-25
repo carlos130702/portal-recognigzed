@@ -1,0 +1,104 @@
+<div class="title-container text-center">
+  <h2>Examenes Registrados</h2>
+</div>
+<div class="grid justify-content-center">
+  <div class="col-xs-12 col-sm-6 search-container">
+    <span class="p-input-icon-left">
+      <i class="pi pi-search"></i>
+      <input pInputText type="text" (input)="buscarEvaluaciones($event)" placeholder="Buscar por título...">
+    </span>
+  </div>
+  <div class="col-xs-12 col-sm-6 text-right button-container">
+    <button pButton label="Registrar Examen" icon="pi pi-plus" routerLink="/admin/registro-examen"></button>
+  </div>
+</div>
+<div class="table-container">
+  <p-table [value]="evaluacionesFiltradas" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[5,10,20]" responsiveLayout="scroll">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Título</th>
+        <th>Acciones</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-examen>
+      <tr>
+        <td>{{ examen.titulo }}</td>
+        <td class="text-center">
+          <button pButton icon="pi pi-eye" class="p-button-rounded p-button-success mr-2" (click)="visualizar(examen)"></button>
+          <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-primary mr-2" (click)="editarEvaluacion(examen)"></button>
+          <button pButton icon="pi pi-trash" class="p-button-rounded p-button-danger" (click)="eliminar(examen)"></button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+<p-dialog header="Detalle de la Evaluación" [(visible)]="displayViewDialog" [modal]="true" [closable]="true" [resizable]="false" [style]="{width: '50vw'}">
+  <div *ngIf="evaluacionSeleccionada">
+    <div class="grid">
+      <div class="col-12">
+        <h3 class="titulo-evaluacion">{{ evaluacionSeleccionada.titulo }}</h3>
+        <p class="descripcion-evaluacion">{{ evaluacionSeleccionada.descripcion }}</p>
+      </div>
+      <div class="col-12">
+        <ul class="evaluacion-preguntas">
+            <div class="pregunta-contenedor">
+              <span class="pregunta-titulo">{{ indiceActual + 1 }}. {{ evaluacionSeleccionada.preguntas[indiceActual].enunciado }}</span>
+              <span class="pregunta-valor">{{ evaluacionSeleccionada.preguntas[indiceActual].valor }} puntos</span>
+            </div>
+            <ul class="opciones-lista">
+              <li *ngFor="let opcion of evaluacionSeleccionada.preguntas[indiceActual].opciones" [class.correcta]="opcion.esCorrecta">
+                {{ opcion.texto }}
+              </li>
+            </ul>
+        </ul>
+      </div>
+    </div>
+    <p-footer>
+      <div class="footer-buttons">
+        <div class="nav-buttons">
+          <button type="button" pButton icon="pi pi-chevron-left" (click)="anterior()" [disabled]="indiceActual === 0"></button>
+          <button type="button" pButton icon="pi pi-chevron-right" (click)="siguiente()" [disabled]="indiceActual === (evaluacionSeleccionada?.preguntas?.length || 0) - 1"></button>
+        </div>
+      </div>
+    </p-footer>
+  </div>
+</p-dialog>
+
+
+<p-dialog header="Editar Evaluación" [(visible)]="displayEditDialog" [modal]="true" [closable]="true" [resizable]="false" [style]="{width: '50vw'}" class="dialog-form-container">
+  <form [formGroup]="evaluacionForm">
+    <!-- Título -->
+    <div class="col-12">
+      <label for="titulo" class="dialog-form-label">Título</label>
+      <input id="titulo" type="text" pInputText formControlName="titulo" class="dialog-form-input">
+    </div>
+    <!-- Descripción -->
+    <div class="col-12">
+      <label for="descripcion" class="dialog-form-label">Descripción</label>
+      <textarea id="descripcion" pInputTextarea formControlName="descripcion" class="dialog-form-textarea"></textarea>
+    </div>
+    <!-- Preguntas y Opciones -->
+    <div formArrayName="preguntas">
+      <div *ngFor="let preguntaGroup of preguntas.controls; let i=index" [formGroupName]="i">
+        <!-- Pregunta -->
+        <label class="dialog-form-label">Pregunta {{ i + 1 }}</label>
+        <input type="text" pInputText formControlName="enunciado" class="dialog-form-input">
+        <!-- Opciones -->
+        <div formArrayName="opciones">
+          <div *ngFor="let opcionGroup of getOpciones(i).controls; let j=index" [formGroupName]="j" class="opcion-container">
+                <input type="radio" class="opcion-radio" [name]="'correcta-opcion-' + i" (change)="establecerRespuestaCorrecta(i, j)" [checked]="opcionGroup.get('esCorrecta')?.value ?? false">
+                <input type="text" pInputText formControlName="texto" class="dialog-form-input opcion-texto">
+          </div>
+        </div>
+      </div>
+    </div>
+    <p-footer>
+      <button type="button" pButton label="Guardar" icon="pi pi-check" (click)="guardarEvaluacion()" class="dialog-footer-button"></button>
+      <button type="button" pButton label="Cancelar" icon="pi pi-times" (click)="displayEditDialog = false" class="dialog-footer-button"></button>
+    </p-footer>
+  </form>
+</p-dialog>
+
+
+
+<p-toast></p-toast>

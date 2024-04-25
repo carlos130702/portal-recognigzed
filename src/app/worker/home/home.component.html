@@ -1,6 +1,9 @@
 <div class="surface-ground px-4 py-2 shadow-2 border-round">
   <p-menubar [model]="items">
     <ng-template pTemplate="end">
+      <div class="user-details">
+        {{ userName}}
+      </div>
       <button class="p-button p-button-outlined p-button-logout" (click)="logout()">
         <i class="pi pi-sign-out mr-1"></i> Logout
       </button>

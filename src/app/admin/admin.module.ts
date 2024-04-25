@@ -11,11 +11,13 @@ import {TableModule} from "primeng/table";
 import {DialogModule} from "primeng/dialog";
 import {ButtonModule} from "primeng/button";
 import {InputTextModule} from "primeng/inputtext";
-import {FormsModule} from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {ToastModule} from "primeng/toast";
 import {MessageService} from "primeng/api";
 import {CheckboxModule} from "primeng/checkbox";
 import {InputTextareaModule} from "primeng/inputtextarea";
+import { ExamenesRegistradosComponent } from './examenes-registrados/examenes-registrados.component';
+import {FileUploadModule} from "primeng/fileupload";
 
 
 @NgModule({
@@ -23,7 +25,8 @@ import {InputTextareaModule} from "primeng/inputtextarea";
     HomeComponent,
     TrabajadoresComponent,
     RegistroTrabajadoresComponent,
-    RegistroExamenComponent
+    RegistroExamenComponent,
+    ExamenesRegistradosComponent
   ],
   imports: [
     CommonModule,
@@ -37,6 +40,8 @@ import {InputTextareaModule} from "primeng/inputtextarea";
     ToastModule,
     CheckboxModule,
     InputTextareaModule,
+    ReactiveFormsModule,
+    FileUploadModule,
   ],
   providers: [
     MessageService

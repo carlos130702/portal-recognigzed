@@ -4,7 +4,7 @@
   <div *ngIf="!evaluacion.id" class="p-fluid">
     <div class="field">
       <label for="titulo">Título de la Evaluación</label>
-      <input type="text" pInputText id="titulo" [(ngModel)]="evaluacion.titulo" required placeholder="Ingrese el título" autocomplete="off"/>
+      <input type="text" id="titulo" [(ngModel)]="evaluacion.titulo" (ngModelChange)="onTitleChange($event)" />
     </div>
 
     <div class="field">
@@ -18,7 +18,9 @@
       <small *ngIf="numPreguntasInvalido()" class="error-message">El número de preguntas debe ser entre 1 y 20.</small>
     </div>
 
-    <button pButton type="button" label="Agregar Preguntas" (click)="guardarEvaluacionSinPreguntas()" [disabled]="botonDeshabilitado()"></button>
+    <button pButton type="button" label="Agregar Preguntas"
+            (click)="guardarEvaluacionSinPreguntas()"
+            [disabled]="botonDeshabilitado() || !tituloEsUnico"></button>
   </div>
 
   <div *ngIf="evaluacion.id">

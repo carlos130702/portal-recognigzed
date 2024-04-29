@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {Evaluacion, ResultadoDeEvaluacion} from "../../interfaces/Evaluacion";
 import {ActivatedRoute, Router} from "@angular/router";
 import {EvaluacionesService} from "../../services/evaluaciones.service";
@@ -15,14 +15,12 @@ import {MessageService} from "primeng/api";
   templateUrl: './vista-examen.component.html',
   styleUrl: './vista-examen.component.css'
 })
-export class VistaExamenComponent implements OnInit , OnDestroy{
+export class VistaExamenComponent implements OnInit , OnDestroy,AfterViewInit{
   exam: Evaluacion | undefined;
   trabajadorActual: Trabajador | null = null;
   userAnswers: { [key: number]: string } = {};
   currentQuestionIndex = 0;
   labeledFaceDescriptors: faceapi.LabeledFaceDescriptors | null = null;
-  @ViewChild('videoElement') videoElement!: ElementRef<HTMLVideoElement>;
-  @ViewChild('canvasElement') canvasElement!: ElementRef<HTMLCanvasElement>;
   intervalId: number | undefined;
   private isModelLoaded: boolean | undefined;
   private failedNoFaceDetectedAttempts  = 0;
@@ -30,10 +28,15 @@ export class VistaExamenComponent implements OnInit , OnDestroy{
 
   private verificationActive = true;
   cameraLoaded = false;
+
+
   onCameraLoad() {
     this.cameraLoaded = true;
-    console.log('Camera loaded:', this.cameraLoaded);
+    const videoElement = document.querySelector('video');
+    if(!videoElement) { return; }
+    videoElement.classList.add('loaded');
   }
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -44,6 +47,19 @@ export class VistaExamenComponent implements OnInit , OnDestroy{
     private messageService: MessageService
   ) {
 
+  }
+  @ViewChild('videoElement') videoElement!: ElementRef<HTMLVideoElement>;
+  @ViewChild('canvasElement') canvasElement!: ElementRef<HTMLCanvasElement>;
+
+  ngAfterViewInit(): void {
+    setTimeout(() => {
+      const cardElement = document.querySelector('.card');
+      if (!cardElement) {
+        console.error('Card element not found.');
+        return;
+      }
+      cardElement.classList.add('enter-active');
+    }, 0);
   }
 
   ngOnInit(): void {

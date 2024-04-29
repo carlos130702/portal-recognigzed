@@ -6,16 +6,24 @@
 
 .card {
   padding: 2rem;
-  --shadow-2: 0 2px 4px rgba(0, 0, 0, 0.1);
-  box-shadow: var(--shadow-2);
   border-radius: var(--border-radius);
-  border: var(--surface-border);
   background-color: var(--surface-ground);
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  max-width: 600px;
+  width: calc(100% - 40px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  position: relative;
+  border: none;
+  margin-left: auto; /* Esto empujará el card a la derecha */
+}
+
+.card.enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.card.enter-active {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .field-radiobutton {
@@ -68,27 +76,62 @@ h3 {
   }
 }
 .container {
-  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
   max-width: 1200px;
   margin: auto;
   text-align: center;
+  width: 100%;
 }
+
+/* Contenedor para el contenido principal */
 .main-content {
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  position: relative;
+  justify-content: flex-start; /* Alinea al principio, pero con espacio a la izquierda */
+  align-items: center; /* Centra verticalmente el contenido */
+  flex-wrap: wrap;
+  gap: 20px;
+  width: 100%;
+  padding-left: 20px; /* Añade algo de espacio en la izquierda */
 }
 .main-content video,
 .main-content canvas {
-  position: absolute;
-  top: 0;
-  left: 0;
+  width: 320px;
+  height: 240px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  margin-bottom: 20px;
 }
 
+/* Ajuste para que el spinner y el texto de carga estén centrados verticalmente */
+.loading-indicator {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.main-content canvas {
+  display: none; /* Esconde el canvas por defecto */
+}
+
+.main-content canvas.active {
+  display: block; /* Muestra el canvas cuando está activo */
+}
 video {
-  margin-right: 20px;
+  width: 320px; /* Tamaño de la cámara */
+  height: auto; /* Altura auto para mantener la relación de aspecto */
+  border-radius: 10px; /* Bordes redondeados */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra para profundidad */
+  z-index: 2; /* Asegúrate de que la cámara está por encima del fondo */
+  opacity: 0; /* Inicia con opacidad 0 */
+}
+video.loaded {
+  opacity: 1; /* Cambia a opacidad 1 cuando se haya cargado */
+}
+video:hover {
+  transform: scale(1.05);
 }
 
 .form-container {
@@ -97,10 +140,10 @@ video {
 
 @media (max-width: 768px) {
   .main-content {
-    flex-direction: column;
+    flex-direction: column-reverse;
   }
 
-  video {
-    margin-bottom: 20px;
+  video, .card {
+    width: 90%;
   }
 }

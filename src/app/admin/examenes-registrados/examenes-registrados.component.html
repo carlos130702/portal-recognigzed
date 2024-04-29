@@ -57,7 +57,7 @@
       <div class="footer-buttons">
         <div class="nav-buttons">
           <button type="button" pButton icon="pi pi-chevron-left" (click)="anterior()" [disabled]="indiceActual === 0"></button>
-          <button type="button" pButton icon="pi pi-chevron-right" (click)="siguiente()" [disabled]="indiceActual === (evaluacionSeleccionada?.preguntas?.length || 0) - 1"></button>
+          <button type="button" pButton icon="pi pi-chevron-right" (click)="siguiente()" [disabled]="indiceActual === evaluacionSeleccionada.preguntas.length - 1"></button>
         </div>
       </div>
     </p-footer>

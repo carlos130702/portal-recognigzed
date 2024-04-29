@@ -375,6 +375,57 @@
           "valor": 10
         }
       ]
+    },
+    {
+      "id": "cb41",
+      "titulo": "angular3",
+      "descripcion": "sgasga",
+      "preguntas": [
+        {
+          "enunciado": "sgasga",
+          "opciones": [
+            {
+              "texto": "a",
+              "esCorrecta": false
+            },
+            {
+              "texto": "d",
+              "esCorrecta": false
+            },
+            {
+              "texto": "b",
+              "esCorrecta": true
+            },
+            {
+              "texto": "c",
+              "esCorrecta": false
+            }
+          ],
+          "valor": 10
+        },
+        {
+          "enunciado": "safasf",
+          "opciones": [
+            {
+              "texto": "fwq",
+              "esCorrecta": false
+            },
+            {
+              "texto": "gwq",
+              "esCorrecta": false
+            },
+            {
+              "texto": "gwq2",
+              "esCorrecta": true
+            },
+            {
+              "texto": "gwqg",
+              "esCorrecta": false
+            }
+          ],
+          "valor": 10
+        }
+      ]
     }
   ],
   "sesionesDeEvaluacion": [
@@ -439,6 +490,30 @@
       "ID_Trabajador": "4",
       "ID_Evaluacion": "04ad",
       "Puntuacion": 20
+    },
+    {
+      "id": "ba58",
+      "ID_Trabajador": "205c",
+      "ID_Evaluacion": "4d92",
+      "Puntuacion": 0
+    },
+    {
+      "id": "6990",
+      "ID_Trabajador": "205c",
+      "ID_Evaluacion": "04ad",
+      "Puntuacion": 0
+    },
+    {
+      "id": "6224",
+      "ID_Trabajador": "205c",
+      "ID_Evaluacion": "a51f",
+      "Puntuacion": 0
+    },
+    {
+      "id": "5e4e",
+      "ID_Trabajador": "4",
+      "ID_Evaluacion": "a51f",
+      "Puntuacion": 0
     }
   ]
 }

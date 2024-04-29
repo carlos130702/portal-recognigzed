@@ -4,17 +4,19 @@
   <div *ngIf="!evaluacion.id" class="p-fluid">
     <div class="field">
       <label for="titulo">Título de la Evaluación</label>
-      <input type="text" id="titulo" [(ngModel)]="evaluacion.titulo" (ngModelChange)="onTitleChange($event)" />
+      <input type="text" id="titulo" [(ngModel)]="evaluacion.titulo" (ngModelChange)="onTitleChange($event)"/>
     </div>
 
     <div class="field">
       <label for="descripcion">Descripción de la Evaluación</label>
-      <textarea rows="5" pInputTextarea id="descripcion" [(ngModel)]="evaluacion.descripcion" required placeholder="Ingrese la descripción" autocomplete="off"></textarea>
+      <textarea rows="5" pInputTextarea id="descripcion" [(ngModel)]="evaluacion.descripcion" required
+                placeholder="Ingrese la descripción" autocomplete="off"></textarea>
     </div>
 
     <div class="field">
       <label for="numPreguntas">Número de Preguntas (1-20)</label>
-      <input type="number" pInputText id="numPreguntas" [(ngModel)]="numPreguntas" required placeholder="Ingrese el número de preguntas" min="1" max="20" />
+      <input type="number" pInputText id="numPreguntas" [(ngModel)]="numPreguntas" required
+             placeholder="Ingrese el número de preguntas" min="1" max="20"/>
       <small *ngIf="numPreguntasInvalido()" class="error-message">El número de preguntas debe ser entre 1 y 20.</small>
     </div>
 
@@ -25,30 +27,38 @@
 
   <div *ngIf="evaluacion.id">
     <h3>Preguntas</h3>
-    <button pButton type="button" label="Agregar Pregunta" (click)="agregarPregunta()" [disabled]="evaluacion.preguntas.length >= numPreguntas || !preguntaValida()"></button>
+    <button pButton type="button" label="Agregar Pregunta" (click)="agregarPregunta()"
+            [disabled]="evaluacion.preguntas.length >= numPreguntas || !preguntaValida()"></button>
     <p>{{ preguntaValida() ? '' : 'Debe marcar al menos una opción como correcta y agregar 4 opciones.' }}</p>
 
     <ng-container *ngFor="let pregunta of evaluacion.preguntas; let i = index">
       <div *ngIf="preguntaActualIndex === i" class="field">
         <label for="enunciado-{{ i }}">Enunciado de la Pregunta {{ i + 1 }}</label>
-        <input class="mb-3" type="text" pInputText id="enunciado-{{ i }}" [(ngModel)]="pregunta.enunciado" required placeholder="Ingrese el enunciado" autocomplete="off" />
+        <input class="mb-3" type="text" pInputText id="enunciado-{{ i }}" [(ngModel)]="pregunta.enunciado" required
+               placeholder="Ingrese el enunciado" autocomplete="off"/>
         <div *ngFor="let opcion of pregunta.opciones; let j = index" class="option-container">
           <label [attr.for]="'opcion-' + pregunta.id + '-' + j" class="option-title">Opción {{ j + 1 }}</label>
           <div class="option-inputs">
-            <input type="radio" [attr.name]="'opcion-' + pregunta.id" [value]="opcion.esCorrecta" (click)="seleccionarOpcion(pregunta, opcion)" class="option-radio">
-            <input type="text" pInputText [attr.id]="'opcion-' + pregunta.id + '-' + j" [(ngModel)]="opcion.texto" required placeholder="Ingrese el texto de la opción" class="option-text" autocomplete="off"  />
+            <input type="radio" [attr.name]="'opcion-' + pregunta.id" [value]="opcion.esCorrecta"
+                   (click)="seleccionarOpcion(pregunta, opcion)" class="option-radio">
+            <input type="text" pInputText [attr.id]="'opcion-' + pregunta.id + '-' + j" [(ngModel)]="opcion.texto"
+                   required placeholder="Ingrese el texto de la opción" class="option-text" autocomplete="off"/>
           </div>
         </div>
-        <button *ngIf="pregunta.opciones.length < maxOpciones" pButton type="button" label="Agregar Opciones" (click)="agregarOpciones(pregunta)"></button>
+        <button *ngIf="pregunta.opciones.length < maxOpciones" pButton type="button" label="Agregar Opciones"
+                (click)="agregarOpciones(pregunta)"></button>
       </div>
     </ng-container>
 
-    <button pButton type="button" label="Anterior" (click)="anteriorPregunta()" [disabled]="preguntaActualIndex <= 0"></button>
-    <button pButton type="button" label="Siguiente" (click)="siguientePregunta()" [disabled]="preguntaActualIndex >= evaluacion.preguntas.length - 1"></button>
+    <button pButton type="button" label="Anterior" (click)="anteriorPregunta()"
+            [disabled]="preguntaActualIndex <= 0"></button>
+    <button pButton type="button" label="Siguiente" (click)="siguientePregunta()"
+            [disabled]="preguntaActualIndex >= evaluacion.preguntas.length - 1"></button>
   </div>
 
   <button *ngIf="evaluacion.titulo && evaluacion.descripcion && numPreguntas > 0 && todasLasPreguntasCompletas()"
           pButton type="button" class="center-button distinct-button"
           label="Guardar Evaluación" (click)="guardarEvaluacionCompleta()">
-  </button>  <p-toast></p-toast>
+  </button>
+  <p-toast></p-toast>
 </div>

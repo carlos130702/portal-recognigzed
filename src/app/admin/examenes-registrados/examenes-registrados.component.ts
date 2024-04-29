@@ -22,7 +22,7 @@ export class ExamenesRegistradosComponent implements OnInit {
   constructor(
     private cd: ChangeDetectorRef,
     private evaluacionService: EvaluacionesService,
-    private messageService: MessageService,private fb: FormBuilder
+    private messageService: MessageService, private fb: FormBuilder
   ) {
     this.evaluacionForm = this.fb.group({
       id: [null],
@@ -55,7 +55,7 @@ export class ExamenesRegistradosComponent implements OnInit {
         this.evaluacionesFiltradas = data;
       },
       error: (error) => {
-        this.messageService.add({severity:'error', summary: 'Error', detail: 'Error al cargar las evaluaciones'});
+        this.messageService.add({severity: 'error', summary: 'Error', detail: 'Error al cargar las evaluaciones'});
         console.error('Error al obtener evaluaciones', error);
       }
     });
@@ -72,9 +72,11 @@ export class ExamenesRegistradosComponent implements OnInit {
     this.evaluacionSeleccionada = evaluacion;
     this.displayViewDialog = true;
   }
+
   get preguntas(): FormArray {
     return this.evaluacionForm.get('preguntas') as FormArray;
   }
+
   editarEvaluacion(evaluacion: Evaluacion) {
     if (!this.evaluacionForm.contains('id')) {
       this.evaluacionForm.addControl('id', new FormControl(''));
@@ -88,6 +90,7 @@ export class ExamenesRegistradosComponent implements OnInit {
     this.setPreguntas(evaluacion.preguntas);
     this.displayEditDialog = true;
   }
+
   guardarEvaluacion() {
     if (this.evaluacionForm.valid) {
       console.log(this.evaluacionForm.value);
@@ -138,6 +141,7 @@ export class ExamenesRegistradosComponent implements OnInit {
     const preguntasFormArray = this.fb.array(preguntasFGs);
     this.evaluacionForm.setControl('preguntas', preguntasFormArray);
   }
+
   establecerRespuestaCorrecta(preguntaIndex: number, opcionSeleccionadaIndex: number) {
     const opciones = (this.preguntas.at(preguntaIndex).get('opciones') as FormArray).controls;
 
@@ -151,7 +155,11 @@ export class ExamenesRegistradosComponent implements OnInit {
 
   eliminar(evaluacion: Evaluacion) {
     if (evaluacion.id == null) {
-      this.messageService.add({severity:'warn', summary: 'Advertencia', detail: 'La evaluación no tiene un ID válido.'});
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Advertencia',
+        detail: 'La evaluación no tiene un ID válido.'
+      });
       return;
     }
     if (confirm('¿Estás seguro de que quieres eliminar esta evaluación?')) {
@@ -159,11 +167,11 @@ export class ExamenesRegistradosComponent implements OnInit {
         next: (resp) => {
           this.evaluaciones = this.evaluaciones.filter(e => e.id !== evaluacion.id);
           this.evaluacionesFiltradas = this.evaluacionesFiltradas.filter(e => e.id !== evaluacion.id);
-          this.messageService.add({ severity:'success', summary: 'Éxito', detail: 'Evaluación eliminada con éxito.' });
+          this.messageService.add({severity: 'success', summary: 'Éxito', detail: 'Evaluación eliminada con éxito.'});
           console.log('Evaluación eliminada con éxito', resp);
         },
         error: (err) => {
-          this.messageService.add({severity:'error', summary: 'Error', detail: 'Error al eliminar la evaluación.'});
+          this.messageService.add({severity: 'error', summary: 'Error', detail: 'Error al eliminar la evaluación.'});
           console.error('Error al eliminar la evaluación', err);
         }
       });

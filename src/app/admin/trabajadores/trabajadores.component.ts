@@ -27,7 +27,8 @@ export class TrabajadoresComponent implements OnInit {
     password: ''
   };
 
-  constructor(  private cd: ChangeDetectorRef,private evaluacionService: EvaluacionesService,private resultadosService: ResultadosService,private trabajadoresService: TrabajadoresService,private messageService: MessageService,) { }
+  constructor(private cd: ChangeDetectorRef, private evaluacionService: EvaluacionesService, private resultadosService: ResultadosService, private trabajadoresService: TrabajadoresService, private messageService: MessageService,) {
+  }
 
   ngOnInit() {
     this.cargarTrabajadores();
@@ -40,7 +41,7 @@ export class TrabajadoresComponent implements OnInit {
         this.trabajadoresFiltrados = data;
       },
       error: (error) => {
-        this.messageService.add({severity:'error', summary: 'Error', detail: 'Error al cargar los trabajadores'});
+        this.messageService.add({severity: 'error', summary: 'Error', detail: 'Error al cargar los trabajadores'});
         console.error('Error al obtener trabajadores', error);
       }
     });
@@ -55,23 +56,27 @@ export class TrabajadoresComponent implements OnInit {
         .subscribe({
           next: (resultados: ResultadoDeEvaluacion[]) => {
             this.resultadosEvaluacion = resultados;
-        this.evaluaciones = [];
+            this.evaluaciones = [];
 
-        if (resultados.length > 0) {
-          resultados.forEach((resultado: ResultadoDeEvaluacion) => {
-            const evaluacionId = resultado.ID_Evaluacion.toString();
+            if (resultados.length > 0) {
+              resultados.forEach((resultado: ResultadoDeEvaluacion) => {
+                const evaluacionId = resultado.ID_Evaluacion.toString();
 
-            this.evaluacionService.getEvaluacionById(evaluacionId).subscribe(evaluacion => {
-              this.evaluaciones.push(evaluacion);
-              this.cd.detectChanges();
+                this.evaluacionService.getEvaluacionById(evaluacionId).subscribe(evaluacion => {
+                  this.evaluaciones.push(evaluacion);
+                  this.cd.detectChanges();
+                });
+              });
+            }
+          },
+          error: (error) => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'Error al cargar los resultados de la evaluación'
             });
-          });
-        }
-      },
-      error: (error) => {
-        this.messageService.add({severity:'error', summary: 'Error', detail: 'Error al cargar los resultados de la evaluación'});
-        console.error('Error al obtener resultados de la evaluación', error);
-      }
+            console.error('Error al obtener resultados de la evaluación', error);
+          }
         });
     }
   }
@@ -82,6 +87,7 @@ export class TrabajadoresComponent implements OnInit {
       `${t.name} ${t.lastName}`.toLowerCase().includes(query)
     );
   }
+
   getEvaluacionTitulo(idEvaluacion: number): string {
     const evaluacion = this.evaluaciones.find(e => e.id === idEvaluacion);
     return evaluacion ? evaluacion.titulo : 'Cargando...';
@@ -119,7 +125,7 @@ export class TrabajadoresComponent implements OnInit {
           this.cd.detectChanges();
         },
         error: (error: any) => {
-          this.messageService.add({severity:'error', summary: 'Error', detail: 'Error al editar el trabajador.'});
+          this.messageService.add({severity: 'error', summary: 'Error', detail: 'Error al editar el trabajador.'});
           console.error('Error al editar el trabajador', error);
         }
       });
@@ -135,10 +141,15 @@ export class TrabajadoresComponent implements OnInit {
     // Aquí puedes manejar la lógica antes de la subida de la foto,
     // por ejemplo, añadir headers o parametros al request de la subida
   }
+
   eliminar(trabajador: Trabajador) {
     console.log('ID del trabajador a eliminar:', trabajador.id);
     if (trabajador.id == null) {
-      this.messageService.add({severity:'warn', summary: 'Advertencia', detail: 'El trabajador no tiene un ID válido.'});
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Advertencia',
+        detail: 'El trabajador no tiene un ID válido.'
+      });
       return;
     }
     if (confirm('¿Estás seguro de que quieres eliminar a este trabajador?')) {
@@ -148,11 +159,11 @@ export class TrabajadoresComponent implements OnInit {
           if (this.trabajadoresFiltrados) {
             this.trabajadoresFiltrados = this.trabajadoresFiltrados.filter(t => t.id !== trabajador.id);
           }
-          this.messageService.add({ severity:'success', summary: 'Éxito', detail: 'Trabajador eliminado con éxito.' });
+          this.messageService.add({severity: 'success', summary: 'Éxito', detail: 'Trabajador eliminado con éxito.'});
           console.log('Trabajador eliminado con éxito', resp);
         },
         error: (err) => {
-          this.messageService.add({severity:'error', summary: 'Error', detail: 'Error al eliminar el trabajador.'});
+          this.messageService.add({severity: 'error', summary: 'Error', detail: 'Error al eliminar el trabajador.'});
           console.error('Error al eliminar el trabajador', err);
         }
       });

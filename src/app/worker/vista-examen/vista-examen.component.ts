@@ -15,7 +15,7 @@ import {MessageService} from "primeng/api";
   templateUrl: './vista-examen.component.html',
   styleUrl: './vista-examen.component.css'
 })
-export class VistaExamenComponent implements OnInit , OnDestroy,AfterViewInit{
+export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
   exam: Evaluacion | undefined;
   trabajadorActual: Trabajador | null = null;
   userAnswers: { [key: number]: string } = {};
@@ -23,8 +23,8 @@ export class VistaExamenComponent implements OnInit , OnDestroy,AfterViewInit{
   labeledFaceDescriptors: faceapi.LabeledFaceDescriptors | null = null;
   intervalId: number | undefined;
   private isModelLoaded: boolean | undefined;
-  private failedNoFaceDetectedAttempts  = 0;
-  private failedIncorrectFaceDetectedAttempts  = 0;
+  private failedNoFaceDetectedAttempts = 0;
+  private failedIncorrectFaceDetectedAttempts = 0;
 
   private verificationActive = true;
   cameraLoaded = false;
@@ -33,7 +33,9 @@ export class VistaExamenComponent implements OnInit , OnDestroy,AfterViewInit{
   onCameraLoad() {
     this.cameraLoaded = true;
     const videoElement = document.querySelector('video');
-    if(!videoElement) { return; }
+    if (!videoElement) {
+      return;
+    }
     videoElement.classList.add('loaded');
   }
 
@@ -41,13 +43,14 @@ export class VistaExamenComponent implements OnInit , OnDestroy,AfterViewInit{
     private route: ActivatedRoute,
     private router: Router,
     private evaluacionesService: EvaluacionesService,
-    private resultadosService:ResultadosService,
+    private resultadosService: ResultadosService,
     private changeDetectorRef: ChangeDetectorRef,
     private authService: AuthService,
     private messageService: MessageService
   ) {
 
   }
+
   @ViewChild('videoElement') videoElement!: ElementRef<HTMLVideoElement>;
   @ViewChild('canvasElement') canvasElement!: ElementRef<HTMLCanvasElement>;
 
@@ -96,6 +99,7 @@ export class VistaExamenComponent implements OnInit , OnDestroy,AfterViewInit{
     }
 
   }
+
   async createReferenceFaceDescriptor(): Promise<boolean> {
     if (this.trabajadorActual) {
       try {
@@ -131,6 +135,7 @@ export class VistaExamenComponent implements OnInit , OnDestroy,AfterViewInit{
       },
     );
   }
+
   initializeAnswers(): void {
     if (!this.exam) return;
     this.exam.preguntas.forEach((pregunta, index) => {
@@ -151,14 +156,15 @@ export class VistaExamenComponent implements OnInit , OnDestroy,AfterViewInit{
       this.currentQuestionIndex--;
     }
   }
+
   onSubmit(puntuacion: number = 0) {
     this.changeDetectorRef.detectChanges();
     if (!this.exam) {
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No hay un examen cargado.' });
+      this.messageService.add({severity: 'error', summary: 'Error', detail: 'No hay un examen cargado.'});
       return;
     }
     if (this.trabajadorActual === null) {
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No hay un trabajador activo.' });
+      this.messageService.add({severity: 'error', summary: 'Error', detail: 'No hay un trabajador activo.'});
       return;
     }
     this.exam.preguntas.forEach((pregunta, index) => {
@@ -180,13 +186,17 @@ export class VistaExamenComponent implements OnInit , OnDestroy,AfterViewInit{
         tap((res: any) => {
         }),
         catchError((error: any) => {
-          this.messageService.add({ severity: 'error', summary: 'Error al enviar', detail: 'Hubo un problema al enviar los resultados del examen.' });
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error al enviar',
+            detail: 'Hubo un problema al enviar los resultados del examen.'
+          });
           return throwError(() => error);
         })
       )
       .subscribe({
         complete: () => {
-          this.messageService.add({severity:'success', summary: 'Success', detail: 'Examen enviado correctamente.'});
+          this.messageService.add({severity: 'success', summary: 'Success', detail: 'Examen enviado correctamente.'});
           setTimeout(() => {
             this.router.navigate(['/worker/examenes']).then(r => console.log(r));
           }, 2000);
@@ -208,8 +218,9 @@ export class VistaExamenComponent implements OnInit , OnDestroy,AfterViewInit{
       console.error('Error loading models:', err);
     }
   }
+
   startVideo() {
-    navigator.mediaDevices.getUserMedia({ video: {} })
+    navigator.mediaDevices.getUserMedia({video: {}})
       .then(stream => {
         this.videoElement.nativeElement.srcObject = stream;
         this.videoElement.nativeElement.play();
@@ -227,7 +238,7 @@ export class VistaExamenComponent implements OnInit , OnDestroy,AfterViewInit{
     }
     const canvas = this.canvasElement.nativeElement;
     const video = this.videoElement.nativeElement;
-    const displaySize = { width: video.width, height: video.height };
+    const displaySize = {width: video.width, height: video.height};
     faceapi.matchDimensions(canvas, displaySize);
 
     video.addEventListener('play', () => {
@@ -243,14 +254,18 @@ export class VistaExamenComponent implements OnInit , OnDestroy,AfterViewInit{
           clearInterval(this.intervalId);
           return;
         }
-        const options = new faceapi.TinyFaceDetectorOptions({ inputSize: 512, scoreThreshold: 0.5 });
+        const options = new faceapi.TinyFaceDetectorOptions({inputSize: 512, scoreThreshold: 0.5});
         const detections = await faceapi.detectAllFaces(video, options).withFaceLandmarks().withFaceDescriptors();
         const resizedDetections = faceapi.resizeResults(detections, displaySize);
         context.clearRect(0, 0, canvas.width, canvas.height);
         faceapi.draw.drawDetections(canvas, resizedDetections);
 
         if (detections.length === 0) {
-          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se detectó un rostro. Intento ' + (this.failedNoFaceDetectedAttempts + 1) + ' de 3.' });
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'No se detectó un rostro. Intento ' + (this.failedNoFaceDetectedAttempts + 1) + ' de 3.'
+          });
           this.handleNoFaceDetected();
         } else {
           const maxDescriptorDistance = 0.5;
@@ -283,7 +298,11 @@ export class VistaExamenComponent implements OnInit , OnDestroy,AfterViewInit{
 
   handleIncorrectFaceDetected() {
     this.failedIncorrectFaceDetectedAttempts++;
-    this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No es la misma persona. Intento ' + this.failedIncorrectFaceDetectedAttempts + ' de 3.' });
+    this.messageService.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'No es la misma persona. Intento ' + this.failedIncorrectFaceDetectedAttempts + ' de 3.'
+    });
     if (this.verificationActive && this.failedIncorrectFaceDetectedAttempts >= 3) {
       clearInterval(this.intervalId);
       this.finishExamWithZero();
@@ -291,36 +310,36 @@ export class VistaExamenComponent implements OnInit , OnDestroy,AfterViewInit{
   }
 
 
-/*
-  async finishExamWithZero() {
-    this.verificationActive = false;
-    this.messageService.add({
-      severity: 'error',
-      summary: 'Error',
-      detail: 'Identidad no verificada. Terminando el examen con puntuación de cero.'
-    });
-    if (this.trabajadorActual && this.exam) {
-      const nombreCompleto = this.trabajadorActual.name + ' ' + this.trabajadorActual.lastName;
-      const cuerpoCorreo = `${nombreCompleto} ha tenido una suplantación en su examen de  ${this.exam.titulo}. Por lo tanto, se colocó 0 en su nota.`;
+  /*
+    async finishExamWithZero() {
+      this.verificationActive = false;
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Identidad no verificada. Terminando el examen con puntuación de cero.'
+      });
+      if (this.trabajadorActual && this.exam) {
+        const nombreCompleto = this.trabajadorActual.name + ' ' + this.trabajadorActual.lastName;
+        const cuerpoCorreo = `${nombreCompleto} ha tenido una suplantación en su examen de  ${this.exam.titulo}. Por lo tanto, se colocó 0 en su nota.`;
 
-      try {
-        const response = await this.http.post<any>('URL_DEL_BACKEND/enviar-correo', {
-          destinatario: 'correo_destino@example.com',
-          asunto: 'Suplantación en examen',
-          cuerpo: cuerpoCorreo
-        }).toPromise();
-        console.log('Correo electrónico enviado:', response);
+        try {
+          const response = await this.http.post<any>('URL_DEL_BACKEND/enviar-correo', {
+            destinatario: 'correo_destino@example.com',
+            asunto: 'Suplantación en examen',
+            cuerpo: cuerpoCorreo
+          }).toPromise();
+          console.log('Correo electrónico enviado:', response);
 
-        setTimeout(() => {
-          this.onSubmit(0);
-        }, 3000);
-      } catch (error) {
-        console.error('Error al enviar el correo electrónico:', error);
+          setTimeout(() => {
+            this.onSubmit(0);
+          }, 3000);
+        } catch (error) {
+          console.error('Error al enviar el correo electrónico:', error);
+        }
+      } else {
+        console.error('Trabajador o examen no definidos');
       }
-    } else {
-      console.error('Trabajador o examen no definidos');
-    }
-  }*/
+    }*/
   finishExamWithZero() {
     this.verificationActive = false;
     this.messageService.add({

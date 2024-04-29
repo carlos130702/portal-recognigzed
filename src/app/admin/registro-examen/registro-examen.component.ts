@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 import {Evaluacion, Pregunta} from "../../interfaces/Evaluacion";
 import {MessageService} from "primeng/api";
 import {Router} from "@angular/router";
@@ -44,6 +44,7 @@ export class RegistroExamenComponent {
       }
     });
   }
+
   onTitleChange(value: string): void {
     this.titleSubject.next(value);
   }
@@ -69,6 +70,7 @@ export class RegistroExamenComponent {
     let unicos = new Set(textoOpciones);
     return unicos.size !== textoOpciones.length;
   }
+
   validarPreguntaActual(): boolean {
     const preguntaActual = this.evaluacion.preguntas[this.preguntaActualIndex];
 
@@ -88,6 +90,7 @@ export class RegistroExamenComponent {
       this.preguntaActualIndex--;
     }
   }
+
   agregarPregunta() {
     console.log(this.evaluacion.id)
     if (!this.evaluacion.id) {
@@ -140,6 +143,7 @@ export class RegistroExamenComponent {
       });
     }
   }
+
   procesoGuardarEvaluacion() {
     this.evaluacionesService.deleteEvaluacion(this.evaluacion.id).subscribe({
       next: () => {
@@ -173,6 +177,7 @@ export class RegistroExamenComponent {
       }
     });
   }
+
   numPreguntasInvalido(): boolean {
     return this.numPreguntas < 1 || this.numPreguntas > 20;
   }
@@ -184,12 +189,20 @@ export class RegistroExamenComponent {
 
   guardarEvaluacionSinPreguntas() {
     if (!this.evaluacion || !this.evaluacion.titulo || !this.evaluacion.descripcion) {
-      this.messageService.add({ severity: 'warn', summary: 'Atención', detail: 'Debe ingresar un título y una descripción.' });
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Atención',
+        detail: 'Debe ingresar un título y una descripción.'
+      });
       return;
     }
 
     if (this.evaluacion.preguntas && this.evaluacion.preguntas.length > 0) {
-      this.messageService.add({ severity: 'warn', summary: 'Atención', detail: 'No se pueden guardar preguntas en una evaluación sin preguntas.' });
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Atención',
+        detail: 'No se pueden guardar preguntas en una evaluación sin preguntas.'
+      });
       return;
     }
 
@@ -214,12 +227,20 @@ export class RegistroExamenComponent {
     this.evaluacionesService.getEvaluaciones().subscribe(evaluaciones => {
       const tituloExiste = evaluaciones.some(e => e.titulo.toLowerCase() === this.evaluacion.titulo.toLowerCase());
       if (tituloExiste) {
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Ya existe una evaluación con el mismo título.' });
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Ya existe una evaluación con el mismo título.'
+        });
       } else {
         this.procederConGuardarEvaluacionSinPreguntas();
       }
     }, error => {
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al verificar la unicidad del título.' });
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Error al verificar la unicidad del título.'
+      });
     });
   }
 
@@ -227,11 +248,15 @@ export class RegistroExamenComponent {
     this.evaluacionesService.addEvaluacion(this.evaluacion).subscribe({
       next: (evaluacionGuardada: Evaluacion) => {
         this.evaluacion = evaluacionGuardada;
-        this.messageService.add({ severity: 'success', summary: 'Evaluación Guardada', detail: 'Ahora puede agregar preguntas.' });
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Evaluación Guardada',
+          detail: 'Ahora puede agregar preguntas.'
+        });
         this.mostrarFormulario = false;
       },
       error: () => {
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo guardar la evaluación.' });
+        this.messageService.add({severity: 'error', summary: 'Error', detail: 'No se pudo guardar la evaluación.'});
       }
     });
   }
@@ -275,7 +300,6 @@ export class RegistroExamenComponent {
     }
     return true;
   }
-
 
 
   preguntaCompleta(pregunta: Pregunta): boolean {

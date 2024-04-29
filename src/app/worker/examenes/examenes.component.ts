@@ -22,7 +22,8 @@ export class ExamenesComponent implements OnInit {
     private resultadosService: ResultadosService,
     private router: Router,
     private authService: AuthService
-  ) {}
+  ) {
+  }
 
   ngOnInit(): void {
     this.loadEvaluaciones();
@@ -54,10 +55,13 @@ export class ExamenesComponent implements OnInit {
     this.router.navigate(['/worker/evaluaciones', examId]).then(r => console.log(r)
     );
   }
+
   cargarResultados(): void {
     this.resultadosService.getEvaluacionResultados().subscribe(resultados => {
       this.resultadosEvaluaciones = resultados.filter(resultado => {
-        if(this.idUsuarioActual === undefined) { return false; }
+        if (this.idUsuarioActual === undefined) {
+          return false;
+        }
         return resultado.ID_Trabajador.toString() === this.idUsuarioActual.toString();
       });
     });

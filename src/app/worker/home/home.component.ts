@@ -13,15 +13,16 @@ export class HomeComponent implements OnInit {
   items: MenuItem[];
   userName: string = '';
 
-  constructor(private authService: AuthService,private router: Router,private cdr: ChangeDetectorRef) {
+  constructor(private authService: AuthService, private router: Router, private cdr: ChangeDetectorRef) {
     this.items = [
       {
         label: 'Examenes',
         routerLink: ['/worker/examenes'],
-        routerLinkActiveOptions : {exact: true}
+        routerLinkActiveOptions: {exact: true}
       }
     ];
   }
+
   ngOnInit() {
     const currentUser = this.authService.getCurrentUser();
     if (currentUser) {
@@ -29,6 +30,7 @@ export class HomeComponent implements OnInit {
       this.cdr.detectChanges();
     }
   }
+
   logout() {
     this.authService.logout();
     this.router.navigate(['/login']).then(r => {

@@ -30,6 +30,7 @@ p-table td {
   background-color: #f8f9fa;
 
 }
+
 p-table tr:nth-child(odd) td {
   background-color: #f2f2f2;
 }
@@ -37,19 +38,23 @@ p-table tr:nth-child(odd) td {
 p-table tr:nth-child(even) td {
   background-color: #ffffff;
 }
+
 p-table td,
 p-table th {
   padding: 12px 15px;
   vertical-align: middle;
   border: 2px solid #dee2e6;
 }
+
 .p-datatable .p-datatable-wrapper {
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   border-radius: 4px;
 }
+
 p-table tr:nth-child(even) {
   background-color: #f9f9f9;
 }
+
 p-table td:first-child {
   text-transform: capitalize;
 }
@@ -62,6 +67,7 @@ p-table td:first-child {
   cursor: pointer;
   border-radius: 5px;
 }
+
 p-button {
   background: red !important;
   color: white;
@@ -71,6 +77,7 @@ p-button {
   cursor: pointer;
   border-radius: 5px;
 }
+
 button.pButton:hover {
   background-color: #0056b3;
 }
@@ -117,19 +124,26 @@ button.pButton:hover::after {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
+
 .acciones-cell {
   display: flex;
   align-items: center;
   justify-content: center;
 }
+
 @media (max-width: 768px) {
   .p-datatable .p-datatable-wrapper {
     overflow-x: auto;
   }
 }
+
 .p-paginator .p-paginator-pages {
   padding: 0;
   margin: 0;
@@ -146,6 +160,7 @@ button.pButton:hover::after {
   min-width: 40px;
   height: 40px;
 }
+
 @media (max-width: 768px) {
   .p-dialog .flex {
     flex-direction: column;
@@ -155,6 +170,7 @@ button.pButton:hover::after {
   .p-dialog img.trabajador-imagen {
     margin-bottom: 15px;
   }
+
   .search-container {
     margin-right: 1rem;
 
@@ -166,21 +182,24 @@ button.pButton:hover::after {
   }
 
 }
+
 .search-container {
   margin-right: 15rem;
-  margin-top:1rem;
-  margin-bottom:1rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
 }
 
 .button-container {
   margin-left: 15rem;
-  margin-top:1rem;
-  margin-bottom:1rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
 }
+
 .table-container {
   max-width: 80%;
   margin: auto;
 }
+
 .titulo-evaluacion {
   font-size: 1.5em;
   font-weight: bold;
@@ -191,10 +210,12 @@ button.pButton:hover::after {
 .descripcion-evaluacion {
   color: #555;
 }
+
 .evaluacion-preguntas {
   list-style-type: none;
   padding-left: 0;
 }
+
 .pregunta-contenedor {
   display: flex;
   justify-content: space-between;
@@ -214,6 +235,7 @@ button.pButton:hover::after {
   margin-left: 15px;
   padding: 0.5em;
 }
+
 .evaluacion-preguntas > li {
   font-weight: bold;
   color: #444;
@@ -223,7 +245,7 @@ button.pButton:hover::after {
 .evaluacion-preguntas li ul {
   list-style-type: none;
   padding-left: 20px;
-  margin:0;
+  margin: 0;
 }
 
 .evaluacion-preguntas li ul li {
@@ -243,9 +265,11 @@ button.pButton:hover::after {
   border-radius: 4px;
   margin-top: 1.25rem;
 }
+
 .p-footer {
   padding: 0.5em;
 }
+
 .p-dialog .p-footer {
   display: flex;
   justify-content: flex-end;
@@ -254,6 +278,7 @@ button.pButton:hover::after {
 .p-dialog .p-footer .p-button {
   margin-left: auto;
 }
+
 .opciones-lista {
   list-style-type: none;
   padding: 0;
@@ -266,6 +291,7 @@ button.pButton:hover::after {
   padding: 0.5em;
   border: 1px solid #ccc;
 }
+
 .footer-buttons {
   display: flex;
   flex-direction: column;
@@ -278,9 +304,11 @@ button.pButton:hover::after {
   width: 85%;
   margin-bottom: 1em;
 }
+
 .nav-buttons button {
   margin: 0 8px;
 }
+
 .dialog-form-container {
   padding: 16px;
 }
@@ -377,6 +405,7 @@ button.pButton:hover::after {
 .search-container .p-input-icon-left input {
   padding-left: 2.5em;
 }
+
 .p-inputtext {
   width: 100%;
   margin-bottom: 20px;

@@ -428,14 +428,6 @@
       ]
     }
   ],
-  "sesionesDeEvaluacion": [
-    {
-      "id": "1",
-      "ID_Evaluacion": "1",
-      "ID_Trabajador": "1",
-      "Estado_Verificacion": false
-    }
-  ],
   "resultadosDeEvaluacion": [
     {
       "id": "47f8",

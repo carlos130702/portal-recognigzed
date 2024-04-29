@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {Trabajador} from "../interfaces/Trabajador";
 import {Observable} from "rxjs";
 import {HttpClient} from "@angular/common/http";
@@ -9,7 +9,8 @@ import {HttpClient} from "@angular/common/http";
 export class TrabajadoresService {
   private apiUrl = 'http://localhost:3000/trabajadores';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {
+  }
 
   getTrabajadores(): Observable<Trabajador[]> {
     return this.http.get<Trabajador[]>(this.apiUrl);

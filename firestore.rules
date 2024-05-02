@@ -1,0 +1,14 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Reemplazar estas reglas por aquellas que mejor se ajusten a tu modelo de acceso.
+    match /{document=**} {
+      allow read, write: if false; // Por defecto, no permitir lectura o escritura.
+    }
+
+    // Ejemplo para permitir lectura/escritura a un usuario autenticado a documentos específicos
+    match /usuarios/{userId} {
+      allow read, write: if request.auth.uid == userId;
+    }
+  }
+}

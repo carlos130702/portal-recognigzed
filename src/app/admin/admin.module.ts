@@ -18,6 +18,7 @@ import {CheckboxModule} from "primeng/checkbox";
 import {InputTextareaModule} from "primeng/inputtextarea";
 import { ExamenesRegistradosComponent } from './examenes-registrados/examenes-registrados.component';
 import {FileUploadModule} from "primeng/fileupload";
+import {SafePipe} from "safe-pipe";
 
 
 @NgModule({
@@ -28,21 +29,22 @@ import {FileUploadModule} from "primeng/fileupload";
     RegistroExamenComponent,
     ExamenesRegistradosComponent
   ],
-  imports: [
-    CommonModule,
-    AdminRoutingModule,
-    MenubarModule,
-    TableModule,
-    DialogModule,
-    ButtonModule,
-    InputTextModule,
-    FormsModule,
-    ToastModule,
-    CheckboxModule,
-    InputTextareaModule,
-    ReactiveFormsModule,
-    FileUploadModule,
-  ],
+    imports: [
+        CommonModule,
+        AdminRoutingModule,
+        MenubarModule,
+        TableModule,
+        DialogModule,
+        ButtonModule,
+        InputTextModule,
+        FormsModule,
+        ToastModule,
+        CheckboxModule,
+        InputTextareaModule,
+        ReactiveFormsModule,
+        FileUploadModule,
+        SafePipe,
+    ],
   providers: [
     MessageService
   ]

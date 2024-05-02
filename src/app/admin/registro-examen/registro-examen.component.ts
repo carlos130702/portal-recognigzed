@@ -1,17 +1,16 @@
-import {Component} from '@angular/core';
+import {Component, OnDestroy} from '@angular/core';
 import {Evaluacion, Pregunta} from "../../interfaces/Evaluacion";
 import {MessageService} from "primeng/api";
 import {Router} from "@angular/router";
 import {EvaluacionesService} from "../../services/evaluaciones.service";
-import {debounceTime, distinctUntilChanged, Observable, startWith, Subject, switchMap} from "rxjs";
-import {map} from "rxjs/operators";
+import {firstValueFrom,Subscription} from "rxjs";
 
 @Component({
   selector: 'app-registro-examen',
   templateUrl: './registro-examen.component.html',
-  styleUrl: './registro-examen.component.css'
+  styleUrls: ['./registro-examen.component.css']
 })
-export class RegistroExamenComponent {
+export class RegistroExamenComponent implements OnDestroy {
   evaluacion: Evaluacion = {
     titulo: '',
     descripcion: '',
@@ -21,41 +20,19 @@ export class RegistroExamenComponent {
   maxOpciones: number = 4;
   mostrarFormulario: boolean = true;
   preguntaActualIndex: number = 0;
-  private titleSubject = new Subject<string>();
-  tituloEsUnico: boolean = false;
+  tituloEsUnico: boolean = true;
+  private subscriptions: Subscription[] = [];
 
   constructor(
     private evaluacionesService: EvaluacionesService,
     private messageService: MessageService,
     private router: Router
   ) {
-    this.titleSubject.pipe(
-      debounceTime(500),
-      distinctUntilChanged(),
-      switchMap(titulo => this.verificarTituloUnico(titulo))
-    ).subscribe(esUnico => {
-      this.tituloEsUnico = esUnico;
-      if (!esUnico) {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'El título no es único.'
-        });
-      }
-    });
+  }
+  ngOnDestroy() {
+    this.subscriptions.forEach(subscription => subscription.unsubscribe());
   }
 
-  onTitleChange(value: string): void {
-    this.titleSubject.next(value);
-  }
-
-  verificarTituloUnico(titulo: string): Observable<boolean> {
-    return this.evaluacionesService.getEvaluaciones().pipe(
-      map(evaluaciones => !evaluaciones.some(evaluacion =>
-        evaluacion.titulo.toLowerCase() === titulo.toLowerCase() && evaluacion.id !== this.evaluacion.id
-      ))
-    );
-  }
 
   siguientePregunta(): void {
     if (this.validarPreguntaActual()) {
@@ -109,8 +86,12 @@ export class RegistroExamenComponent {
       console.error('Error: La propiedad preguntas no está definida como un array.');
     }
   }
+  private evaluacionesSubscription: Subscription | undefined;
 
-  guardarEvaluacionCompleta() {
+  async guardarEvaluacionCompleta() {
+    if (this.evaluacionesSubscription) {
+      this.evaluacionesSubscription.unsubscribe();
+    }
     if (!this.evaluacion || !this.evaluacion.titulo || !this.evaluacion.descripcion || this.evaluacion.preguntas.length === 0) {
       this.messageService.add({
         severity: 'warn',
@@ -121,61 +102,52 @@ export class RegistroExamenComponent {
     }
 
     if (this.todasLasPreguntasCompletas() && this.validarPreguntaActual()) {
-      this.evaluacionesService.getEvaluaciones().subscribe({
-        next: (evaluaciones: Evaluacion[]) => {
-          if (this.evaluacion.id) {
-            this.procesoGuardarEvaluacion();
-          } else {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Ya existe una evaluación con el mismo título.'
-            });
-          }
-        },
-        error: () => {
+      try {
+        const evaluaciones = await firstValueFrom(this.evaluacionesService.getEvaluaciones());
+        if (this.evaluacion.id) {
+          await this.procesoGuardarEvaluacion();
+        } else {
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
-            detail: 'Error al verificar la unicidad del título.'
+            detail: 'Ya existe una evaluación con el mismo título.'
           });
         }
-      });
-    }
-  }
-
-  procesoGuardarEvaluacion() {
-    this.evaluacionesService.deleteEvaluacion(this.evaluacion.id).subscribe({
-      next: () => {
-        this.evaluacionesService.addEvaluacion(this.evaluacion).subscribe({
-          next: (evaluacionGuardada: Evaluacion) => {
-            this.evaluacion = evaluacionGuardada;
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Evaluación Guardada',
-              detail: 'La evaluación se ha guardado correctamente.'
-            });
-            setTimeout(() => {
-              this.router.navigate(['/admin/examenes-registrados']);
-            }, 2000);
-          },
-          error: () => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'No se pudo guardar la evaluación.'
-            });
-          }
-        });
-      },
-      error: () => {
+      } catch (error) {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'No se pudo eliminar la evaluación existente.'
+          detail: 'Error al verificar la unicidad del título.'
         });
       }
-    });
+    }
+  }
+
+  async procesoGuardarEvaluacion() {
+    if (this.evaluacion.id == null) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'La evaluación no tiene un ID válido.'
+      });
+      return;
+    }
+    try {
+      await this.evaluacionesService.actualizarEvaluacion(this.evaluacion);
+      await this.router.navigate(['/admin/examenes-registrados']);
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Actualización exitosa',
+        detail: 'La actualización del examen fue exitosa.'
+      });
+    } catch (error) {
+      console.error("Error durante el proceso de guardado", error);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'No se pudo completar la operación de guardado.'
+      });
+    }
   }
 
   numPreguntasInvalido(): boolean {
@@ -183,11 +155,11 @@ export class RegistroExamenComponent {
   }
 
   botonDeshabilitado(): boolean {
-    return !this.evaluacion.titulo || !this.evaluacion.descripcion || this.numPreguntasInvalido() || !this.tituloEsUnico || this.evaluacion.preguntas.length >= this.numPreguntas;
+    return !this.evaluacion.titulo || !this.evaluacion.descripcion || this.numPreguntasInvalido();
   }
 
 
-  guardarEvaluacionSinPreguntas() {
+  async guardarEvaluacionSinPreguntas() {
     if (!this.evaluacion || !this.evaluacion.titulo || !this.evaluacion.descripcion) {
       this.messageService.add({
         severity: 'warn',
@@ -197,24 +169,17 @@ export class RegistroExamenComponent {
       return;
     }
 
-    if (this.evaluacion.preguntas && this.evaluacion.preguntas.length > 0) {
+    const tituloEsUnico = await firstValueFrom(this.evaluacionesService.checkTituloUnico(this.evaluacion.titulo));
+    if (!tituloEsUnico) {
       this.messageService.add({
-        severity: 'warn',
-        summary: 'Atención',
-        detail: 'No se pueden guardar preguntas en una evaluación sin preguntas.'
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Ya existe una evaluación con el mismo título.'
       });
       return;
     }
 
-    let valorPorPregunta: number;
-    if (this.numPreguntas === 1) {
-      valorPorPregunta = 20;
-    } else if (this.numPreguntas === 2) {
-      valorPorPregunta = 10;
-    } else {
-      valorPorPregunta = 20 / this.numPreguntas;
-    }
-
+    let valorPorPregunta = this.numPreguntas === 1 ? 20 : 20 / this.numPreguntas;
     for (let i = 0; i < this.numPreguntas; i++) {
       const nuevaPregunta: Pregunta = {
         enunciado: '',
@@ -224,42 +189,25 @@ export class RegistroExamenComponent {
       this.evaluacion.preguntas.push(nuevaPregunta);
     }
 
-    this.evaluacionesService.getEvaluaciones().subscribe(evaluaciones => {
-      const tituloExiste = evaluaciones.some(e => e.titulo.toLowerCase() === this.evaluacion.titulo.toLowerCase());
-      if (tituloExiste) {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Ya existe una evaluación con el mismo título.'
-        });
-      } else {
-        this.procederConGuardarEvaluacionSinPreguntas();
-      }
-    }, error => {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Error al verificar la unicidad del título.'
-      });
-    });
+    await this.procederConGuardarEvaluacionSinPreguntas();
   }
 
-  procederConGuardarEvaluacionSinPreguntas() {
-    this.evaluacionesService.addEvaluacion(this.evaluacion).subscribe({
-      next: (evaluacionGuardada: Evaluacion) => {
-        this.evaluacion = evaluacionGuardada;
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Evaluación Guardada',
-          detail: 'Ahora puede agregar preguntas.'
-        });
-        this.mostrarFormulario = false;
-      },
-      error: () => {
-        this.messageService.add({severity: 'error', summary: 'Error', detail: 'No se pudo guardar la evaluación.'});
-      }
-    });
+
+  async procederConGuardarEvaluacionSinPreguntas() {
+    try {
+      this.evaluacion = await this.evaluacionesService.addEvaluacion(this.evaluacion);
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Evaluación Guardada',
+        detail: 'Ahora puede agregar preguntas.'
+      });
+      this.mostrarFormulario = false;
+    } catch (error) {
+      this.messageService.add({severity: 'error', summary: 'Error', detail: 'No se pudo guardar la evaluación.'});
+    }
   }
+
+
 
   preguntaValida(): boolean {
     if (this.evaluacion.preguntas.length === 0) {
@@ -271,7 +219,6 @@ export class RegistroExamenComponent {
   }
 
   agregarOpciones(pregunta: Pregunta) {
-    const idPregunta = pregunta.id ?? 0;
     while (pregunta.opciones.length < this.maxOpciones) {
       pregunta.opciones.push({
         texto: '',

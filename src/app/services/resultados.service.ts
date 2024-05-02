@@ -1,28 +1,43 @@
 import {Injectable} from '@angular/core';
 import {ResultadoDeEvaluacion} from "../interfaces/Evaluacion";
 import {Observable} from "rxjs";
+import {AngularFirestore} from "@angular/fire/compat/firestore";
+import firebase from "firebase/compat";
+import DocumentReference = firebase.firestore.DocumentReference;
+import {map} from "rxjs/operators";
 import {HttpClient, HttpParams} from "@angular/common/http";
 
 @Injectable({
   providedIn: 'root'
 })
 export class ResultadosService {
-  private apiUrl = 'http://localhost:3000/resultadosDeEvaluacion';
+  private collectionPath = 'resultadosDeEvaluacion';
 
-  constructor(private http: HttpClient) {
+  constructor(private firestore: AngularFirestore) {
   }
 
-  submitEvaluacionResultado(resultado: ResultadoDeEvaluacion): Observable<ResultadoDeEvaluacion> {
-    return this.http.post<ResultadoDeEvaluacion>(this.apiUrl, resultado);
+  submitEvaluacionResultado(resultado: ResultadoDeEvaluacion): Promise<DocumentReference<ResultadoDeEvaluacion>> {
+    return this.firestore.collection<ResultadoDeEvaluacion>(this.collectionPath).add(resultado);
   }
-
 
   getEvaluacionResultados(): Observable<ResultadoDeEvaluacion[]> {
-    return this.http.get<ResultadoDeEvaluacion[]>(this.apiUrl);
+    return this.firestore.collection<ResultadoDeEvaluacion>(this.collectionPath).snapshotChanges().pipe(
+      map(actions => actions.map(a => {
+        const data = a.payload.doc.data() as ResultadoDeEvaluacion;
+        const id = a.payload.doc.id;
+        return { id, ...data };
+      }))
+    );
   }
 
+
   getEvaluacionResultadosDeTrabajador(idTrabajador: string): Observable<ResultadoDeEvaluacion[]> {
-    const params = new HttpParams().set('ID_Trabajador', idTrabajador);
-    return this.http.get<ResultadoDeEvaluacion[]>(`${this.apiUrl}`, {params});
+    return this.firestore.collection<ResultadoDeEvaluacion>(this.collectionPath, ref => ref.where('ID_Trabajador', '==', idTrabajador)).snapshotChanges().pipe(
+      map(actions => actions.map(a => {
+        const data = a.payload.doc.data() as ResultadoDeEvaluacion;
+        const id = a.payload.doc.id;
+        return { id, ...data };
+      }))
+    );
   }
 }

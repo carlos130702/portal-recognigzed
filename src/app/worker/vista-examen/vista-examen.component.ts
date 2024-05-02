@@ -1,19 +1,18 @@
 import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {Evaluacion, ResultadoDeEvaluacion} from "../../interfaces/Evaluacion";
+import {Evaluacion,ResultadoDeEvaluacion} from "../../interfaces/Evaluacion";
 import {ActivatedRoute, Router} from "@angular/router";
 import {EvaluacionesService} from "../../services/evaluaciones.service";
 import {Trabajador} from "../../interfaces/Trabajador";
 import {ResultadosService} from "../../services/resultados.service";
-import {tap, throwError} from "rxjs";
-import {catchError} from "rxjs/operators";
 import {AuthService} from "../../core/services/auth.service";
 import * as faceapi from 'face-api.js';
 import {MessageService} from "primeng/api";
+import emailjs from 'emailjs-com';
 
 @Component({
   selector: 'app-vista-examen',
   templateUrl: './vista-examen.component.html',
-  styleUrl: './vista-examen.component.css'
+  styleUrls: ['./vista-examen.component.css']
 })
 export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
   exam: Evaluacion | undefined;
@@ -32,11 +31,10 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
 
   onCameraLoad() {
     this.cameraLoaded = true;
-    const videoElement = document.querySelector('video');
-    if (!videoElement) {
-      return;
-    }
+    const videoElement = this.videoElement.nativeElement;
     videoElement.classList.add('loaded');
+    const canvasElement = this.canvasElement.nativeElement;
+    canvasElement.classList.add('loaded');
   }
 
   constructor(
@@ -157,7 +155,7 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  onSubmit(puntuacion: number = 0) {
+  onSubmit(puntuacion: number = 0, estadoVerificacion: boolean = true) {
     this.changeDetectorRef.detectChanges();
     if (!this.exam) {
       this.messageService.add({severity: 'error', summary: 'Error', detail: 'No hay un examen cargado.'});
@@ -174,33 +172,35 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
         puntuacion += pregunta.valor;
       }
     });
-
+    if (this.trabajadorActual.id === undefined || this.exam.id === undefined) {
+      console.error('ID de trabajador o evaluación no definido');
+      return;
+    }
     const resultado: ResultadoDeEvaluacion = {
-      ID_Trabajador: this.trabajadorActual.id as number,
-      ID_Evaluacion: this.exam.id as number,
-      Puntuacion: puntuacion
+      ID_Trabajador: this.trabajadorActual.id,
+      ID_Evaluacion: this.exam.id,
+      Puntuacion: puntuacion,
+      estado_Verificacion: estadoVerificacion
     };
 
     this.resultadosService.submitEvaluacionResultado(resultado)
-      .pipe(
-        tap((res: any) => {
-        }),
-        catchError((error: any) => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error al enviar',
-            detail: 'Hubo un problema al enviar los resultados del examen.'
-          });
-          return throwError(() => error);
-        })
-      )
-      .subscribe({
-        complete: () => {
-          this.messageService.add({severity: 'success', summary: 'Success', detail: 'Examen enviado correctamente.'});
-          setTimeout(() => {
-            this.router.navigate(['/worker/examenes']).then(r => console.log(r));
-          }, 2000);
-        }
+      .then(docRef => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Examen enviado correctamente.'
+        });
+        setTimeout(() => {
+          this.router.navigate(['/worker/examenes']).then(r => console.log('Redireccionamiento exitoso', r));
+        }, 2000);
+      })
+      .catch(error => {
+        console.error('Error al enviar los resultados del examen:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error al enviar',
+          detail: 'Hubo un problema al enviar los resultados del examen.'
+        });
       });
   }
 
@@ -223,7 +223,7 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
     navigator.mediaDevices.getUserMedia({video: {}})
       .then(stream => {
         this.videoElement.nativeElement.srcObject = stream;
-        this.videoElement.nativeElement.play();
+        this.videoElement.nativeElement.play().then(r => console.log(r));
         this.detectFaces();
       })
       .catch(err => {
@@ -308,38 +308,21 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
       this.finishExamWithZero();
     }
   }
+  sendSecurityAlertEmail(trabajadorNombre: string, examenNombre: string) {
+    const templateParams = {
+      fecha_incidente: new Date().toLocaleString(),
+      trabajador_nombre: trabajadorNombre,
+      examen_nombre: examenNombre
+    };
 
-
-  /*
-    async finishExamWithZero() {
-      this.verificationActive = false;
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Identidad no verificada. Terminando el examen con puntuación de cero.'
+    emailjs.send('service_fx1m46t', 'template_ed6nlrw', templateParams, 't6DTaMMkS6zjoTBcQ')
+      .then((response) => {
+        console.log('Email successfully sent!', response.status, response.text);
+      }, (error) => {
+        console.error('Failed to send email:', error);
       });
-      if (this.trabajadorActual && this.exam) {
-        const nombreCompleto = this.trabajadorActual.name + ' ' + this.trabajadorActual.lastName;
-        const cuerpoCorreo = `${nombreCompleto} ha tenido una suplantación en su examen de  ${this.exam.titulo}. Por lo tanto, se colocó 0 en su nota.`;
+  }
 
-        try {
-          const response = await this.http.post<any>('URL_DEL_BACKEND/enviar-correo', {
-            destinatario: 'correo_destino@example.com',
-            asunto: 'Suplantación en examen',
-            cuerpo: cuerpoCorreo
-          }).toPromise();
-          console.log('Correo electrónico enviado:', response);
-
-          setTimeout(() => {
-            this.onSubmit(0);
-          }, 3000);
-        } catch (error) {
-          console.error('Error al enviar el correo electrónico:', error);
-        }
-      } else {
-        console.error('Trabajador o examen no definidos');
-      }
-    }*/
   finishExamWithZero() {
     this.verificationActive = false;
     this.messageService.add({
@@ -348,7 +331,11 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
       detail: 'Identidad no verificada. Terminando el examen con puntuación de cero.'
     });
     setTimeout(() => {
-      this.onSubmit(0);
-    }, 3000);
+      this.onSubmit(0, false);
+      if (this.trabajadorActual && this.exam) {
+        this.sendSecurityAlertEmail(this.trabajadorActual.name, this.exam.titulo);
+      } else {
+        console.error('Trabajador o examen no definido');
+      }    }, 3000);
   }
 }

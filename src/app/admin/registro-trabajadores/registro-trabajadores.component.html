@@ -10,9 +10,10 @@
       <input type="text" pInputText id="apellidos" [(ngModel)]="trabajador.lastName" name="apellidos" required
              autocomplete="off">
     </div>
+
     <div class="field">
       <label for="foto">Foto</label>
-      <input type="file" (change)="onFileSelected($event)" id="foto" name="foto">
+      <input type="file" (change)="onFileSelected($event)" id="foto" name="foto" aria-label="Carga una foto">
       <img *ngIf="selectedFile" [src]="selectedFileUrl" alt="Foto seleccionada">
     </div>
 

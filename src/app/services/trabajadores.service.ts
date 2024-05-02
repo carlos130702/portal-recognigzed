@@ -1,32 +1,54 @@
 import {Injectable} from '@angular/core';
 import {Trabajador} from "../interfaces/Trabajador";
-import {Observable} from "rxjs";
-import {HttpClient} from "@angular/common/http";
+import {last, Observable, switchMap, throwError} from "rxjs";
+import {AngularFirestore} from "@angular/fire/compat/firestore";
+import {catchError, map} from "rxjs/operators";
+import firebase from "firebase/compat";
+import DocumentReference = firebase.firestore.DocumentReference;
+import {AngularFireStorage} from "@angular/fire/compat/storage";
+import { finalize } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TrabajadoresService {
-  private apiUrl = 'http://localhost:3000/trabajadores';
+  private collectionPath = 'trabajadores';
 
-  constructor(private http: HttpClient) {
+  constructor(private firestore: AngularFirestore,private storage: AngularFireStorage) {
   }
 
   getTrabajadores(): Observable<Trabajador[]> {
-    return this.http.get<Trabajador[]>(this.apiUrl);
+    return this.firestore.collection<Trabajador>(this.collectionPath).snapshotChanges().pipe(
+      map(actions => actions.map(a => {
+        const data = a.payload.doc.data() as Trabajador;
+        const id = a.payload.doc.id;
+        return { id, ...data };
+      }))
+    );
+  }
+  uploadFile(file: File): Observable<string> {
+    const filePath = `trabajadores/${Date.now()}_${file.name}`;
+    const ref = this.storage.ref(filePath);
+    const task = this.storage.upload(filePath, file);
+    return task.snapshotChanges().pipe(
+      last(),
+      switchMap(() => ref.getDownloadURL()),
+      catchError(error => {
+        console.error('Error en la carga:', error);
+        return throwError(error);
+      })
+    );
   }
 
-  addTrabajador(trabajador: Omit<Trabajador, 'id'>): Observable<Trabajador> {
-    return this.http.post<Trabajador>(this.apiUrl, trabajador);
+  addTrabajador(trabajador: Omit<Trabajador, 'id'>): Promise<DocumentReference<Trabajador>> {
+    return this.firestore.collection<Trabajador>(this.collectionPath).add(trabajador);
   }
 
-  editarTrabajador(trabajador: Trabajador): Observable<Trabajador> {
-    const url = `${this.apiUrl}/${trabajador.id}`;
-    return this.http.put<Trabajador>(url, trabajador);
+  editarTrabajador(trabajador: Trabajador): Promise<void> {
+    return this.firestore.doc<Trabajador>(`${this.collectionPath}/${trabajador.id}`).update(trabajador);
   }
 
-  eliminarTrabajador(id: number | undefined): Observable<any> {
-    const url = `${this.apiUrl}/${id}`;
-    return this.http.delete(url);
+  eliminarTrabajador(id: string): Promise<void> {
+    return this.firestore.doc(`${this.collectionPath}/${id}`).delete();
   }
 }

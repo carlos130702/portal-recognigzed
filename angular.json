@@ -45,7 +45,6 @@
             ],
             "scripts": [],
             "allowedCommonJsDependencies": [
-              "node-fetch",
               "face-api.js",
               "@tensorflow/tfjs-core"
             ]

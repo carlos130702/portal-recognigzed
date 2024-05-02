@@ -1,10 +1,11 @@
-import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, OnInit, ViewChild} from '@angular/core';
 import {Trabajador} from "../../interfaces/Trabajador";
 import {TrabajadoresService} from "../../services/trabajadores.service";
 import {MessageService} from "primeng/api";
 import {Evaluacion, ResultadoDeEvaluacion} from "../../interfaces/Evaluacion";
 import {ResultadosService} from "../../services/resultados.service";
 import {EvaluacionesService} from "../../services/evaluaciones.service";
+import {FileUpload} from "primeng/fileupload";
 
 @Component({
   selector: 'app-trabajadores',
@@ -12,6 +13,7 @@ import {EvaluacionesService} from "../../services/evaluaciones.service";
   styleUrl: './trabajadores.component.css'
 })
 export class TrabajadoresComponent implements OnInit {
+  @ViewChild('fileUpload') fileUpload: FileUpload | undefined;
   trabajadores: Trabajador[] = [];
   displayEditDialog: boolean = false;
   displayViewDialog: boolean = false;
@@ -19,7 +21,7 @@ export class TrabajadoresComponent implements OnInit {
   resultadosEvaluacion: ResultadoDeEvaluacion[] = [];
   evaluaciones: Evaluacion[] = [];
   trabajadorSeleccionado: Trabajador = {
-    id: 0,
+    id: '',
     name: '',
     lastName: '',
     photo: '',
@@ -48,10 +50,13 @@ export class TrabajadoresComponent implements OnInit {
 
   }
 
+  resetFileUpload(): void {
+    if (!this.fileUpload) return;
+    this.fileUpload.clear(); // Limpiar cualquier archivo seleccionado previamente
+  }
+
   cargarResultados(): void {
     if (this.trabajadorSeleccionado && this.trabajadorSeleccionado.id) {
-      const trabajadorId = this.trabajadorSeleccionado.id.toString();
-
       this.resultadosService.getEvaluacionResultadosDeTrabajador(this.trabajadorSeleccionado.id.toString())
         .subscribe({
           next: (resultados: ResultadoDeEvaluacion[]) => {
@@ -88,7 +93,7 @@ export class TrabajadoresComponent implements OnInit {
     );
   }
 
-  getEvaluacionTitulo(idEvaluacion: number): string {
+  getEvaluacionTitulo(idEvaluacion: string): string {
     const evaluacion = this.evaluaciones.find(e => e.id === idEvaluacion);
     return evaluacion ? evaluacion.titulo : 'Cargando...';
   }
@@ -101,49 +106,49 @@ export class TrabajadoresComponent implements OnInit {
   }
 
   editar(trabajador: Trabajador) {
-    this.trabajadorSeleccionado = {...trabajador}; // Hace una copia para editar
-    this.displayEditDialog = true; // Muestra el diálogo de edición
+    this.trabajadorSeleccionado = {...trabajador};
+    this.displayEditDialog = true;
+    this.resetFileUpload();
   }
 
-  confirmarEdicion(valoresFormulario: any) {
-    if (this.trabajadorSeleccionado && this.trabajadorSeleccionado.id) {
+  onBeforeUpload(event: any): void {
+    event.formData.append('trabajadorId', this.trabajadorSeleccionado.id);
+  }
 
-      const datosActualizados: Trabajador = {
-        ...this.trabajadorSeleccionado,
-        photo: this.trabajadorSeleccionado?.photo,
-        user: this.trabajadorSeleccionado?.user,
-        password: this.trabajadorSeleccionado?.password,
-      };
-      this.trabajadoresService.editarTrabajador(datosActualizados).subscribe({
-        next: (trabajadorActualizado: Trabajador) => {
-          const index = this.trabajadores.findIndex(t => t.id === this.trabajadorSeleccionado?.id);
-          if (index !== -1) {
-            this.trabajadores[index] = trabajadorActualizado;
-            this.messageService.add({severity: 'success', summary: 'Éxito', detail: 'Trabajador editado con éxito.'});
-          }
-          this.displayEditDialog = false;
-          this.cd.detectChanges();
+  onUpload(event: any): void {
+    if (event.files && event.files.length > 0) {
+      const file = event.files[0] as File;
+      this.trabajadoresService.uploadFile(file).subscribe({
+        next: (url: string) => {
+          this.trabajadorSeleccionado.photo = url;
+          this.cd.markForCheck();
         },
-        error: (error: any) => {
-          this.messageService.add({severity: 'error', summary: 'Error', detail: 'Error al editar el trabajador.'});
-          console.error('Error al editar el trabajador', error);
+        error: (error) => {
+          this.messageService.add({severity: 'error', summary: 'Error al cargar la imagen', detail: 'No se pudo cargar la imagen.'});
         }
       });
     }
   }
 
-  onUpload(event: any) {
-    // Aquí manejarías la respuesta del servidor después de cargar la foto,
-    // por ejemplo, actualizando la URL de la foto en trabajadorSeleccionado.photo
-  }
-
-  onBeforeUpload(event: any) {
-    // Aquí puedes manejar la lógica antes de la subida de la foto,
-    // por ejemplo, añadir headers o parametros al request de la subida
+  confirmarEdicion(valoresFormulario: any): void {
+    if (this.trabajadorSeleccionado && this.trabajadorSeleccionado.id) {
+      const datosActualizados: Trabajador = {
+        ...this.trabajadorSeleccionado,
+        user: valoresFormulario.user,
+        password: valoresFormulario.password,
+        photo: this.trabajadorSeleccionado.photo
+      };
+      this.trabajadoresService.editarTrabajador(datosActualizados).then(() => {
+        this.messageService.add({severity: 'success', summary: 'Éxito', detail: 'Trabajador editado con éxito.'});
+        this.displayEditDialog = false;
+        this.cd.markForCheck();
+      }).catch(error => {
+        this.messageService.add({severity: 'error', summary: 'Error', detail: 'Error al editar el trabajador.'});
+      });
+    }
   }
 
   eliminar(trabajador: Trabajador) {
-    console.log('ID del trabajador a eliminar:', trabajador.id);
     if (trabajador.id == null) {
       this.messageService.add({
         severity: 'warn',
@@ -153,19 +158,15 @@ export class TrabajadoresComponent implements OnInit {
       return;
     }
     if (confirm('¿Estás seguro de que quieres eliminar a este trabajador?')) {
-      this.trabajadoresService.eliminarTrabajador(trabajador.id).subscribe({
-        next: (resp) => {
-          this.trabajadores = this.trabajadores.filter(t => t.id !== trabajador.id);
-          if (this.trabajadoresFiltrados) {
-            this.trabajadoresFiltrados = this.trabajadoresFiltrados.filter(t => t.id !== trabajador.id);
-          }
-          this.messageService.add({severity: 'success', summary: 'Éxito', detail: 'Trabajador eliminado con éxito.'});
-          console.log('Trabajador eliminado con éxito', resp);
-        },
-        error: (err) => {
-          this.messageService.add({severity: 'error', summary: 'Error', detail: 'Error al eliminar el trabajador.'});
-          console.error('Error al eliminar el trabajador', err);
+      this.trabajadoresService.eliminarTrabajador(trabajador.id).then(() => {
+        this.trabajadores = this.trabajadores.filter(t => t.id !== trabajador.id);
+        if (this.trabajadoresFiltrados) {
+          this.trabajadoresFiltrados = this.trabajadoresFiltrados.filter(t => t.id !== trabajador.id);
         }
+        this.messageService.add({severity: 'success', summary: 'Éxito', detail: 'Trabajador eliminado con éxito.'});
+      }).catch(err => {
+        this.messageService.add({severity: 'error', summary: 'Error', detail: 'Error al eliminar el trabajador.'});
+        console.error('Error al eliminar el trabajador', err);
       });
     }
   }

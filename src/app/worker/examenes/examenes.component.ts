@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {Evaluacion, ResultadoDeEvaluacion} from "../../interfaces/Evaluacion";
+import {Evaluacion,ResultadoDeEvaluacion} from "../../interfaces/Evaluacion";
 import {EvaluacionesService} from "../../services/evaluaciones.service";
 import {Router} from "@angular/router";
 import {catchError} from "rxjs/operators";
@@ -15,7 +15,7 @@ import {AuthService} from "../../core/services/auth.service";
 export class ExamenesComponent implements OnInit {
   evaluaciones: Evaluacion[] = [];
   resultadosEvaluaciones: ResultadoDeEvaluacion[] = [];
-  idUsuarioActual: number | undefined;
+  idUsuarioActual: string | undefined;
 
   constructor(
     private evaluacionesService: EvaluacionesService,
@@ -28,10 +28,9 @@ export class ExamenesComponent implements OnInit {
   ngOnInit(): void {
     this.loadEvaluaciones();
     const usuario = this.authService.getCurrentUser();
-    if (usuario) {
+    if (usuario && usuario.id) {
       this.idUsuarioActual = usuario.id;
       this.cargarResultados();
-    } else {
     }
   }
 
@@ -57,6 +56,9 @@ export class ExamenesComponent implements OnInit {
   }
 
   cargarResultados(): void {
+    if (this.idUsuarioActual === undefined) {
+      return;
+    }
     this.resultadosService.getEvaluacionResultados().subscribe(resultados => {
       this.resultadosEvaluaciones = resultados.filter(resultado => {
         if (this.idUsuarioActual === undefined) {
@@ -67,14 +69,13 @@ export class ExamenesComponent implements OnInit {
     });
   }
 
-
-  obtenerCalificacion(idEvaluacion: number): number | null {
+  obtenerCalificacion(idEvaluacion: string): number | null {
     const resultado = this.resultadosEvaluaciones.find(resultado => resultado.ID_Evaluacion === idEvaluacion);
     return resultado ? resultado.Puntuacion : null;
   }
 
 
-  tieneCalificacion(idEvaluacion: number): boolean {
+  tieneCalificacion(idEvaluacion: string): boolean {
     return this.obtenerCalificacion(idEvaluacion) !== null;
   }
 

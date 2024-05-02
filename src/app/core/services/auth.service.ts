@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+import {Observable, of, switchMap} from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+import {AngularFirestore} from "@angular/fire/compat/firestore";
 
 export interface User {
-  id: number;
+  id: string;
   user: string;
   password: string;
   name?: string;
@@ -17,37 +18,39 @@ export interface User {
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly apiUrl = 'http://localhost:3000';
   private currentUser: User | null = null;
 
-  constructor(private http: HttpClient) { }
+  constructor(private firestore: AngularFirestore) { }
 
   login(username: string, password: string): Observable<User | null> {
-    return this.http.get<User[]>(`${this.apiUrl}/administradores`).pipe(
-      map(admins => {
-        const admin = admins.find(a => a.user === username && a.password === password);
-        if (admin) {
-          const userToStore = { ...admin, role: 'administrador' };
-          sessionStorage.setItem('currentUser', JSON.stringify(userToStore));
-          return userToStore;
-        }
-        throw new Error('Not admin');
-      }),
-      catchError(err =>
-        err.message === 'Not admin' ? this.http.get<User[]>(`${this.apiUrl}/trabajadores`).pipe(
-          map(workers => {
-            const worker = workers.find(w => w.user === username && w.password === password);
-            if (worker) {
-              const userToStore = { ...worker, role: 'trabajador' };
-              sessionStorage.setItem('currentUser', JSON.stringify(userToStore));
-              return userToStore;
-            }
-            return null;
-          })
-        ) : of(null)
-      )
-    );
+    return this.firestore.collection<User>('administradores', ref => ref.where('user', '==', username).where('password', '==', password))
+      .valueChanges({ idField: 'id' })
+      .pipe(
+        switchMap(admins => {
+          const admin = admins[0]; // Tomamos el primer resultado
+          if (admin) {
+            const userToStore = { ...admin, role: 'administrador' };
+            sessionStorage.setItem('currentUser', JSON.stringify(userToStore));
+            return of(userToStore);
+          }
+          // Si no es administrador, busca en la colección de trabajadores
+          return this.firestore.collection<User>('trabajadores', ref => ref.where('user', '==', username).where('password', '==', password))
+            .valueChanges({ idField: 'id' })
+            .pipe(
+              map(workers => {
+                const worker = workers[0];
+                if (worker) {
+                  const userToStore = { ...worker, role: 'trabajador' };
+                  sessionStorage.setItem('currentUser', JSON.stringify(userToStore));
+                  return userToStore;
+                }
+                return null;
+              })
+            );
+        })
+      );
   }
+
   isAuthenticated(): boolean {
     const currentUser = sessionStorage.getItem('currentUser');
     return !!currentUser;

@@ -1,5 +1,5 @@
-import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
-import {Evaluacion, Opcion, Pregunta} from "../../interfaces/Evaluacion";
+import {Component, OnInit} from '@angular/core';
+import {Evaluacion,Pregunta} from "../../interfaces/Evaluacion";
 import {EvaluacionesService} from "../../services/evaluaciones.service";
 import {MessageService} from "primeng/api";
 import {FormArray, FormBuilder, FormControl, FormGroup} from "@angular/forms";
@@ -13,14 +13,12 @@ export class ExamenesRegistradosComponent implements OnInit {
   evaluaciones: Evaluacion[] = [];
   evaluacionesFiltradas: Evaluacion[] = [];
   evaluacionSeleccionada?: Evaluacion;
-  displayDialog: boolean = false;
   displayViewDialog: boolean = false;
   displayEditDialog: boolean = false;
   evaluacionForm: FormGroup;
   indiceActual: number = 0;
 
   constructor(
-    private cd: ChangeDetectorRef,
     private evaluacionService: EvaluacionesService,
     private messageService: MessageService, private fb: FormBuilder
   ) {
@@ -93,24 +91,30 @@ export class ExamenesRegistradosComponent implements OnInit {
 
   guardarEvaluacion() {
     if (this.evaluacionForm.valid) {
-      console.log(this.evaluacionForm.value);
-      this.evaluacionService.actualizarEvaluacion(this.evaluacionForm.value).subscribe({
-        next: (respuesta) => {
-          this.displayEditDialog = false;
-          this.cargarEvaluaciones();
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Actualización exitosa',
-            detail: 'La actualización del examen fue exitosa.'
-          });
-        },
-        error: (error) => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Hubo un problema al actualizar el examen.'
-          });
-        }
+      const evaluacion: Evaluacion = this.evaluacionForm.value;
+      if (!evaluacion.id || evaluacion.id.trim() === '') {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'La evaluación no tiene un ID válido.'
+        });
+        return;
+      }
+      this.evaluacionService.actualizarEvaluacion(evaluacion).then(() => {
+        this.displayEditDialog = false;
+        this.cargarEvaluaciones();
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Actualización exitosa',
+          detail: 'La actualización del examen fue exitosa.'
+        });
+      }).catch((error) => {
+        console.error('Error al actualizar la evaluación:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Hubo un problema al actualizar el examen.'
+        });
       });
     }
   }
@@ -163,18 +167,15 @@ export class ExamenesRegistradosComponent implements OnInit {
       return;
     }
     if (confirm('¿Estás seguro de que quieres eliminar esta evaluación?')) {
-      this.evaluacionService.deleteEvaluacion(evaluacion.id).subscribe({
-        next: (resp) => {
-          this.evaluaciones = this.evaluaciones.filter(e => e.id !== evaluacion.id);
-          this.evaluacionesFiltradas = this.evaluacionesFiltradas.filter(e => e.id !== evaluacion.id);
-          this.messageService.add({severity: 'success', summary: 'Éxito', detail: 'Evaluación eliminada con éxito.'});
-          console.log('Evaluación eliminada con éxito', resp);
-        },
-        error: (err) => {
-          this.messageService.add({severity: 'error', summary: 'Error', detail: 'Error al eliminar la evaluación.'});
-          console.error('Error al eliminar la evaluación', err);
-        }
+      this.evaluacionService.deleteEvaluacion(evaluacion.id).then(() => {
+        this.evaluaciones = this.evaluaciones.filter(e => e.id !== evaluacion.id);
+        this.evaluacionesFiltradas = this.evaluacionesFiltradas.filter(e => e.id !== evaluacion.id);
+        this.messageService.add({severity: 'success', summary: 'Éxito', detail: 'Evaluación eliminada con éxito.'});
+      }).catch(err => {
+        this.messageService.add({severity: 'error', summary: 'Error', detail: 'Error al eliminar la evaluación.'});
+        console.error('Error al eliminar la evaluación', err);
       });
     }
   }
+
 }

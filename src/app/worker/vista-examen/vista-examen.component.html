@@ -8,8 +8,8 @@
       <p-progressSpinner></p-progressSpinner>
       <p>Loading camera...</p>
     </div>
-    <video #videoElement width="320" height="160" autoplay muted (loadedmetadata)="onCameraLoad()"></video>
-    <canvas #canvasElement></canvas>
+    <video #videoElement width="320" height="240" autoplay muted (loadedmetadata)="onCameraLoad()" class="loaded"></video>
+    <canvas #canvasElement class="loaded"></canvas>
     <div class="form-container mr-8 ml-8" *ngIf="cameraLoaded">
       <form (ngSubmit)="onSubmit()" class="flex flex-column align-items-center card">
         <div *ngIf="exam.preguntas[currentQuestionIndex]" class="mb-4">

@@ -426,6 +426,57 @@
           "valor": 10
         }
       ]
+    },
+    {
+      "id": "7cd8",
+      "titulo": "dhdsh",
+      "descripcion": "hdhsh",
+      "preguntas": [
+        {
+          "enunciado": "hdshsh",
+          "opciones": [
+            {
+              "texto": "shdsdh",
+              "esCorrecta": false
+            },
+            {
+              "texto": "hdshsh",
+              "esCorrecta": true
+            },
+            {
+              "texto": "dhshdh",
+              "esCorrecta": false
+            },
+            {
+              "texto": "hsdhshds",
+              "esCorrecta": false
+            }
+          ],
+          "valor": 10
+        },
+        {
+          "enunciado": "sdhdsh",
+          "opciones": [
+            {
+              "texto": "hdshs",
+              "esCorrecta": false
+            },
+            {
+              "texto": "hdhd",
+              "esCorrecta": false
+            },
+            {
+              "texto": "hhfhf",
+              "esCorrecta": true
+            },
+            {
+              "texto": "hfhfh",
+              "esCorrecta": false
+            }
+          ],
+          "valor": 10
+        }
+      ]
     }
   ],
   "resultadosDeEvaluacion": [

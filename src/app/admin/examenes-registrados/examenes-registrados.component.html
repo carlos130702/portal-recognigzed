@@ -82,12 +82,10 @@
       <label for="titulo" class="dialog-form-label">Título</label>
       <input id="titulo" type="text" pInputText formControlName="titulo" class="dialog-form-input">
     </div>
-    <!-- Descripción -->
     <div class="col-12">
       <label for="descripcion" class="dialog-form-label">Descripción</label>
       <textarea id="descripcion" pInputTextarea formControlName="descripcion" class="dialog-form-textarea"></textarea>
     </div>
-    <!-- Preguntas y Opciones -->
     <div formArrayName="preguntas">
       <div *ngFor="let preguntaGroup of preguntas.controls; let i=index" [formGroupName]="i">
         <!-- Pregunta -->

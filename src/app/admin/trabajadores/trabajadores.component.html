@@ -37,14 +37,19 @@
   </p-table>
 </div>
 
-<p-dialog header="Detalle del Trabajador" [(visible)]="displayViewDialog" [modal]="true" [style]="{width: '50vw'}">
+<p-dialog header="Detalle del Trabajador" [(visible)]="displayViewDialog" [modal]="true" [style]="{width: '50vw'}" (onHide)="resetDialog()">
   <ng-container *ngIf="trabajadorSeleccionado">
     <div class="flex align-items-center mb-5">
-      <img [src]="trabajadorSeleccionado.photo" alt="Imagen de perfil" class="mr-2 trabajador-imagen"
+      <img [src]="trabajadorSeleccionado.photo"
+           alt="Imagen de perfil"
+           class="mr-2 trabajador-imagen" loading="lazy"
            style="width: 100px; height: 100px; border-radius: 50%;">
       <div>
-        <h4>{{ trabajadorSeleccionado.name }} {{ trabajadorSeleccionado.lastName }}</h4>
+        <h4>{{ trabajadorSeleccionado.name + ' ' + trabajadorSeleccionado.lastName | upperCamelCase }}</h4>
       </div>
+    </div>
+    <div class="legend mb-3">
+      <div><span class="color-box"></span> Suplantación encontrada</div>
     </div>
     <div *ngIf="resultadosEvaluacion.length > 0; else noEvaluaciones">
       <p-table [value]="resultadosEvaluacion" [autoLayout]="true" responsiveLayout="scroll">
@@ -55,7 +60,7 @@
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-resultado>
-          <tr>
+          <tr [ngClass]="{'red-row': !resultado.estado_Verificacion}">
             <td>{{ getEvaluacionTitulo(resultado.ID_Evaluacion) }}</td>
             <td>{{ resultado.Puntuacion }}</td>
           </tr>
@@ -68,7 +73,7 @@
   </ng-container>
 </p-dialog>
 
-<p-dialog header="Editar Trabajador" [(visible)]="displayEditDialog" [modal]="true" [style]="{width: '50vw'}">
+<p-dialog header="Editar Trabajador" [(visible)]="displayEditDialog" [modal]="true" [style]="{width: '50vw'}" (onHide)="resetDialog()">
   <form #trabajadorForm="ngForm" (ngSubmit)="confirmarEdicion(trabajadorForm.value)">
     <div class="p-fluid">
       <div class="p-field">
@@ -82,7 +87,6 @@
         <input pInputText id="password" [(ngModel)]="trabajadorSeleccionado.password" name="password" required>
         <i class="pi pi-lock field-icon"></i>
       </div>
-
 
       <div class="p-field photo-container">
         <label for="photo">Foto</label>
@@ -99,6 +103,4 @@
     </div>
   </form>
 </p-dialog>
-
-
 <p-toast></p-toast>

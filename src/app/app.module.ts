@@ -20,11 +20,13 @@ import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import {ToastModule} from "primeng/toast";
 import {MessageService} from "primeng/api";
+import { UpperCamelCasePipe } from './pipes/upper-camel-case.pipe';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
+    UpperCamelCasePipe,
   ],
   imports: [
     BrowserModule,
@@ -44,6 +46,9 @@ import {MessageService} from "primeng/api";
   providers: [
     firebaseProviders,
     MessageService
+  ],
+  exports: [
+    UpperCamelCasePipe
   ],
   bootstrap: [AppComponent]
 })

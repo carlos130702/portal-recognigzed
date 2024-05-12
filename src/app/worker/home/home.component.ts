@@ -16,7 +16,7 @@ export class HomeComponent implements OnInit {
   constructor(private authService: AuthService, private router: Router, private cdr: ChangeDetectorRef) {
     this.items = [
       {
-        label: 'Examenes',
+        label: 'Examenes Disponibles',
         routerLink: ['/worker/examenes'],
         routerLinkActiveOptions: {exact: true}
       }

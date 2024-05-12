@@ -4,7 +4,7 @@
 }
 
 body {
-  font-family: 'Arial', sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: #333;
 }
 
@@ -13,7 +13,7 @@ body {
   color: #007bff;
   margin-bottom: 1rem;
 }
-.p-button {
+p-button {
   color: white;
   border: none;
   padding: 10px 15px;
@@ -22,7 +22,7 @@ body {
   border-radius: 5px;
 }
 
-.p-table {
+p-table {
   border-collapse: collapse;
 }
 
@@ -30,6 +30,11 @@ p-table th {
   background-color: #007bff;
   color: white;
   text-align: center;
+  font-size: 16px;
+  width: 50%;
+}
+p-table tr {
+  transition: background-color 0.3s ease;
 }
 
 p-table td {
@@ -47,22 +52,16 @@ p-table tr:nth-child(even) td {
 }
 p-table td,
 p-table th {
-  padding: 12px 15px;
+  padding: 15px 20px;
   vertical-align: middle;
-  border: 2px solid #dee2e6;
+  border: 1px solid #ddd;
 }
-.p-datatable .p-datatable-wrapper {
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  border-radius: 4px;
-}
-p-table tr:nth-child(even) {
-  background-color: #f9f9f9;
-}
+
 p-table td:first-child {
   text-transform: capitalize;
 }
 
-.p-button:hover::after {
+p-button:hover::after {
   content: attr(data-tooltip);
   position: absolute;
   bottom: -25px;
@@ -117,7 +116,7 @@ p-table td:first-child {
     overflow-x: auto;
   }
 }
-.p-paginator .p-paginator-pages {
+p-paginator p-paginator-pages {
   padding: 0;
   margin: 0;
   list-style-type: none;
@@ -125,7 +124,7 @@ p-table td:first-child {
   justify-content: center;
 }
 
-.p-paginator .p-paginator-page {
+p-paginator p-paginator-page {
   margin: 0 5px;
   display: flex;
   align-items: center;
@@ -134,12 +133,12 @@ p-table td:first-child {
   height: 40px;
 }
 @media (max-width: 768px) {
-  .p-dialog .flex {
+  p-dialog .flex {
     flex-direction: column;
     align-items: center;
   }
 
-  .p-dialog img.trabajador-imagen {
+  p-dialog img.trabajador-imagen {
     margin-bottom: 15px;
   }
   .search-container {
@@ -164,11 +163,16 @@ p-table td:first-child {
   margin-top:1rem;
   margin-bottom:1rem;
 }
+
 .table-container {
   max-width: 80%;
   margin: auto;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
 }
-.p-fileupload .p-fileupload-buttonbar {
+
+p-fileupload p-fileupload-buttonbar {
   display: flex;
   justify-content: center;
   margin-bottom: 10px;
@@ -184,7 +188,7 @@ p-table td:first-child {
   border-radius: 4px;
 }
 
-.p-field.photo-container {
+p-field.photo-container {
   text-align: center;
 }
 .p-inputtext {
@@ -226,4 +230,20 @@ p-table td:first-child {
 
 .search-container .p-input-icon-left input {
   padding-left: 2.5em;
+}
+p-table tr.red-row td {
+  background-color: #ffcccc;
+}
+
+.legend div {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.color-box {
+  width: 20px;
+  height: 20px;
+  background-color: red;
+  margin-right: 5px;
 }

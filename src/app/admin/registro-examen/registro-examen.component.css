@@ -69,13 +69,13 @@ div.field, button {
   justify-content: space-between;
 }
 
-.p-button {
+p-button {
   padding: 10px 20px;
   font-weight: bold;
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
-.p-button:not(:last-child) {
+p-button:not(:last-child) {
   margin-right: 10px;
 }
 .option-container {

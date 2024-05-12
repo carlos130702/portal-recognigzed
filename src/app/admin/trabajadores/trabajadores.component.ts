@@ -10,7 +10,7 @@ import {FileUpload} from "primeng/fileupload";
 @Component({
   selector: 'app-trabajadores',
   templateUrl: './trabajadores.component.html',
-  styleUrl: './trabajadores.component.css'
+  styleUrls: ['./trabajadores.component.css']
 })
 export class TrabajadoresComponent implements OnInit {
   @ViewChild('fileUpload') fileUpload: FileUpload | undefined;
@@ -35,6 +35,21 @@ export class TrabajadoresComponent implements OnInit {
   ngOnInit() {
     this.cargarTrabajadores();
   }
+  get emptyTrabajador(): Trabajador {
+    return {
+      id: '',
+      name: '',
+      lastName: '',
+      photo: '',
+      user: '',
+      password: ''
+    };
+  }
+
+  resetDialog() {
+    this.trabajadorSeleccionado = this.emptyTrabajador;
+    this.resultadosEvaluacion = [];
+  }
 
   cargarTrabajadores() {
     this.trabajadoresService.getTrabajadores().subscribe({
@@ -52,7 +67,7 @@ export class TrabajadoresComponent implements OnInit {
 
   resetFileUpload(): void {
     if (!this.fileUpload) return;
-    this.fileUpload.clear(); // Limpiar cualquier archivo seleccionado previamente
+    this.fileUpload.clear();
   }
 
   cargarResultados(): void {

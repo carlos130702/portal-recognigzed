@@ -19,6 +19,7 @@ import {InputTextareaModule} from "primeng/inputtextarea";
 import { ExamenesRegistradosComponent } from './examenes-registrados/examenes-registrados.component';
 import {FileUploadModule} from "primeng/fileupload";
 import {SafePipe} from "safe-pipe";
+import {UpperCamelCasePipe} from "../pipes/upper-camel-case.pipe";
 
 
 @NgModule({
@@ -27,7 +28,8 @@ import {SafePipe} from "safe-pipe";
     TrabajadoresComponent,
     RegistroTrabajadoresComponent,
     RegistroExamenComponent,
-    ExamenesRegistradosComponent
+    ExamenesRegistradosComponent,
+    UpperCamelCasePipe
   ],
     imports: [
         CommonModule,

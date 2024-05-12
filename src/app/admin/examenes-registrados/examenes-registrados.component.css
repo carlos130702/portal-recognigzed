@@ -4,7 +4,7 @@
 }
 
 body {
-  font-family: 'Arial', sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: #333;
 }
 
@@ -22,6 +22,8 @@ p-table th {
   background-color: #007bff;
   color: white;
   text-align: center;
+  font-size: 16px;
+  width: 50%;
 }
 
 p-table td {
@@ -41,14 +43,10 @@ p-table tr:nth-child(even) td {
 
 p-table td,
 p-table th {
-  padding: 12px 15px;
+  padding: 15px 20px;
   vertical-align: middle;
-  border: 2px solid #dee2e6;
-}
-
-.p-datatable .p-datatable-wrapper {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
+  border: 1px solid #ddd;
+  text-align: center; /* Centra el texto en las celdas */
 }
 
 p-table tr:nth-child(even) {
@@ -57,15 +55,6 @@ p-table tr:nth-child(even) {
 
 p-table td:first-child {
   text-transform: capitalize;
-}
-
-.p-button {
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  font-size: 16px;
-  cursor: pointer;
-  border-radius: 5px;
 }
 
 p-button {
@@ -78,11 +67,11 @@ p-button {
   border-radius: 5px;
 }
 
-button.pButton:hover {
+p-button:hover {
   background-color: #0056b3;
 }
 
-button.pButton:hover::after {
+p-button:hover::after {
   content: attr(data-tooltip);
   position: absolute;
   bottom: -25px;
@@ -144,7 +133,7 @@ button.pButton:hover::after {
   }
 }
 
-.p-paginator .p-paginator-pages {
+p-paginator p-paginator-pages {
   padding: 0;
   margin: 0;
   list-style-type: none;
@@ -152,7 +141,7 @@ button.pButton:hover::after {
   justify-content: center;
 }
 
-.p-paginator .p-paginator-page {
+p-paginator p-paginator-page {
   margin: 0 5px;
   display: flex;
   align-items: center;
@@ -162,12 +151,12 @@ button.pButton:hover::after {
 }
 
 @media (max-width: 768px) {
-  .p-dialog .flex {
+  p-dialog .flex {
     flex-direction: column;
     align-items: center;
   }
 
-  .p-dialog img.trabajador-imagen {
+  p-dialog img.trabajador-imagen {
     margin-bottom: 15px;
   }
 
@@ -198,6 +187,9 @@ button.pButton:hover::after {
 .table-container {
   max-width: 80%;
   margin: auto;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 .titulo-evaluacion {
@@ -266,16 +258,16 @@ button.pButton:hover::after {
   margin-top: 1.25rem;
 }
 
-.p-footer {
+p-footer {
   padding: 0.5em;
 }
 
-.p-dialog .p-footer {
+p-dialog p-footer {
   display: flex;
   justify-content: flex-end;
 }
 
-.p-dialog .p-footer .p-button {
+p-dialog p-footer p-button {
   margin-left: auto;
 }
 

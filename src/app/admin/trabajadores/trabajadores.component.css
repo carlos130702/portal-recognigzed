@@ -244,6 +244,6 @@ p-table tr.red-row td {
 .color-box {
   width: 20px;
   height: 20px;
-  background-color: red;
+  background-color: #ffcccc;
   margin-right: 5px;
 }

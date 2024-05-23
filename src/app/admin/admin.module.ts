@@ -21,7 +21,6 @@ import {FileUploadModule} from "primeng/fileupload";
 import {SafePipe} from "safe-pipe";
 import {UpperCamelCasePipe} from "../pipes/upper-camel-case.pipe";
 
-
 @NgModule({
   declarations: [
     HomeComponent,
@@ -31,22 +30,22 @@ import {UpperCamelCasePipe} from "../pipes/upper-camel-case.pipe";
     ExamenesRegistradosComponent,
     UpperCamelCasePipe
   ],
-    imports: [
-        CommonModule,
-        AdminRoutingModule,
-        MenubarModule,
-        TableModule,
-        DialogModule,
-        ButtonModule,
-        InputTextModule,
-        FormsModule,
-        ToastModule,
-        CheckboxModule,
-        InputTextareaModule,
-        ReactiveFormsModule,
-        FileUploadModule,
-        SafePipe,
-    ],
+  imports: [
+    CommonModule,
+    AdminRoutingModule,
+    MenubarModule,
+    TableModule,
+    DialogModule,
+    ButtonModule,
+    InputTextModule,
+    FormsModule,
+    ToastModule,
+    CheckboxModule,
+    InputTextareaModule,
+    ReactiveFormsModule,
+    FileUploadModule,
+    SafePipe
+  ],
   providers: [
     MessageService
   ]

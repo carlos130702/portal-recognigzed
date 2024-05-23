@@ -16,7 +16,7 @@
       <tr>
         <td>{{ evaluacion.titulo | upperCamelCase }}</td>
         <td>{{ evaluacion.descripcion}}</td>
-        <td [ngClass]="{'red-cell': (obtenerCalificacion(evaluacion.id)) < 11}">
+        <td [ngClass]="{'red-cell': (obtenerCalificacion(evaluacion.id) ?? 0) < 11}">
           {{ obtenerCalificacion(evaluacion.id) != null ? (obtenerCalificacion(evaluacion.id)) : '-' }}
         </td>
         <td>

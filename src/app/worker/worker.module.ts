@@ -31,7 +31,7 @@ import {UpperCamelCasePipe} from "../pipes/upper-camel-case.pipe";
     FormsModule,
     RadioButtonModule,
     ToastModule,
-    ProgressSpinnerModule
+    ProgressSpinnerModule,
   ],
   providers: [
     MessageService

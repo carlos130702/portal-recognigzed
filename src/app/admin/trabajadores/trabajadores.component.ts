@@ -1,7 +1,7 @@
-import {ChangeDetectorRef, Component, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, OnInit, ViewChild} from '@angular/core';
 import {Trabajador} from "../../interfaces/Trabajador";
 import {TrabajadoresService} from "../../services/trabajadores.service";
-import {MessageService} from "primeng/api";
+import {ConfirmationService, MessageService} from "primeng/api";
 import {Evaluacion, ResultadoDeEvaluacion} from "../../interfaces/Evaluacion";
 import {ResultadosService} from "../../services/resultados.service";
 import {EvaluacionesService} from "../../services/evaluaciones.service";
@@ -12,7 +12,7 @@ import {FileUpload} from "primeng/fileupload";
   templateUrl: './trabajadores.component.html',
   styleUrls: ['./trabajadores.component.css']
 })
-export class TrabajadoresComponent implements OnInit {
+export class TrabajadoresComponent implements OnInit, AfterViewInit{
   @ViewChild('fileUpload') fileUpload: FileUpload | undefined;
   trabajadores: Trabajador[] = [];
   displayEditDialog: boolean = false;
@@ -28,8 +28,10 @@ export class TrabajadoresComponent implements OnInit {
     user: '',
     password: ''
   };
-
-  constructor(private cd: ChangeDetectorRef, private evaluacionService: EvaluacionesService, private resultadosService: ResultadosService, private trabajadoresService: TrabajadoresService, private messageService: MessageService,) {
+  ngAfterViewInit() {
+    this.setupFocus();
+  }
+  constructor(private confirmationService: ConfirmationService,private cd: ChangeDetectorRef, private evaluacionService: EvaluacionesService, private resultadosService: ResultadosService, private trabajadoresService: TrabajadoresService, private messageService: MessageService,) {
   }
 
   ngOnInit() {
@@ -185,5 +187,41 @@ export class TrabajadoresComponent implements OnInit {
       });
     }
   }
+  confirmarEliminarResultado(id: string): void {
+    this.confirmationService.confirm({
+      message: '¿Está seguro de que desea eliminar este resultado?',
+      header: 'Confirmar eliminación',
+      icon: 'pi pi-info-circle',
+      acceptLabel: 'Sí',
+      rejectLabel: 'No',
+      accept: () => {
+        this.eliminarResultado(id);
+      },
+      reject: () => {
+        // Acciones si se rechaza
+      },
+      defaultFocus: 'reject'
+    });
 
+    setTimeout(() => {
+      this.setupFocus();
+    }, 0);
+  }
+
+  setupFocus() {
+    setTimeout(() => {
+      const rejectButton = document.querySelector('.custom-confirm-dialog .p-button-secondary');
+      if (rejectButton) {
+        (rejectButton as HTMLElement).focus();
+      }
+    }, 100);
+  }
+
+  eliminarResultado(id: string): void {
+    this.resultadosService.deleteEvaluacionResultado(id).then(() => {
+      this.resultadosEvaluacion = this.resultadosEvaluacion.filter(r => r.id !== id);
+    }).catch(error => {
+      console.error('Error eliminando resultado:', error);
+    });
+  }
 }

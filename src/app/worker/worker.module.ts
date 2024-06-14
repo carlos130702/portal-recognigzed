@@ -13,14 +13,13 @@ import {RadioButtonModule} from "primeng/radiobutton";
 import {MessageService} from "primeng/api";
 import {ToastModule} from "primeng/toast";
 import {ProgressSpinnerModule} from "primeng/progressspinner";
-import {UpperCamelCasePipe} from "../pipes/upper-camel-case.pipe";
+import {SharedModule} from "../shared/shared.module";
 
 @NgModule({
   declarations: [
     HomeComponent,
     ExamenesComponent,
-    VistaExamenComponent,
-    UpperCamelCasePipe
+    VistaExamenComponent
   ],
   imports: [
     CommonModule,
@@ -32,6 +31,7 @@ import {UpperCamelCasePipe} from "../pipes/upper-camel-case.pipe";
     RadioButtonModule,
     ToastModule,
     ProgressSpinnerModule,
+    SharedModule
   ],
   providers: [
     MessageService

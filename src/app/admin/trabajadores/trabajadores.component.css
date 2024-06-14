@@ -33,9 +33,6 @@ p-table th {
   font-size: 16px;
   width: 50%;
 }
-p-table tr {
-  transition: background-color 0.3s ease;
-}
 
 p-table td {
   text-align: center;
@@ -43,6 +40,7 @@ p-table td {
   background-color: #f8f9fa;
 
 }
+
 p-table tr:nth-child(odd) td {
   background-color: #f2f2f2;
 }
@@ -50,11 +48,17 @@ p-table tr:nth-child(odd) td {
 p-table tr:nth-child(even) td {
   background-color: #ffffff;
 }
+
 p-table td,
 p-table th {
   padding: 15px 20px;
   vertical-align: middle;
   border: 1px solid #ddd;
+  text-align: center; /* Centra el texto en las celdas */
+}
+
+p-table tr:nth-child(even) {
+  background-color: #f9f9f9;
 }
 
 p-table td:first-child {
@@ -132,6 +136,7 @@ p-paginator p-paginator-page {
   min-width: 40px;
   height: 40px;
 }
+
 @media (max-width: 768px) {
   p-dialog .flex {
     flex-direction: column;
@@ -246,4 +251,22 @@ p-table tr.red-row td {
   height: 20px;
   background-color: #ffcccc;
   margin-right: 5px;
+}
+.p-table-custom {
+  width: 100%;
+  display: table;
+}
+
+.p-table-custom th, .p-table-custom td {
+  padding: 12px 15px;
+  text-align: center;
+  width: 33.33%;
+}
+
+.p-table-custom tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.p-table-custom tr:hover {
+  background-color: #f1f1f1;
 }

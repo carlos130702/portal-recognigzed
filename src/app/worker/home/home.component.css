@@ -1,22 +1,37 @@
-.p-menubar .p-menuitem-link {
-  transition: color 0.2s ease, background-color 0.2s ease, text-decoration 0.2s ease;
-  padding: 10px 20px;
+/* Menubar Styles */
+.p-menubar {
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+  border: 1px solid #007bff;
+}
+
+.p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-content .p-menuitem-link {
+  transition: color 0.2s ease, background-color 0.2s ease;
+  padding: 15px 20px;
   font-size: 16px;
+  color: #212529;
+  font-weight: 500;
+  text-decoration: none;
 }
-@media (max-width: 768px) {
-  .p-menubar .p-menuitem-link {
-    font-size: 14px;
-    padding: 8px 15px;
-  }
-  .p-button-logout {
-    padding: 8px 15px;
-  }
+
+.p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-content .p-menuitem-link:hover {
+  color: #ffffff;
+  background-color: #007bff;
+  border-radius: 10px;
 }
+
+.p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-content .p-menuitem-link.active-menu-item {
+  color: #ffffff;
+  background-color: #007bff;
+  border-radius: 10px;
+}
+
 .p-button-logout {
   color: #fff;
   background-color: #dc3545;
   border-color: #dc3545;
-  border-radius: 10px;
+  border-radius: 8px;
   transition: background-color 0.2s, box-shadow 0.2s;
   padding: 10px 20px;
 }
@@ -30,21 +45,16 @@
   background-color: #a71d2a;
 }
 
-.p-menubar {
-  border: 1px solid green;
-  border-radius: 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  background-color: #ffffff;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+@media (max-width: 768px) {
+  .p-menubar .p-menuitem-link {
+    font-size: 14px;
+    padding: 10px 15px;
+  }
+  .p-button-logout {
+    padding: 8px 15px;
+  }
 }
-
-.p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-content .p-menuitem-link .p-menuitem-text {
-  font-weight: bold;
-  color: #CB3234;
-}
-.surface-ground .user-details {
+.user-details {
   font-weight: bold;
   color: #004085;
   border-color: #b8daff;
@@ -53,8 +63,5 @@
   border-radius: 0.25rem;
   display: inline-block;
   line-height: 1.5;
-  align-self: center;
-}
-.p-menubar .p-button-outlined.p-button-logout {
   align-self: center;
 }

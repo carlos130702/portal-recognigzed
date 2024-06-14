@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
 import { AdminRoutingModule } from './admin-routing.module';
 import { HomeComponent } from './home/home.component';
 import { TrabajadoresComponent } from './trabajadores/trabajadores.component';
@@ -19,7 +18,8 @@ import {InputTextareaModule} from "primeng/inputtextarea";
 import { ExamenesRegistradosComponent } from './examenes-registrados/examenes-registrados.component';
 import {FileUploadModule} from "primeng/fileupload";
 import {SafePipe} from "safe-pipe";
-import {UpperCamelCasePipe} from "../pipes/upper-camel-case.pipe";
+import {ConfirmDialogModule} from "primeng/confirmdialog";
+import {SharedModule} from "../shared/shared.module";
 
 @NgModule({
   declarations: [
@@ -28,7 +28,6 @@ import {UpperCamelCasePipe} from "../pipes/upper-camel-case.pipe";
     RegistroTrabajadoresComponent,
     RegistroExamenComponent,
     ExamenesRegistradosComponent,
-    UpperCamelCasePipe
   ],
   imports: [
     CommonModule,
@@ -44,7 +43,9 @@ import {UpperCamelCasePipe} from "../pipes/upper-camel-case.pipe";
     InputTextareaModule,
     ReactiveFormsModule,
     FileUploadModule,
-    SafePipe
+    SafePipe,
+    ConfirmDialogModule,
+    SharedModule
   ],
   providers: [
     MessageService

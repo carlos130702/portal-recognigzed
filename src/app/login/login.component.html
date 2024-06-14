@@ -1,21 +1,21 @@
 <div class="flex align-items-center justify-content-center" style="height: 100vh;">
-  <div class="surface-card p-4 shadow-2 border-round" style="max-width: 400px; width: 90%;">
+  <div class="surface-card p-4 shadow-2 border-round">
     <h1>Login</h1>
-    <p>Bienvenido! Porfavor accede con tus credenciales de administrador o trabajador.</p>
+    <p>Bienvenido! Por favor accede con tus credenciales de administrador o trabajador.</p>
     <form (ngSubmit)="onSubmit()" class="flex flex-column">
-    <div class="field">
-      <label for="username" [class.active]="usernameFocused || user">Username</label>
-      <i class="fa fa-user"></i>
-      <input type="text" [(ngModel)]="user" (focus)="usernameFocused=true" (blur)="usernameFocused=false" id="username" name="username" required pInputText>
-    </div>
-    <div class="field">
-      <label for="password" [class.active]="passwordFocused || password">Contraseña</label>
-      <i class="fa fa-lock"></i>
-      <input type="password" [(ngModel)]="password" (focus)="passwordFocused=true" (blur)="passwordFocused=false" id="password" name="password" required pInputText [type]="mostrar ? 'text' : 'password'">
-      <i class="fa" [ngClass]="mostrar ? 'fa-eye' : 'fa-eye-slash'" (click)="toggleMostrar()"></i>
-    </div>
-    <button type="submit">LOGIN</button>
-  </form>
+      <div class="field">
+        <i class="fa fa-user"></i>
+        <label for="username" [class.active]="usernameFocused || user">Username</label>
+        <input type="text" [(ngModel)]="user" (focus)="usernameFocused=true" (blur)="usernameFocused=false" id="username" name="username" required pInputText>
+      </div>
+      <div class="field">
+        <i class="fa fa-lock"></i>
+        <label for="password" [class.active]="passwordFocused || password">Contraseña</label>
+        <input type="password" [(ngModel)]="password" (focus)="passwordFocused=true" (blur)="passwordFocused=false" id="password" name="password" required pInputText [type]="mostrar ? 'text' : 'password'">
+        <i class="fa" [ngClass]="mostrar ? 'fa-eye' : 'fa-eye-slash'" (click)="toggleMostrar()"></i>
+      </div>
+      <button type="submit" class="login-button">LOGIN</button>
+    </form>
   </div>
   <p-toast></p-toast>
 </div>

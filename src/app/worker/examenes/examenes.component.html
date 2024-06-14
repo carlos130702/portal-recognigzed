@@ -17,7 +17,7 @@
         <td>{{ evaluacion.titulo | upperCamelCase }}</td>
         <td>{{ evaluacion.descripcion}}</td>
         <td [ngClass]="{'red-cell': (obtenerCalificacion(evaluacion.id) ?? 0) < 11}">
-          {{ obtenerCalificacion(evaluacion.id) != null ? (obtenerCalificacion(evaluacion.id)) : '-' }}
+          {{ obtenerCalificacion(evaluacion.id) !== null ? obtenerCalificacion(evaluacion.id) : '-' }}
         </td>
         <td>
           <button type="button" pButton icon="pi pi-pencil" *ngIf="!tieneCalificacion(evaluacion.id)"

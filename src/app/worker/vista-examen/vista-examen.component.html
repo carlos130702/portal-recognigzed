@@ -6,7 +6,7 @@
   <div class="main-content">
     <div *ngIf="!cameraLoaded" class="loading-indicator">
       <p-progressSpinner></p-progressSpinner>
-      <p>Loading camera...</p>
+      <p>Cargando Camara...</p>
     </div>
     <video #videoElement width="320" height="240" autoplay muted (loadedmetadata)="onCameraLoad()" class="loaded"></video>
     <canvas #canvasElement class="loaded"></canvas>

@@ -75,6 +75,7 @@ export class ExamenesComponent implements OnInit {
   }
 
 
+
   tieneCalificacion(idEvaluacion: string): boolean {
     return this.obtenerCalificacion(idEvaluacion) !== null;
   }

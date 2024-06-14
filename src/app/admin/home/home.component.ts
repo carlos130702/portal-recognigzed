@@ -12,17 +12,19 @@ import {Router} from "@angular/router";
 export class HomeComponent {
   items: MenuItem[];
 
-  constructor(private authService: AuthService,private router: Router) {
+  constructor(private authService: AuthService, private router: Router) {
     this.items = [
       {
         label: 'Listado de Trabajadores',
         routerLink: ['/admin/trabajadores'],
-        routerLinkActiveOptions : {exact: true}
+        routerLinkActiveOptions: { exact: true },
+        routerLinkActive: 'active-menu-item'
       },
       {
         label: 'Exámenes Registrados',
         routerLink: ['/admin/examenes-registrados'],
-        routerLinkActiveOptions : {exact: true}
+        routerLinkActiveOptions: { exact: true },
+        routerLinkActive: 'active-menu-item'
       }
     ];
   }

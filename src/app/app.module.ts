@@ -1,3 +1,4 @@
+import '@angular/compiler';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
@@ -19,14 +20,14 @@ import {AngularFireAuthModule} from "@angular/fire/compat/auth";
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import {ToastModule} from "primeng/toast";
-import {MessageService} from "primeng/api";
-import { UpperCamelCasePipe } from './pipes/upper-camel-case.pipe';
+import {ConfirmationService, MessageService} from "primeng/api";
+import {ConfirmDialogModule} from "primeng/confirmdialog";
+import {SharedModule} from "./shared/shared.module";
 
 @NgModule({
   declarations: [
     AppComponent,
-    LoginComponent,
-    UpperCamelCasePipe,
+    LoginComponent
   ],
   imports: [
     BrowserModule,
@@ -41,14 +42,16 @@ import { UpperCamelCasePipe } from './pipes/upper-camel-case.pipe';
     provideAuth(() => getAuth()),
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireAuthModule,
-    ToastModule
+    ToastModule,
+    ConfirmDialogModule,
+    SharedModule
   ],
   providers: [
     firebaseProviders,
-    MessageService
+    MessageService,
+    ConfirmationService
   ],
   exports: [
-    UpperCamelCasePipe
   ],
   bootstrap: [AppComponent]
 })

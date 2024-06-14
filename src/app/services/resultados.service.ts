@@ -5,7 +5,6 @@ import {AngularFirestore} from "@angular/fire/compat/firestore";
 import firebase from "firebase/compat";
 import DocumentReference = firebase.firestore.DocumentReference;
 import {map} from "rxjs/operators";
-import {HttpClient, HttpParams} from "@angular/common/http";
 
 @Injectable({
   providedIn: 'root'
@@ -30,7 +29,6 @@ export class ResultadosService {
     );
   }
 
-
   getEvaluacionResultadosDeTrabajador(idTrabajador: string): Observable<ResultadoDeEvaluacion[]> {
     return this.firestore.collection<ResultadoDeEvaluacion>(this.collectionPath, ref => ref.where('ID_Trabajador', '==', idTrabajador)).snapshotChanges().pipe(
       map(actions => actions.map(a => {
@@ -39,5 +37,8 @@ export class ResultadosService {
         return { id, ...data };
       }))
     );
+  }
+  deleteEvaluacionResultado(id: string): Promise<void> {
+    return this.firestore.collection(this.collectionPath).doc(id).delete();
   }
 }

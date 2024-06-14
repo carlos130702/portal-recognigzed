@@ -1,5 +1,5 @@
 <div class="surface-ground px-4 py-2 shadow-2 border-round">
-  <p-menubar [model]="items">
+  <p-menubar #menu [model]="items" styleClass="menucus">
     <ng-template pTemplate="end">
       <div class="user-details">
         {{ userName | upperCamelCase}}

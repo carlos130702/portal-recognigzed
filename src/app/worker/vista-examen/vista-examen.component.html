@@ -14,7 +14,7 @@
       <form (ngSubmit)="onSubmit()" class="flex flex-column align-items-center card">
         <div *ngIf="exam.preguntas[currentQuestionIndex]" class="mb-4">
           <h3>{{ currentQuestionIndex + 1 }}. {{ exam.preguntas[currentQuestionIndex].enunciado }}
-            ({{ exam.preguntas[currentQuestionIndex].valor }} points)</h3>
+            ({{ exam.preguntas[currentQuestionIndex].valor  | number:'1.0-1' }} puntos)</h3>
           <div class="flex flex-column">
             <div *ngFor="let opcion of exam.preguntas[currentQuestionIndex].opciones" class="field-radiobutton">
               <p-radioButton name="pregunta" [value]="opcion.texto" label="{{ opcion.texto }}"

@@ -174,19 +174,41 @@ export class TrabajadoresComponent implements OnInit, AfterViewInit{
       });
       return;
     }
-    if (confirm('¿Estás seguro de que quieres eliminar a este trabajador?')) {
-      this.trabajadoresService.eliminarTrabajador(trabajador.id).then(() => {
-        this.trabajadores = this.trabajadores.filter(t => t.id !== trabajador.id);
-        if (this.trabajadoresFiltrados) {
-          this.trabajadoresFiltrados = this.trabajadoresFiltrados.filter(t => t.id !== trabajador.id);
-        }
-        this.messageService.add({severity: 'success', summary: 'Éxito', detail: 'Trabajador eliminado con éxito.'});
-      }).catch(err => {
-        this.messageService.add({severity: 'error', summary: 'Error', detail: 'Error al eliminar el trabajador.'});
-        console.error('Error al eliminar el trabajador', err);
-      });
-    }
+
+    this.confirmationService.confirm({
+      message: '¿Estás seguro de que quieres eliminar a este trabajador?',
+      header: 'Confirmación de Eliminación',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        this.trabajadoresService.eliminarTrabajador(trabajador.id).then(() => {
+          this.trabajadores = this.trabajadores.filter(t => t.id !== trabajador.id);
+          if (this.trabajadoresFiltrados) {
+            this.trabajadoresFiltrados = this.trabajadoresFiltrados.filter(t => t.id !== trabajador.id);
+          }
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Éxito',
+            detail: 'Trabajador eliminado con éxito.'
+          });
+        }).catch(err => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Error al eliminar el trabajador.'
+          });
+          console.error('Error al eliminar el trabajador', err);
+        });
+      },
+      reject: () => {
+        this.messageService.add({
+          severity: 'info',
+          summary: 'Cancelado',
+          detail: 'La eliminación del trabajador ha sido cancelada.'
+        });
+      }
+    });
   }
+
   confirmarEliminarResultado(id: string): void {
     this.confirmationService.confirm({
       message: '¿Está seguro de que desea eliminar este resultado?',

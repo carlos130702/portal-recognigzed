@@ -169,7 +169,10 @@ export class RegistroExamenComponent implements OnDestroy {
       return;
     }
 
-    const tituloEsUnico = await firstValueFrom(this.evaluacionesService.checkTituloUnico(this.evaluacion.titulo));
+    const normalizedTitulo = this.evaluacionesService.normalizeString(this.evaluacion.titulo);
+
+    const tituloEsUnico = await firstValueFrom(this.evaluacionesService.checkTituloUnico(normalizedTitulo));
+    console.log('normalizedTitulo', normalizedTitulo);
     if (!tituloEsUnico) {
       this.messageService.add({
         severity: 'error',
@@ -179,6 +182,7 @@ export class RegistroExamenComponent implements OnDestroy {
       return;
     }
 
+    // Crea las preguntas para la evaluación
     let valorPorPregunta = this.numPreguntas === 1 ? 20 : 20 / this.numPreguntas;
     for (let i = 0; i < this.numPreguntas; i++) {
       const nuevaPregunta: Pregunta = {

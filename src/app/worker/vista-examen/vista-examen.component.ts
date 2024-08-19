@@ -24,6 +24,7 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
   private isModelLoaded: boolean | undefined;
   private failedNoFaceDetectedAttempts = 0;
   private failedIncorrectFaceDetectedAttempts = 0;
+  errorMessage: string | null = null;
 
   private verificationActive = true;
   cameraLoaded = false;
@@ -76,17 +77,32 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
           if (isDescriptorCreated) {
             this.startVideo();
           } else {
-            console.error('Failed to create face descriptor.');
+            this.showError('La foto de su usuario no contiene un rostro para comparar.\n\n Comuniquese con el administrador para cambiar su foto.');
           }
-        }).catch(e => console.error(e));
+        }).catch(e => {
+          console.error(e);
+          this.showError('Ocurrió un error al crear el descriptor facial.');
+        });
       }).catch(error => {
         console.error("Error loading models:", error);
+        this.showError('Ocurrió un error al cargar los modelos de reconocimiento facial.');
       });
     } else {
-      console.error('Usuario actual no es un trabajador o no está definido');
+      this.showError('Usuario actual no es un trabajador o no está definido');
     }
   }
 
+  showError(message: string) {
+    this.messageService.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: message,
+      sticky: false,
+    });
+    setTimeout(() => {
+      this.router.navigate(['/worker/examenes']);
+    }, 3000);
+  }
 
   ngOnDestroy(): void {
     if (this.videoElement && this.videoElement.nativeElement.srcObject) {

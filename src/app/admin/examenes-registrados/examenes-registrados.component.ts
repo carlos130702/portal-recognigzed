@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {Evaluacion,Pregunta} from "../../interfaces/Evaluacion";
 import {EvaluacionesService} from "../../services/evaluaciones.service";
-import {MessageService} from "primeng/api";
+import {ConfirmationService, MessageService} from "primeng/api";
 import {FormArray, FormBuilder, FormControl, FormGroup} from "@angular/forms";
 
 @Component({
@@ -20,7 +20,8 @@ export class ExamenesRegistradosComponent implements OnInit {
 
   constructor(
     private evaluacionService: EvaluacionesService,
-    private messageService: MessageService, private fb: FormBuilder
+    private messageService: MessageService, private fb: FormBuilder,
+    private confirmationService: ConfirmationService
   ) {
     this.evaluacionForm = this.fb.group({
       id: [null],
@@ -166,16 +167,29 @@ export class ExamenesRegistradosComponent implements OnInit {
       });
       return;
     }
-    if (confirm('¿Estás seguro de que quieres eliminar esta evaluación?')) {
-      this.evaluacionService.deleteEvaluacion(evaluacion.id).then(() => {
-        this.evaluaciones = this.evaluaciones.filter(e => e.id !== evaluacion.id);
-        this.evaluacionesFiltradas = this.evaluacionesFiltradas.filter(e => e.id !== evaluacion.id);
-        this.messageService.add({severity: 'success', summary: 'Éxito', detail: 'Evaluación eliminada con éxito.'});
-      }).catch(err => {
-        this.messageService.add({severity: 'error', summary: 'Error', detail: 'Error al eliminar la evaluación.'});
-        console.error('Error al eliminar la evaluación', err);
-      });
-    }
+
+    this.confirmationService.confirm({
+      message: '¿Estás seguro de que quieres eliminar esta evaluación?',
+      header: 'Confirmación',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        this.evaluacionService.deleteEvaluacion(evaluacion.id).then(() => {
+          this.evaluaciones = this.evaluaciones.filter(e => e.id !== evaluacion.id);
+          this.evaluacionesFiltradas = this.evaluacionesFiltradas.filter(e => e.id !== evaluacion.id);
+          this.messageService.add({severity: 'success', summary: 'Éxito', detail: 'Evaluación eliminada con éxito.'});
+        }).catch(err => {
+          this.messageService.add({severity: 'error', summary: 'Error', detail: 'Error al eliminar la evaluación.'});
+          console.error('Error al eliminar la evaluación', err);
+        });
+      },
+      reject: () => {
+        this.messageService.add({
+          severity: 'info',
+          summary: 'Cancelado',
+          detail: 'La eliminación de la evaluación ha sido cancelada.'
+        });
+      }
+    });
   }
 
 }

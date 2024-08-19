@@ -17,7 +17,10 @@
            responsiveLayout="scroll">
     <ng-template pTemplate="header">
       <tr>
-        <th>Título</th>
+        <th pSortableColumn="titulo">
+          Título
+          <p-sortIcon field="titulo"></p-sortIcon>
+        </th>
         <th>Acciones</th>
       </tr>
     </ng-template>
@@ -36,6 +39,7 @@
     </ng-template>
   </p-table>
 </div>
+
 <p-dialog header="Detalle de la Evaluación" [(visible)]="displayViewDialog" [modal]="true" [closable]="true"
           [resizable]="false" [style]="{width: '50vw'}">
   <div *ngIf="evaluacionSeleccionada">
@@ -49,7 +53,7 @@
           <div class="pregunta-contenedor">
             <span class="pregunta-titulo">{{ indiceActual + 1 }}
               . {{ evaluacionSeleccionada.preguntas[indiceActual].enunciado }}</span>
-            <span class="pregunta-valor">{{ evaluacionSeleccionada.preguntas[indiceActual].valor }} puntos</span>
+            <span class="pregunta-valor">{{ evaluacionSeleccionada.preguntas[indiceActual].valor | number:'1.0-1' }} puntos</span>
           </div>
           <ul class="opciones-lista">
             <li *ngFor="let opcion of evaluacionSeleccionada.preguntas[indiceActual].opciones"
@@ -112,3 +116,4 @@
   </form>
 </p-dialog>
 <p-toast></p-toast>
+<p-confirmDialog header="Confirmar eliminación" icon="pi pi-exclamation-triangle" class="custom-confirm-dialog"></p-confirmDialog>

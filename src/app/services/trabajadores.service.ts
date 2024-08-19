@@ -48,7 +48,7 @@ export class TrabajadoresService {
     return this.firestore.doc<Trabajador>(`${this.collectionPath}/${trabajador.id}`).update(trabajador);
   }
 
-  eliminarTrabajador(id: string): Promise<void> {
+  eliminarTrabajador(id: string | undefined): Promise<void> {
     return this.firestore.doc(`${this.collectionPath}/${id}`).delete();
   }
 }

@@ -1,5 +1,5 @@
 import {ChangeDetectorRef, Component, OnInit, ViewEncapsulation} from '@angular/core';
-import {MenuItem} from "primeng/api";
+import {ConfirmationService, MenuItem} from "primeng/api";
 import {AuthService} from "../../core/services/auth.service";
 import {Router} from "@angular/router";
 
@@ -13,7 +13,7 @@ export class HomeComponent implements OnInit {
   items: MenuItem[];
   userName: string = '';
 
-  constructor(private authService: AuthService, private router: Router, private cdr: ChangeDetectorRef) {
+  constructor( private confirmationService: ConfirmationService,private authService: AuthService, private router: Router, private cdr: ChangeDetectorRef) {
     this.items = [
       {
         label: 'Examenes Disponibles',
@@ -31,13 +31,20 @@ export class HomeComponent implements OnInit {
     }
   }
 
+
   logout() {
-    this.authService.logout();
-    this.router.navigate(['/login']).then(r => {
-      console.clear();
-      console.log('Redirección a login:', r);
-      console.log('Usuario ha cerrado sesión correctamente.');
+    this.confirmationService.confirm({
+      message: '¿Estás seguro de que quieres cerrar sesión?',
+      header: 'Confirmación',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        this.authService.logout();
+        this.router.navigate(['/login']).then(r => {
+          console.clear();
+          console.log('Redirección a login:', r);
+          console.log('Usuario ha cerrado sesión correctamente.');
+        });
+      }
     });
   }
-
 }

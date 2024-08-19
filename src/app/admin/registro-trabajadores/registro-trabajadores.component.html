@@ -11,9 +11,12 @@
     </div>
     <div class="field">
       <label for="foto">Foto</label>
-      <input type="file" (change)="onFileSelected($event)" id="foto" name="foto" aria-label="Carga una foto">
-      <img *ngIf="selectedFile" [src]="selectedFileUrl" alt="Foto seleccionada">
+      <p-fileUpload #fileUpload id="foto" mode="basic" name="foto" accept="image/*" (onSelect)="onFileSelected($event)" chooseLabel="Seleccionar foto"></p-fileUpload>
+      <img *ngIf="selectedFileUrl" [src]="selectedFileUrl" alt="Foto seleccionada" class="preview-image">
+      <button *ngIf="selectedFile" type="button" (click)="resetFile()" pButton label="Volver a Subir una Foto" class="p-button-secondary mt-2"></button>
+      <p *ngIf="!selectedFile && trabajadorForm.submitted" class="error-message">Debe seleccionar una foto.</p>
     </div>
+
     <div class="field">
       <label for="usuario">Usuario</label>
       <input type="text" pInputText id="usuario" [(ngModel)]="trabajador.user" name="usuario" required autocomplete="off">
@@ -22,7 +25,7 @@
       <label for="contrasena">Contraseña</label>
       <input type="password" pInputText id="contrasena" [(ngModel)]="trabajador.password" name="contrasena" required autocomplete="off">
     </div>
-    <button type="submit" pButton label="Registrar" [disabled]="!trabajadorForm.form.valid"></button>
+    <button type="submit" pButton label="Registrar" [disabled]="!trabajadorForm.form.valid || !selectedFile"></button>
   </form>
   <p-toast></p-toast>
 </div>

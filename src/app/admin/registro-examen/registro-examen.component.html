@@ -6,7 +6,6 @@
       <label for="titulo">Título de la Evaluación</label>
       <input type="text" id="titulo" [(ngModel)]="evaluacion.titulo" autocomplete="off"/>
     </div>
-    <small *ngIf="!tituloEsUnico" class="error-message">El título de la evaluación ya existe.</small>
 
     <div class="field">
       <label for="descripcion">Descripción de la Evaluación</label>

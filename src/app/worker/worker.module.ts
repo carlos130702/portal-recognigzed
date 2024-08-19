@@ -14,6 +14,7 @@ import {MessageService} from "primeng/api";
 import {ToastModule} from "primeng/toast";
 import {ProgressSpinnerModule} from "primeng/progressspinner";
 import {SharedModule} from "../shared/shared.module";
+import {ConfirmDialogModule} from "primeng/confirmdialog";
 
 @NgModule({
   declarations: [
@@ -21,18 +22,19 @@ import {SharedModule} from "../shared/shared.module";
     ExamenesComponent,
     VistaExamenComponent
   ],
-  imports: [
-    CommonModule,
-    WorkerRoutingModule,
-    MenubarModule,
-    TableModule,
-    ButtonModule,
-    FormsModule,
-    RadioButtonModule,
-    ToastModule,
-    ProgressSpinnerModule,
-    SharedModule
-  ],
+    imports: [
+        CommonModule,
+        WorkerRoutingModule,
+        MenubarModule,
+        TableModule,
+        ButtonModule,
+        FormsModule,
+        RadioButtonModule,
+        ToastModule,
+        ProgressSpinnerModule,
+        SharedModule,
+        ConfirmDialogModule
+    ],
   providers: [
     MessageService
   ]

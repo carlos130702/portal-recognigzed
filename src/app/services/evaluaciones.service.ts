@@ -46,16 +46,25 @@ export class EvaluacionesService {
   }
 
 
-  deleteEvaluacion(id: string): Promise<void> {
+  deleteEvaluacion(id: string | undefined): Promise<void> {
     return this.firestore.doc(`${this.collectionPath}/${id}`).delete();
   }
   actualizarEvaluacion(evaluacion: Evaluacion) {
     return this.firestore.doc<Trabajador>(`${this.collectionPath}/${evaluacion.id}`).update(evaluacion);
   }
 
+  normalizeString(str: string): string {
+    return str
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+
   checkTituloUnico(titulo: string): Observable<boolean> {
+    const normalizedTitulo = this.normalizeString(titulo);
+    console.log('normalizedTitulo', normalizedTitulo);
     return this.firestore.collection<Evaluacion>(this.collectionPath, ref =>
-      ref.where('titulo', '==', titulo.toLowerCase())
+      ref.where('titulo', '==', normalizedTitulo)
     ).snapshotChanges().pipe(
       map(changes => changes.length === 0)
     );

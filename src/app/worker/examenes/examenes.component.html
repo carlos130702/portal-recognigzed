@@ -6,7 +6,10 @@
            responsiveLayout="scroll">
     <ng-template pTemplate="header">
       <tr>
-        <th>Título</th>
+        <th pSortableColumn="titulo">
+          Título
+          <p-sortIcon field="titulo"></p-sortIcon>
+        </th>
         <th>Descripción</th>
         <th>Calificación</th>
         <th>Acciones</th>
@@ -15,7 +18,7 @@
     <ng-template pTemplate="body" let-evaluacion>
       <tr>
         <td>{{ evaluacion.titulo | upperCamelCase }}</td>
-        <td>{{ evaluacion.descripcion}}</td>
+        <td>{{ evaluacion.descripcion }}</td>
         <td [ngClass]="{'red-cell': (obtenerCalificacion(evaluacion.id) ?? 0) < 11}">
           {{ obtenerCalificacion(evaluacion.id) !== null ? obtenerCalificacion(evaluacion.id) : '-' }}
         </td>
@@ -28,4 +31,6 @@
     </ng-template>
   </p-table>
 </div>
+<p-toast></p-toast>
+<p-confirmDialog header="Confirmar eliminación" icon="pi pi-exclamation-triangle" class="custom-confirm-dialog"></p-confirmDialog>
 

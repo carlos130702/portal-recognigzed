@@ -6,7 +6,7 @@
       <div class="field">
         <i class="fa fa-user"></i>
         <label for="username" [class.active]="usernameFocused || user">Username</label>
-        <input type="text" [(ngModel)]="user" (focus)="usernameFocused=true" (blur)="usernameFocused=false" id="username" name="username" required pInputText>
+        <input type="text" [(ngModel)]="user" (focus)="usernameFocused=true" (blur)="usernameFocused=false" id="username" name="username" required pInputText autocomplete="off">
       </div>
       <div class="field">
         <i class="fa fa-lock"></i>

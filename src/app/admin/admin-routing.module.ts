@@ -17,6 +17,7 @@ const routes: Routes = [
       { path: 'registro-trabajador', component: RegistroTrabajadoresComponent, canActivate: [AuthGuard] },
       { path: 'registro-examen', component: RegistroExamenComponent, canActivate: [AuthGuard] },
       { path: '', redirectTo: 'trabajadores', pathMatch: 'full' }
+
     ]
   }
 ];

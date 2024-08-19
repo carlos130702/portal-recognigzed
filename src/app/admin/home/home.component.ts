@@ -1,5 +1,5 @@
 import {Component, ViewEncapsulation} from '@angular/core';
-import {MenuItem} from "primeng/api";
+import {ConfirmationService, MenuItem} from "primeng/api";
 import {AuthService} from "../../core/services/auth.service";
 import {Router} from "@angular/router";
 
@@ -7,12 +7,17 @@ import {Router} from "@angular/router";
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
-  encapsulation: ViewEncapsulation.None, // Esto desactivará el encapsulamiento
+  encapsulation: ViewEncapsulation.None,
+  providers: [ConfirmationService]
 })
 export class HomeComponent {
   items: MenuItem[];
 
-  constructor(private authService: AuthService, private router: Router) {
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private confirmationService: ConfirmationService
+  ) {
     this.items = [
       {
         label: 'Listado de Trabajadores',
@@ -28,13 +33,20 @@ export class HomeComponent {
       }
     ];
   }
+
   logout() {
-    this.authService.logout();
-    this.router.navigate(['/login']).then(r => {
-      console.clear();
-      console.log('Redirección a login:', r);
-      console.log('Usuario ha cerrado sesión correctamente.');
+    this.confirmationService.confirm({
+      message: '¿Estás seguro de que quieres cerrar sesión?',
+      header: 'Confirmación',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        this.authService.logout();
+        this.router.navigate(['/login']).then(r => {
+          console.clear();
+          console.log('Redirección a login:', r);
+          console.log('Usuario ha cerrado sesión correctamente.');
+        });
+      }
     });
   }
-
 }

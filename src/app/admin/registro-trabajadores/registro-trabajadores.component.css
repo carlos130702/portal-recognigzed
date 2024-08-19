@@ -1,8 +1,8 @@
-/* styles.css */
 * {
   box-sizing: border-box;
   max-width: 100%;
 }
+
 
 body {
   background: #f4f7f6;
@@ -139,4 +139,20 @@ button[type="submit"]:disabled {
     transform: translateY(0);
     opacity: 1;
   }
+}
+.error-message {
+  color: #dc3545;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.preview-image {
+  max-width: 150px;
+  max-height: 150px;
+  margin-top: 10px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.p-button-secondary {
+  margin-top: 10px;
 }

@@ -11,6 +11,7 @@ const routes: Routes = [
     component: HomeComponent,
     children: [
       { path: 'examenes', component: ExamenesComponent, canActivate: [AuthGuard] },
+      { path: 'evaluaciones/:id/preview', component: VistaExamenComponent, canActivate: [AuthGuard] },
       { path: 'evaluaciones/:id', component: VistaExamenComponent, canActivate: [AuthGuard] },
       { path: '', redirectTo: 'examenes', pathMatch: 'full' }
     ]

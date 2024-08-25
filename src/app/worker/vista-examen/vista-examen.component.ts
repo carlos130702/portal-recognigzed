@@ -24,11 +24,25 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
   private isModelLoaded: boolean | undefined;
   private failedNoFaceDetectedAttempts = 0;
   private failedIncorrectFaceDetectedAttempts = 0;
+  private failedMultipleFacesDetectedAttempts = 0;
+  tabSwitchCount: number = 0;
+  private visibilityChangeHandler: (() => void) | undefined;
+
   errorMessage: string | null = null;
 
   private verificationActive = true;
   cameraLoaded = false;
 
+  isPreviewVisible: boolean = true;
+
+  showPreview(): void {
+    this.isPreviewVisible = true;
+  }
+
+  startExam(): void {
+    this.isPreviewVisible = false;
+    this.ngOnInit();
+  }
 
   onCameraLoad() {
     this.cameraLoaded = true;
@@ -57,39 +71,60 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
     setTimeout(() => {
       const cardElement = document.querySelector('.card');
       if (!cardElement) {
-        console.error('Card element not found.');
         return;
       }
       cardElement.classList.add('enter-active');
     }, 0);
   }
+  private cleanupVisibilityChangeHandler(): void {
+    if (this.visibilityChangeHandler) {
+      document.removeEventListener('visibilitychange', this.visibilityChangeHandler);
+      this.visibilityChangeHandler = undefined;
+    }
+  }
 
   ngOnInit(): void {
     const examId = this.route.snapshot.params['id'];
     this.loadExam(examId);
-    const usuarioActual = this.authService.getCurrentUser();
-    console.log('Usuario actual:', usuarioActual);
+    if (!this.isPreviewVisible) {
+      const usuarioActual = this.authService.getCurrentUser();
 
-    if (this.esTrabajador(usuarioActual)) {
-      this.trabajadorActual = usuarioActual;
-      this.loadModels().then(() => {
-        this.createReferenceFaceDescriptor().then((isDescriptorCreated) => {
-          if (isDescriptorCreated) {
-            this.startVideo();
+      this.visibilityChangeHandler = () => {
+        if (document.hidden) {
+          this.tabSwitchCount++;
+          if (this.tabSwitchCount < 3) {
+            this.showWarningToast('Has cambiado de pestaña. Intento ' + this.tabSwitchCount + ' de 3.');
           } else {
-            this.showError('La foto de su usuario no contiene un rostro para comparar.\n\n Comuniquese con el administrador para cambiar su foto.');
+            this.finishExamDueToTabSwitch();
           }
-        }).catch(e => {
-          console.error(e);
-          this.showError('Ocurrió un error al crear el descriptor facial.');
+        }
+      };
+      document.addEventListener('visibilitychange', this.visibilityChangeHandler);
+
+      if (this.esTrabajador(usuarioActual)) {
+        this.trabajadorActual = usuarioActual;
+        this.loadModels().then(() => {
+          this.createReferenceFaceDescriptor().then((isDescriptorCreated) => {
+            if (isDescriptorCreated) {
+              this.startVideo();
+            } else {
+              this.showError('La foto de su usuario no contiene un rostro para comparar.\n\n Comuniquese con el administrador para cambiar su foto.');
+            }
+          }).catch(e => {
+            console.error(e);
+            this.showError('Ocurrió un error al crear el descriptor facial.');
+          });
+        }).catch(error => {
+          console.error("Error loading models:", error);
+          this.showError('Ocurrió un error al cargar los modelos de reconocimiento facial.');
         });
-      }).catch(error => {
-        console.error("Error loading models:", error);
-        this.showError('Ocurrió un error al cargar los modelos de reconocimiento facial.');
-      });
-    } else {
-      this.showError('Usuario actual no es un trabajador o no está definido');
+      } else {
+        this.showError('Usuario actual no es un trabajador o no está definido');
+      }
     }
+  }
+  showWarningToast(message: string) {
+    this.messageService.add({severity:'error', summary: 'Error', detail: message});
   }
 
   showError(message: string) {
@@ -111,13 +146,14 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
     if (this.intervalId) {
       clearInterval(this.intervalId);
     }
-
+    if (this.visibilityChangeHandler) {
+      document.removeEventListener('visibilitychange', this.visibilityChangeHandler);
+    }
   }
 
   async createReferenceFaceDescriptor(): Promise<boolean> {
     if (this.trabajadorActual) {
       try {
-        console.log('Loading reference image:', this.trabajadorActual.photo);
         const image = await faceapi.fetchImage(this.trabajadorActual.photo);
         const singleResult = await faceapi.detectSingleFace(image).withFaceLandmarks().withFaceDescriptor();
         if (singleResult) {
@@ -235,6 +271,18 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
+  preprocessImage(image: HTMLVideoElement): HTMLCanvasElement {
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d', { willReadFrequently: true });
+    if (context) {
+      canvas.width = image.videoWidth;
+      canvas.height = image.videoHeight;
+      context.drawImage(image, 0, 0, canvas.width, canvas.height);
+    }
+    return canvas;
+  }
+
+
   startVideo() {
     navigator.mediaDevices.getUserMedia({video: {}})
       .then(stream => {
@@ -246,15 +294,24 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
         console.error("Error accessing the webcam: ", err);
       });
   }
+  isCameraMinimized = false;
+
+  toggleCamera() {
+    this.isCameraMinimized = !this.isCameraMinimized;
+  }
+  goBack() {
+    this.router.navigate(['/worker/examenes']);
+  }
 
   detectFaces() {
     if (!this.isModelLoaded) {
       console.error('Models not loaded yet. Cannot start face detection.');
       return;
     }
+
     const canvas = this.canvasElement.nativeElement;
     const video = this.videoElement.nativeElement;
-    const displaySize = {width: video.width, height: video.height};
+    const displaySize = { width: video.width, height: video.height };
     faceapi.matchDimensions(canvas, displaySize);
 
     video.addEventListener('play', () => {
@@ -264,66 +321,86 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
           clearInterval(this.intervalId);
           return;
         }
+
         const context = canvas.getContext('2d');
         if (!context) {
           console.error('Context is null.');
           clearInterval(this.intervalId);
           return;
         }
-        const options = new faceapi.TinyFaceDetectorOptions({inputSize: 512, scoreThreshold: 0.5});
-        const detections = await faceapi.detectAllFaces(video, options).withFaceLandmarks().withFaceDescriptors();
+
+        const options = new faceapi.SsdMobilenetv1Options({ minConfidence: 0.5 });
+        const preprocessedCanvas = this.preprocessImage(video);
+        const detections = await faceapi.detectAllFaces(preprocessedCanvas, options)
+          .withFaceLandmarks()
+          .withFaceDescriptors();
+
         const resizedDetections = faceapi.resizeResults(detections, displaySize);
         context.clearRect(0, 0, canvas.width, canvas.height);
         faceapi.draw.drawDetections(canvas, resizedDetections);
 
-        if (detections.length === 0) {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'No se detectó un rostro. Intento ' + (this.failedNoFaceDetectedAttempts + 1) + ' de 3.'
-          });
-          this.handleNoFaceDetected();
-        } else {
-          const maxDescriptorDistance = 0.5;
-          const faceMatcher = new faceapi.FaceMatcher([this.labeledFaceDescriptors], maxDescriptorDistance);
-          let faceMatched = false;
-          resizedDetections.forEach((detection) => {
-            const bestMatch = faceMatcher.findBestMatch(detection.descriptor);
-            if (bestMatch && bestMatch.distance < maxDescriptorDistance && bestMatch.label === this.trabajadorActual?.user) {
-              faceMatched = true;
-            }
-          });
-          if (!faceMatched) {
-            this.handleIncorrectFaceDetected();
-          } else {
-            this.failedNoFaceDetectedAttempts = 0;
-            this.failedIncorrectFaceDetectedAttempts = 0;
+        if (detections.length === 0 || detections.length > 1) {
+          if (detections.length === 0) {
+            this.failedNoFaceDetectedAttempts++;
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'No se detectó un rostro. Intento ' + this.failedNoFaceDetectedAttempts + ' de 3.'
+            });
+          } else if (detections.length > 1) {
+            this.failedMultipleFacesDetectedAttempts++;
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'Se detectó más de un rostro en la cámara. Asegúrate de que solo haya una persona visible. Intento ' + this.failedMultipleFacesDetectedAttempts + ' de 3.'
+            });
           }
+
+          if (this.verificationActive && (this.failedNoFaceDetectedAttempts >= 3 || this.failedMultipleFacesDetectedAttempts >= 3)) {
+            clearInterval(this.intervalId);
+            this.finishExamWithZero();
+          }
+        } else {
+          this.handleFaceMatch(resizedDetections);
         }
       }, 5000);
     });
   }
 
-  handleNoFaceDetected() {
-    this.failedNoFaceDetectedAttempts++;
-    if (this.verificationActive && this.failedNoFaceDetectedAttempts >= 3) {
-      clearInterval(this.intervalId);
-      this.finishExamWithZero();
+  handleFaceMatch(resizedDetections: any) {
+    const maxDescriptorDistance = 0.65;
+    const faceMatcher = new faceapi.FaceMatcher([this.labeledFaceDescriptors], maxDescriptorDistance);
+    let faceMatched = false;
+
+    resizedDetections.forEach((detection: any) => {
+      const bestMatch = faceMatcher.findBestMatch(detection.descriptor);
+      if (bestMatch && bestMatch.distance < maxDescriptorDistance && bestMatch.label === this.trabajadorActual?.user) {
+        faceMatched = true;
+      }
+    });
+
+    if (!faceMatched) {
+      this.failedIncorrectFaceDetectedAttempts++;
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'No es la misma persona. Intento ' + this.failedIncorrectFaceDetectedAttempts + ' de 3.'
+      });
+
+      if (this.verificationActive && this.failedIncorrectFaceDetectedAttempts >= 3) {
+        clearInterval(this.intervalId);
+        this.finishExamWithZero();
+      }
+    } else {
+      this.resetFaceDetectionCounters();
     }
+  }
+  resetFaceDetectionCounters() {
+    this.failedNoFaceDetectedAttempts = 0;
+    this.failedIncorrectFaceDetectedAttempts = 0;
+    this.failedMultipleFacesDetectedAttempts = 0;
   }
 
-  handleIncorrectFaceDetected() {
-    this.failedIncorrectFaceDetectedAttempts++;
-    this.messageService.add({
-      severity: 'error',
-      summary: 'Error',
-      detail: 'No es la misma persona. Intento ' + this.failedIncorrectFaceDetectedAttempts + ' de 3.'
-    });
-    if (this.verificationActive && this.failedIncorrectFaceDetectedAttempts >= 3) {
-      clearInterval(this.intervalId);
-      this.finishExamWithZero();
-    }
-  }
   sendSecurityAlertEmail(trabajadorNombre: string, examenNombre: string) {
     const templateParams = {
       fecha_incidente: new Date().toLocaleString(),
@@ -341,17 +418,42 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
 
   finishExamWithZero() {
     this.verificationActive = false;
+    this.cleanupVisibilityChangeHandler();
+
     this.messageService.add({
       severity: 'error',
       summary: 'Error',
       detail: 'Identidad no verificada. Terminando el examen con puntuación de cero.'
     });
+
     setTimeout(() => {
       this.onSubmit(0, false);
       if (this.trabajadorActual && this.exam) {
         this.sendSecurityAlertEmail(this.trabajadorActual.name, this.exam.titulo);
       } else {
         console.error('Trabajador o examen no definido');
-      }    }, 3000);
+      }
+      window.location.reload();
+    }, 3000);
+  }
+  finishExamDueToTabSwitch() {
+    this.verificationActive = false;
+    this.cleanupVisibilityChangeHandler();
+
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Advertencia',
+      detail: 'Has cambiado de pestaña demasiadas veces. El examen se finalizará con una puntuación de cero.'
+    });
+
+    setTimeout(() => {
+      this.onSubmit(0, false);
+      if (this.trabajadorActual && this.exam) {
+        this.sendSecurityAlertEmail(this.trabajadorActual.name, this.exam.titulo);
+      } else {
+        console.error('Trabajador o examen no definido');
+      }
+      window.location.reload();
+    }, 3000);
   }
 }

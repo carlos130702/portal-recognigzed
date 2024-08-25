@@ -51,9 +51,9 @@ export class ExamenesComponent implements OnInit {
 
 
   rendirEvaluacion(examId: string): void {
-    this.router.navigate(['/worker/evaluaciones', examId]).then(r => console.log(r)
-    );
+    this.router.navigate(['/worker/evaluaciones', examId, 'preview']).then(r => console.log(r));
   }
+
 
   cargarResultados(): void {
     if (this.idUsuarioActual === undefined) {

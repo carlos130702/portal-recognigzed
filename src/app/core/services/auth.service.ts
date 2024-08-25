@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import {Observable, of, switchMap} from 'rxjs';
+import {Observable, of, switchMap, take} from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import {AngularFirestore} from "@angular/fire/compat/firestore";
 
@@ -26,17 +26,18 @@ export class AuthService {
     return this.firestore.collection<User>('administradores', ref => ref.where('user', '==', username).where('password', '==', password))
       .valueChanges({ idField: 'id' })
       .pipe(
+        take(1),
         switchMap(admins => {
-          const admin = admins[0]; // Tomamos el primer resultado
+          const admin = admins[0];
           if (admin) {
             const userToStore = { ...admin, role: 'administrador' };
             sessionStorage.setItem('currentUser', JSON.stringify(userToStore));
             return of(userToStore);
           }
-          // Si no es administrador, busca en la colección de trabajadores
           return this.firestore.collection<User>('trabajadores', ref => ref.where('user', '==', username).where('password', '==', password))
             .valueChanges({ idField: 'id' })
             .pipe(
+              take(1),
               map(workers => {
                 const worker = workers[0];
                 if (worker) {
@@ -50,6 +51,7 @@ export class AuthService {
         })
       );
   }
+
 
   isAuthenticated(): boolean {
     const currentUser = sessionStorage.getItem('currentUser');

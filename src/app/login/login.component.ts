@@ -14,37 +14,39 @@ export class LoginComponent {
   mostrar: boolean = false;
   usernameFocused: boolean = false;
   passwordFocused: boolean = false;
+  isLoading: boolean = false;
+
   constructor(private authService: AuthService, private router: Router,private messageService: MessageService,) { }
 
   onSubmit(): void {
-    console.log('Intentando iniciar sesión con:', this.user);
+    if (this.isLoading) return;
+    this.isLoading = true;
+
     this.authService.login(this.user, this.password).subscribe((user: User | null) => {
-      console.log('Respuesta de login:', user);
-      if (user && user.role === 'administrador') {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Credenciales Correctas',
-          detail: 'Redirigiendo a la vista de administrador.'
-        });
-        setTimeout(() => {
-          this.router.navigate(['/admin']).then(r => console.log('Redirección a admin:', r));
-        }, 1000);
-      } else if (user && user.role === 'trabajador') {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Credenciales Correctas',
-          detail: 'Redirigiendo a la vista de trabajador.'
-        });
-        setTimeout(() => {
-          this.router.navigate(['/worker']).then(r => console.log('Redirección a worker:', r));
-        }, 1000);
-      } else {
+      this.isLoading = false;
+
+      if (!user) {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'Contraseña incorrectas o usuario no encontrado.'
+          detail: 'Contraseña incorrecta o usuario no encontrado.'
         });
+        return;
       }
+
+      const redirectPath = user.role === 'administrador' ? '/admin' : '/worker';
+      const redirectMessage = user.role === 'administrador' ?
+        'Redirigiendo a la vista de administrador.' : 'Redirigiendo a la vista de trabajador.';
+
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Credenciales Correctas',
+        detail: redirectMessage
+      });
+
+      setTimeout(() => {
+        this.router.navigate([redirectPath]).then(r => console.log(`Redirección a ${redirectPath}:`, r));
+      }, 1000);
     });
   }
   toggleMostrar() {

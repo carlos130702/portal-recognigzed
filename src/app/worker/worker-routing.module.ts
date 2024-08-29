@@ -4,6 +4,7 @@ import {HomeComponent} from "./home/home.component";
 import {AuthGuard} from "../core/guards";
 import {ExamenesComponent} from "./examenes/examenes.component";
 import {VistaExamenComponent} from "./vista-examen/vista-examen.component";
+import {IndicationComponent} from "./indication/indication.component";
 
 const routes: Routes = [
   {
@@ -11,8 +12,8 @@ const routes: Routes = [
     component: HomeComponent,
     children: [
       { path: 'examenes', component: ExamenesComponent, canActivate: [AuthGuard] },
-      { path: 'evaluaciones/:id/preview', component: VistaExamenComponent, canActivate: [AuthGuard] },
       { path: 'evaluaciones/:id', component: VistaExamenComponent, canActivate: [AuthGuard] },
+      { path: 'evaluaciones/:id/preview', component: IndicationComponent, canActivate: [AuthGuard] },
       { path: '', redirectTo: 'examenes', pathMatch: 'full' }
     ]
   }

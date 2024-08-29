@@ -48,6 +48,12 @@ export class RegistroExamenComponent implements OnDestroy {
     return unicos.size !== textoOpciones.length;
   }
 
+  tieneEnunciadosDuplicados(): boolean {
+    const enunciados = this.evaluacion.preguntas.map(pregunta => pregunta.enunciado.trim().toLowerCase());
+    const enunciadosUnicos = new Set(enunciados);
+    return enunciadosUnicos.size !== enunciados.length;
+  }
+
   validarPreguntaActual(): boolean {
     const preguntaActual = this.evaluacion.preguntas[this.preguntaActualIndex];
 
@@ -59,6 +65,16 @@ export class RegistroExamenComponent implements OnDestroy {
       });
       return false;
     }
+
+    if (this.tieneEnunciadosDuplicados()) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'No puede haber enunciados de pregunta duplicados en el examen.'
+      });
+      return false;
+    }
+
     return true;
   }
 
@@ -100,12 +116,24 @@ export class RegistroExamenComponent implements OnDestroy {
       });
       return;
     }
-
+    if (this.tieneEnunciadosDuplicados()) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'No puede haber enunciados de pregunta duplicados en el examen.'
+      });
+      return;
+    }
     if (this.todasLasPreguntasCompletas() && this.validarPreguntaActual()) {
       try {
         const evaluaciones = await firstValueFrom(this.evaluacionesService.getEvaluaciones());
         if (this.evaluacion.id) {
           await this.procesoGuardarEvaluacion();
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Guardado Exitoso',
+            detail: 'El examen ha sido guardado satisfactoriamente.'
+          });
         } else {
           this.messageService.add({
             severity: 'error',
@@ -134,12 +162,9 @@ export class RegistroExamenComponent implements OnDestroy {
     }
     try {
       await this.evaluacionesService.actualizarEvaluacion(this.evaluacion);
-      await this.router.navigate(['/admin/examenes-registrados']);
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Actualización exitosa',
-        detail: 'La actualización del examen fue exitosa.'
-      });
+      setTimeout(async () => {
+        await this.router.navigate(['/admin/examenes-registrados']);
+      }, 1500);
     } catch (error) {
       console.error("Error durante el proceso de guardado", error);
       this.messageService.add({
@@ -182,7 +207,6 @@ export class RegistroExamenComponent implements OnDestroy {
       return;
     }
 
-    // Crea las preguntas para la evaluación
     let valorPorPregunta = this.numPreguntas === 1 ? 20 : 20 / this.numPreguntas;
     for (let i = 0; i < this.numPreguntas; i++) {
       const nuevaPregunta: Pregunta = {

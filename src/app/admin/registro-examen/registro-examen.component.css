@@ -121,3 +121,32 @@ p-button:not(:last-child) {
   display: block;
   margin-top: 5px;
 }
+.navigation-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  gap: 10px;
+}
+
+.navigation-buttons p-button {
+  flex: 1;
+  padding: 12px 25px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #ffffff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.navigation-buttons p-button:hover {
+  background-color: #0056b3;
+}
+
+.navigation-buttons p-button:disabled {
+  background-color: #c0c0c0;
+  cursor: not-allowed;
+}

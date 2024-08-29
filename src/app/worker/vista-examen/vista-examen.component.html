@@ -1,77 +1,53 @@
-<div *ngIf="isPreviewVisible; else examView" class="preview-container">
-  <span class="back-arrow" (click)="goBack()">&larr;</span>
-  <div class="indication p-4">
-    <h2>Instrucciones para el Examen</h2>
-    <p>A continuación, se realizarán varias verificaciones de seguridad. Es fundamental que sigas estas indicaciones para asegurar la validez de tu examen:</p>
-    <ul>
-      <li>La cámara verificará tu identidad continuamente durante todo el examen. Asegúrate de estar siempre visible.</li>
-      <li>Si cambias de pestaña o ventana más de 3 veces, recibirás avisos. Al tercer aviso, el examen se terminará automáticamente con una puntuación de cero.</li>
-      <li>Si tu rostro no es detectado en 3 ocasiones consecutivas, recibirás avisos. Al tercer aviso, el examen se finalizará automáticamente.</li>
-      <li>Si se detectan múltiples rostros en 3 ocasiones, recibirás avisos. Al tercer aviso, el examen se terminará automáticamente.</li>
-      <li>Si se detecta que el rostro no coincide con el registrado en el sistema en 3 ocasiones, recibirás avisos. Al tercer aviso, el examen se finalizará automáticamente.</li>
-    </ul>
-    <p class="advice">Por favor, asegúrate de estar solo frente a la cámara en un entorno tranquilo, sin distracciones, y evita cambiar de pestaña durante el examen.</p>
-    <button pButton label="Comenzar Examen" (click)="startExam()"
-            class="p-button-rounded p-button-primary mt-3"></button>
+<div *ngIf="exam" class="container">
+  <div class="header-container">
+    <h2>{{ exam.titulo }}</h2>
+    <p>{{ exam.descripcion }}</p>
   </div>
-</div>
+  <div *ngIf="!cameraLoaded" class="loading-indicator">
+    <p-progressSpinner></p-progressSpinner>
+    <p>Cargando Cámara...</p>
+  </div>
 
-
-
-<ng-template #examView>
-  <div *ngIf="exam" class="container">
-    <div class="header-container">
-      <h2>{{ exam.titulo }}</h2>
-      <p>{{ exam.descripcion }}</p>
-    </div>
-    <div *ngIf="!cameraLoaded" class="loading-indicator">
-      <p-progressSpinner></p-progressSpinner>
-      <p>Cargando Cámara...</p>
-    </div>
-
-    <div class="main-content flex align-items-center justify-content-center">
-      <div class="camera-container">
-        <div class="camera-header p-3 text-center shadow-1" *ngIf="cameraLoaded">
-          <span class="toggle-camera" (click)="toggleCamera()">
-            {{ isCameraMinimized ? 'Mostrar Cámara' : 'Ocultar Cámara' }}
-            <i class="pi ml-3" [ngClass]="isCameraMinimized ? 'pi-window-maximize' : 'pi-window-minimize'"></i>
-          </span>
-        </div>
-
-        <div class="video-container mb-3">
-          <video #videoElement width="180" height="150" id="video" autoplay muted
-                 (loadedmetadata)="onCameraLoad()" [class.hidden]="isCameraMinimized" class="small-video"></video>
-          <canvas #canvasElement class="small-canvas" [class.hidden]="isCameraMinimized"></canvas>
-        </div>
+  <div class="main-content">
+    <div cdkDrag cdkDragBoundary=".drag-boundary" [cdkDragFreeDragPosition]="{x: 0, y: 0}" class="camera-container">
+      <div class="camera-header p-3 text-center shadow-1" *ngIf="cameraLoaded">
+        <span class="toggle-camera" (click)="toggleCamera()">
+          {{ isCameraMinimized ? 'Mostrar Cámara' : 'Ocultar Cámara' }}
+          <i class="pi ml-3" [ngClass]="isCameraMinimized ? 'pi-window-maximize' : 'pi-window-minimize'"></i>
+        </span>
       </div>
+      <div class="video-container">
+        <video #videoElement width="180" height="150" id="video" autoplay muted
+               (loadedmetadata)="onCameraLoad()" [class.hidden]="isCameraMinimized" class="small-video"></video>
+        <canvas #canvasElement class="small-canvas" [class.hidden]="isCameraMinimized"></canvas>
+      </div>
+    </div>
 
-      <div class="form-container" *ngIf="cameraLoaded">
-        <form (ngSubmit)="onSubmit()" class="flex flex-column align-items-center card">
-          <div *ngIf="exam.preguntas[currentQuestionIndex]" class="mb-4">
-            <h3>{{ currentQuestionIndex + 1 }}. {{ exam.preguntas[currentQuestionIndex].enunciado }}
-              ({{ exam.preguntas[currentQuestionIndex].valor | number:'1.0-1' }} puntos)</h3>
-            <div class="flex flex-column">
-              <div *ngFor="let opcion of exam.preguntas[currentQuestionIndex].opciones" class="field-radiobutton">
-                <p-radioButton name="pregunta" [value]="opcion.texto" label="{{ opcion.texto }}"
-                               [(ngModel)]="userAnswers[currentQuestionIndex]"></p-radioButton>
-              </div>
+    <div class="form-container" *ngIf="cameraLoaded">
+      <form (ngSubmit)="onSubmit()" class="card">
+        <div *ngIf="exam.preguntas[currentQuestionIndex]" class="mb-4">
+          <h3>{{ currentQuestionIndex + 1 }}. {{ exam.preguntas[currentQuestionIndex].enunciado }}
+            ({{ exam.preguntas[currentQuestionIndex].valor | number:'1.0-1' }} puntos)</h3>
+          <div class="flex flex-column">
+            <div *ngFor="let opcion of exam.preguntas[currentQuestionIndex].opciones" class="field-radiobutton">
+              <p-radioButton name="pregunta" [value]="opcion.texto" label="{{ opcion.texto }}"
+                             [(ngModel)]="userAnswers[currentQuestionIndex]"></p-radioButton>
             </div>
           </div>
+        </div>
 
-          <div class="buttons flex justify-content-between w-full">
-            <button type="button" pButton label="Previous" (click)="goToPreviousQuestion()"
-                    [disabled]="currentQuestionIndex === 0" class="p-button-text"></button>
-            <button type="button" pButton label="Next" (click)="goToNextQuestion()"
-                    [disabled]="currentQuestionIndex === exam.preguntas.length - 1" class="p-button-text"></button>
-          </div>
+        <div class="buttons flex justify-content-between w-full">
+          <button type="button" pButton label="Previous" (click)="goToPreviousQuestion()"
+                  [disabled]="currentQuestionIndex === 0" class="p-button-text"></button>
+          <button type="button" pButton label="Next" (click)="goToNextQuestion()"
+                  [disabled]="currentQuestionIndex === exam.preguntas.length - 1" class="p-button-text"></button>
+        </div>
 
-          <button type="submit" pButton label="Submit Exam"
-                  [disabled]="currentQuestionIndex !== exam.preguntas.length - 1"
-                  class="p-button-rounded p-button-success mt-3"></button>
-        </form>
-      </div>
+        <button type="submit" pButton label="Submit Exam"
+                [disabled]="currentQuestionIndex !== exam.preguntas.length - 1"
+                class="p-button-rounded p-button-success mt-3"></button>
+      </form>
     </div>
   </div>
-</ng-template>
+</div>
 <p-toast></p-toast>
-

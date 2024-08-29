@@ -146,8 +146,19 @@ export class TrabajadoresComponent implements OnInit, AfterViewInit{
       });
     }
   }
-
+  esUsuarioDuplicado(usuario: string, idTrabajadorActual: string): boolean {
+    return this.trabajadores.some(t => t.user === usuario && t.id !== idTrabajadorActual);
+  }
   confirmarEdicion(valoresFormulario: any): void {
+    if (this.esUsuarioDuplicado(valoresFormulario.user!, this.trabajadorSeleccionado.id!)) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'El usuario ya existe. Por favor, elija otro nombre de usuario.'
+      });
+      return;
+    }
+
     if (this.trabajadorSeleccionado && this.trabajadorSeleccionado.id) {
       const datosActualizados: Trabajador = {
         ...this.trabajadorSeleccionado,

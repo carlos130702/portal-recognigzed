@@ -54,7 +54,6 @@ export class ExamenesComponent implements OnInit {
     this.router.navigate(['/worker/evaluaciones', examId, 'preview']).then(r => console.log(r));
   }
 
-
   cargarResultados(): void {
     if (this.idUsuarioActual === undefined) {
       return;

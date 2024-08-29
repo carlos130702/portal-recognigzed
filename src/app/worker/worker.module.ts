@@ -15,12 +15,15 @@ import {ToastModule} from "primeng/toast";
 import {ProgressSpinnerModule} from "primeng/progressspinner";
 import {SharedModule} from "../shared/shared.module";
 import {ConfirmDialogModule} from "primeng/confirmdialog";
+import { IndicationComponent } from './indication/indication.component';
+import {DragDropModule} from "@angular/cdk/drag-drop";
 
 @NgModule({
   declarations: [
     HomeComponent,
     ExamenesComponent,
-    VistaExamenComponent
+    VistaExamenComponent,
+    IndicationComponent
   ],
     imports: [
         CommonModule,
@@ -33,7 +36,8 @@ import {ConfirmDialogModule} from "primeng/confirmdialog";
         ToastModule,
         ProgressSpinnerModule,
         SharedModule,
-        ConfirmDialogModule
+        ConfirmDialogModule,
+      DragDropModule
     ],
   providers: [
     MessageService

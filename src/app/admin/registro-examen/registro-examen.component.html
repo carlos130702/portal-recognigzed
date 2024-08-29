@@ -50,10 +50,12 @@
       </div>
     </ng-container>
 
-    <button pButton type="button" label="Anterior" (click)="anteriorPregunta()"
-            [disabled]="preguntaActualIndex <= 0"></button>
-    <button pButton type="button" label="Siguiente" (click)="siguientePregunta()"
-            [disabled]="preguntaActualIndex >= evaluacion.preguntas.length - 1"></button>
+    <div class="navigation-buttons">
+      <button pButton type="button" label="Anterior" (click)="anteriorPregunta()"
+              [disabled]="preguntaActualIndex <= 0"></button>
+      <button pButton type="button" label="Siguiente" (click)="siguientePregunta()"
+              [disabled]="preguntaActualIndex >= evaluacion.preguntas.length - 1"></button>
+    </div>
   </div>
 
   <button *ngIf="evaluacion.titulo && evaluacion.descripcion && numPreguntas > 0 && todasLasPreguntasCompletas()"

@@ -44,6 +44,12 @@ export class TrabajadoresService {
     return this.firestore.collection<Trabajador>(this.collectionPath).add(trabajador);
   }
 
+  checkIfUserExists(user: string): Observable<boolean> {
+    return this.firestore.collection<Trabajador>(this.collectionPath, ref => ref.where('user', '==', user)).valueChanges().pipe(
+      map(users => users.length > 0)
+    );
+  }
+
   editarTrabajador(trabajador: Trabajador): Promise<void> {
     return this.firestore.doc<Trabajador>(`${this.collectionPath}/${trabajador.id}`).update(trabajador);
   }

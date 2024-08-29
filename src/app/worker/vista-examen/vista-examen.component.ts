@@ -33,17 +33,6 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
   private verificationActive = true;
   cameraLoaded = false;
 
-  isPreviewVisible: boolean = true;
-
-  showPreview(): void {
-    this.isPreviewVisible = true;
-  }
-
-  startExam(): void {
-    this.isPreviewVisible = false;
-    this.ngOnInit();
-  }
-
   onCameraLoad() {
     this.cameraLoaded = true;
     const videoElement = this.videoElement.nativeElement;
@@ -69,25 +58,19 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
 
   ngAfterViewInit(): void {
     setTimeout(() => {
-      const cardElement = document.querySelector('.card');
-      if (!cardElement) {
-        return;
+      if (this.videoElement && this.canvasElement) {
+      } else {
+        console.error('No se encontraron las referencias a videoElement o canvasElement.');
       }
-      cardElement.classList.add('enter-active');
-    }, 0);
+    }, 1000);
   }
-  private cleanupVisibilityChangeHandler(): void {
-    if (this.visibilityChangeHandler) {
-      document.removeEventListener('visibilitychange', this.visibilityChangeHandler);
-      this.visibilityChangeHandler = undefined;
-    }
-  }
+
+
 
   ngOnInit(): void {
     const examId = this.route.snapshot.params['id'];
     this.loadExam(examId);
-    if (!this.isPreviewVisible) {
-      const usuarioActual = this.authService.getCurrentUser();
+    const usuarioActual = this.authService.getCurrentUser();
 
       this.visibilityChangeHandler = () => {
         if (document.hidden) {
@@ -99,6 +82,19 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
           }
         }
       };
+    this.visibilityChangeHandler = () => {
+      if (document.hidden) {
+        this.tabSwitchCount++;
+        if (this.tabSwitchCount < 3) {
+          this.showWarningToast('Has cambiado de pestaña. Intento ' + this.tabSwitchCount + ' de 3.');
+        } else if (this.tabSwitchCount === 3) {
+          this.showWarningToast('Has cambiado de pestaña. Intento 3 de 3.');
+          setTimeout(() => {
+            this.finishExamDueToTabSwitch();
+          }, 2000);
+        }
+      }
+    };
       document.addEventListener('visibilitychange', this.visibilityChangeHandler);
 
       if (this.esTrabajador(usuarioActual)) {
@@ -121,7 +117,6 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
       } else {
         this.showError('Usuario actual no es un trabajador o no está definido');
       }
-    }
   }
   showWarningToast(message: string) {
     this.messageService.add({severity:'error', summary: 'Error', detail: message});
@@ -135,7 +130,7 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
       sticky: false,
     });
     setTimeout(() => {
-      this.router.navigate(['/worker/examenes']);
+      this.router.navigate(['/worker/examenes']).then(r =>console.log('Redireccionamiento exitoso', r));
     }, 3000);
   }
 
@@ -292,15 +287,18 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
       })
       .catch(err => {
         console.error("Error accessing the webcam: ", err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Cámara no disponible',
+          detail: 'No se pudo acceder a la cámara. Asegúrate de que la cámara esté conectada y no esté siendo utilizada por otra aplicación.'
+        });
       });
   }
+
   isCameraMinimized = false;
 
   toggleCamera() {
     this.isCameraMinimized = !this.isCameraMinimized;
-  }
-  goBack() {
-    this.router.navigate(['/worker/examenes']);
   }
 
   detectFaces() {
@@ -418,7 +416,6 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
 
   finishExamWithZero() {
     this.verificationActive = false;
-    this.cleanupVisibilityChangeHandler();
 
     this.messageService.add({
       severity: 'error',
@@ -433,17 +430,16 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
       } else {
         console.error('Trabajador o examen no definido');
       }
-      window.location.reload();
     }, 3000);
   }
+
   finishExamDueToTabSwitch() {
     this.verificationActive = false;
-    this.cleanupVisibilityChangeHandler();
 
     this.messageService.add({
-      severity: 'warn',
-      summary: 'Advertencia',
-      detail: 'Has cambiado de pestaña demasiadas veces. El examen se finalizará con una puntuación de cero.'
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Has excedido el limite de intentos al cambiar de ventana. El examen se finalizará con una puntuación de cero.'
     });
 
     setTimeout(() => {
@@ -453,7 +449,6 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
       } else {
         console.error('Trabajador o examen no definido');
       }
-      window.location.reload();
     }, 3000);
   }
 }

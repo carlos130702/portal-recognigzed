@@ -89,10 +89,45 @@ export class ExamenesRegistradosComponent implements OnInit {
     this.setPreguntas(evaluacion.preguntas);
     this.displayEditDialog = true;
   }
+  validarPreguntasDuplicadas(preguntas: any[]): boolean {
+    const enunciados = preguntas.map(p => p.enunciado.trim().toLowerCase());
+    const duplicados = new Set(enunciados).size !== enunciados.length;
+    return duplicados;
+  }
+
+  validarOpcionesDuplicadas(preguntas: any[]): boolean {
+    for (const pregunta of preguntas) {
+      const opcionesTexto = pregunta.opciones.map((o: { texto: string; }) => o.texto.trim().toLowerCase());
+      const duplicados = new Set(opcionesTexto).size !== opcionesTexto.length;
+      if (duplicados) {
+        return true;
+      }
+    }
+    return false;
+  }
 
   guardarEvaluacion() {
     if (this.evaluacionForm.valid) {
       const evaluacion: Evaluacion = this.evaluacionForm.value;
+
+      if (this.validarPreguntasDuplicadas(evaluacion.preguntas)) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Existen preguntas duplicadas en la evaluación.'
+        });
+        return;
+      }
+
+      if (this.validarOpcionesDuplicadas(evaluacion.preguntas)) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Existen opciones duplicadas en algunas preguntas.'
+        });
+        return;
+      }
+
       if (!evaluacion.id || evaluacion.id.trim() === '') {
         this.messageService.add({
           severity: 'error',
@@ -101,6 +136,7 @@ export class ExamenesRegistradosComponent implements OnInit {
         });
         return;
       }
+
       this.evaluacionService.actualizarEvaluacion(evaluacion).then(() => {
         this.displayEditDialog = false;
         this.cargarEvaluaciones();
@@ -119,6 +155,7 @@ export class ExamenesRegistradosComponent implements OnInit {
       });
     }
   }
+
 
 
   getOpciones(preguntaIndex: number): FormArray {

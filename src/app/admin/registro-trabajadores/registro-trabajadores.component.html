@@ -1,14 +1,18 @@
 <div class="p-fluid form-container mt-5">
   <h2>Registrar Nuevo Trabajador</h2>
-  <form #trabajadorForm="ngForm" (ngSubmit)="registrarTrabajador()" class="trabajador-form">
+  <form #trabajadorForm="ngForm" (ngSubmit)="registrarTrabajador(trabajadorForm)" class="trabajador-form">
     <div class="field">
       <label for="nombre">Nombre</label>
-      <input type="text" pInputText id="nombre" [(ngModel)]="trabajador.name" name="nombre" required autocomplete="off">
+      <input type="text" pInputText id="nombre" [(ngModel)]="trabajador.name" name="nombre" required autocomplete="off" #nombre="ngModel">
+      <div *ngIf="nombre.invalid && nombre.touched" class="error-message">El nombre es requerido.</div>
     </div>
+
     <div class="field">
       <label for="apellidos">Apellidos</label>
-      <input type="text" pInputText id="apellidos" [(ngModel)]="trabajador.lastName" name="apellidos" required autocomplete="off">
+      <input type="text" pInputText id="apellidos" [(ngModel)]="trabajador.lastName" name="apellidos" required autocomplete="off" #apellidos="ngModel">
+      <div *ngIf="apellidos.invalid && apellidos.touched" class="error-message">Los apellidos son requeridos.</div>
     </div>
+
     <div class="field">
       <label for="foto">Foto</label>
       <p-fileUpload #fileUpload id="foto" mode="basic" name="foto" accept="image/*" (onSelect)="onFileSelected($event)" chooseLabel="Seleccionar foto"></p-fileUpload>
@@ -19,13 +23,19 @@
 
     <div class="field">
       <label for="usuario">Usuario</label>
-      <input type="text" pInputText id="usuario" [(ngModel)]="trabajador.user" name="usuario" required autocomplete="off">
+      <input type="text" pInputText id="usuario" [(ngModel)]="trabajador.user" name="usuario" required autocomplete="off" #usuario="ngModel">
+      <div *ngIf="usuario.invalid && usuario.touched" class="error-message">El usuario es requerido.</div>
     </div>
+
     <div class="field">
       <label for="contrasena">Contraseña</label>
-      <input type="password" pInputText id="contrasena" [(ngModel)]="trabajador.password" name="contrasena" required autocomplete="off">
+      <input type="password" pInputText id="contrasena" [(ngModel)]="trabajador.password" name="contrasena" required autocomplete="off" #contrasena="ngModel" minlength="6">
+      <div *ngIf="contrasena.invalid && contrasena.touched" class="error-message">
+        La contraseña es requerida y debe tener al menos 6 caracteres.
+      </div>
     </div>
-    <button type="submit" pButton label="Registrar" [disabled]="!trabajadorForm.form.valid || !selectedFile"></button>
+
+    <button type="submit" pButton label="Registrar" [disabled]="trabajadorForm.invalid || !selectedFile"></button>
   </form>
+  <p-toast></p-toast>
 </div>
-<p-toast></p-toast>

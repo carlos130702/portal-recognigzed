@@ -65,9 +65,9 @@ export class RegistroTrabajadoresComponent {
     }
   }
 
-  registrarTrabajador() {
-    if (!this.selectedFile) {
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Debe seleccionar una foto.' });
+  registrarTrabajador(trabajadorForm: any): void {
+    if (trabajadorForm.invalid || !this.selectedFile) {
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Por favor complete todos los campos requeridos y seleccione una foto.' });
       return;
     }
     if (this.isChecking) return;
@@ -123,5 +123,4 @@ export class RegistroTrabajadoresComponent {
       }
     });
   }
-
 }

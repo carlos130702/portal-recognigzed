@@ -89,30 +89,34 @@
     <div class="p-fluid">
       <div class="p-field">
         <label for="usuario">Usuario</label>
-        <input type="text" pInputText id="usuario" [(ngModel)]="trabajadorSeleccionado.user" name="user" required>
+        <input type="text" pInputText id="usuario" [(ngModel)]="trabajadorSeleccionado.user" name="user" required (input)="onUserInputChange()">
         <i class="pi pi-user field-icon"></i>
+        <small class="p-error" *ngIf="usuarioDuplicado">El usuario ya existe. Por favor, elija otro.</small>
       </div>
 
       <div class="p-field">
         <label for="password">Contraseña</label>
-        <input pInputText id="password" [(ngModel)]="trabajadorSeleccionado.password" name="password" required>
+        <input pInputText id="password" [(ngModel)]="trabajadorSeleccionado.password" name="password" required minlength="6">
         <i class="pi pi-lock field-icon"></i>
+        <small class="p-error" *ngIf="trabajadorForm.controls['password']?.invalid && trabajadorForm.controls['password']?.dirty">La contraseña debe tener al menos 6 caracteres.</small>
       </div>
 
       <div class="p-field photo-container">
         <label for="photo">Foto</label>
         <p-fileUpload #fileUpload name="photo" id="photo" accept="image/*" maxFileSize="1000000"
-                       (onBeforeUpload)="onBeforeUpload($event)"
+                      (onBeforeUpload)="onBeforeUpload($event)"
                       customUpload="true" (uploadHandler)="onUpload($event)" chooseLabel="Elegir" uploadLabel="Subir" cancelLabel="Cancelar">
         </p-fileUpload>
         <img *ngIf="trabajadorSeleccionado.photo" [src]="trabajadorSeleccionado.photo | safe: 'url'" alt="Foto del trabajador" class="photo-preview">
       </div>
 
       <div class="p-field">
-        <button type="submit" pButton label="Guardar Cambios" [disabled]="!trabajadorForm.valid"></button>
+        <button type="submit" pButton label="Guardar Cambios" [disabled]="!trabajadorForm.valid || usuarioDuplicado"></button>
       </div>
     </div>
   </form>
 </p-dialog>
+
+
 <p-toast></p-toast>
 <p-confirmDialog header="Confirmar eliminación" icon="pi pi-exclamation-triangle" class="custom-confirm-dialog"></p-confirmDialog>

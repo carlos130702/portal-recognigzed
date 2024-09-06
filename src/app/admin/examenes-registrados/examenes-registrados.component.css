@@ -46,7 +46,7 @@ p-table th {
   padding: 15px 20px;
   vertical-align: middle;
   border: 1px solid #ddd;
-  text-align: center; /* Centra el texto en las celdas */
+  text-align: center;
 }
 
 p-table tr:nth-child(even) {

@@ -20,6 +20,7 @@ export class TrabajadoresComponent implements OnInit, AfterViewInit{
   trabajadoresFiltrados: Trabajador[] = [];
   resultadosEvaluacion: ResultadoDeEvaluacion[] = [];
   evaluaciones: Evaluacion[] = [];
+  usuarioDuplicado: boolean = false;
   trabajadorSeleccionado: Trabajador = {
     id: '',
     name: '',
@@ -146,11 +147,25 @@ export class TrabajadoresComponent implements OnInit, AfterViewInit{
       });
     }
   }
+
+  verificarUsuarioDuplicado(): void {
+    if (this.trabajadorSeleccionado && this.trabajadorSeleccionado.user) {
+      this.usuarioDuplicado = this.esUsuarioDuplicado(this.trabajadorSeleccionado.user, this.trabajadorSeleccionado.id!);
+    } else {
+      this.usuarioDuplicado = false;
+    }
+  }
+
   esUsuarioDuplicado(usuario: string, idTrabajadorActual: string): boolean {
     return this.trabajadores.some(t => t.user === usuario && t.id !== idTrabajadorActual);
   }
+
+  onUserInputChange() {
+    this.verificarUsuarioDuplicado();
+  }
   confirmarEdicion(valoresFormulario: any): void {
-    if (this.esUsuarioDuplicado(valoresFormulario.user!, this.trabajadorSeleccionado.id!)) {
+    this.verificarUsuarioDuplicado();
+    if (this.usuarioDuplicado) {
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
@@ -166,12 +181,13 @@ export class TrabajadoresComponent implements OnInit, AfterViewInit{
         password: valoresFormulario.password,
         photo: this.trabajadorSeleccionado.photo
       };
+
       this.trabajadoresService.editarTrabajador(datosActualizados).then(() => {
-        this.messageService.add({severity: 'success', summary: 'Éxito', detail: 'Trabajador editado con éxito.'});
+        this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Trabajador editado con éxito.' });
         this.displayEditDialog = false;
         this.cd.markForCheck();
       }).catch(error => {
-        this.messageService.add({severity: 'error', summary: 'Error', detail: 'Error al editar el trabajador.'});
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al editar el trabajador.' });
       });
     }
   }

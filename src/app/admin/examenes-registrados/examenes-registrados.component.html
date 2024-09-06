@@ -81,21 +81,10 @@
 <p-dialog header="Editar Evaluación" [(visible)]="displayEditDialog" [modal]="true" [closable]="true"
           [resizable]="false" [style]="{width: '50vw'}" class="dialog-form-container">
   <form [formGroup]="evaluacionForm">
-    <!-- Título -->
-    <div class="col-12">
-      <label for="titulo" class="dialog-form-label">Título</label>
-      <input id="titulo" type="text" pInputText formControlName="titulo" class="dialog-form-input">
-    </div>
-    <div class="col-12">
-      <label for="descripcion" class="dialog-form-label">Descripción</label>
-      <textarea id="descripcion" pInputTextarea formControlName="descripcion" class="dialog-form-textarea"></textarea>
-    </div>
     <div formArrayName="preguntas">
       <div *ngFor="let preguntaGroup of preguntas.controls; let i=index" [formGroupName]="i">
-        <!-- Pregunta -->
         <label class="dialog-form-label">Pregunta {{ i + 1 }}</label>
         <input type="text" pInputText formControlName="enunciado" class="dialog-form-input">
-        <!-- Opciones -->
         <div formArrayName="opciones">
           <div *ngFor="let opcionGroup of getOpciones(i).controls; let j=index" [formGroupName]="j"
                class="opcion-container">

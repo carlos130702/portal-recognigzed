@@ -33,7 +33,9 @@ export class RegistroTrabajadoresComponent {
     private messageService: MessageService,
     private router: Router
   ) { }
-
+  goBack() {
+    this.router.navigate(['admin/trabajadores']).then(r => console.log(r));
+  }
   onFileSelected(event: any): void {
     const file = event.files[0];
 

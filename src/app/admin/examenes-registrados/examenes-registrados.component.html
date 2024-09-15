@@ -77,25 +77,29 @@
   </div>
 </p-dialog>
 
-
 <p-dialog header="Editar Evaluación" [(visible)]="displayEditDialog" [modal]="true" [closable]="true"
           [resizable]="false" [style]="{width: '50vw'}" class="dialog-form-container">
   <form [formGroup]="evaluacionForm">
     <div formArrayName="preguntas">
-      <div *ngFor="let preguntaGroup of preguntas.controls; let i=index" [formGroupName]="i">
-        <label class="dialog-form-label">Pregunta {{ i + 1 }}</label>
-        <input type="text" pInputText formControlName="enunciado" class="dialog-form-input">
+      <div *ngFor="let preguntaGroup of preguntas.controls; let i=index" [formGroupName]="i" class="pregunta-container">
+        <div class="pregunta-header">
+          <label class="pregunta-label">Pregunta {{ i + 1 }}</label>
+          <button type="button" pButton icon="pi pi-trash" (click)="eliminarPregunta(i)"
+                  class="p-button-rounded p-button-danger p-button-icon-only"></button>
+        </div>
+        <input type="text" pInputText formControlName="enunciado" class="pregunta-input">
         <div formArrayName="opciones">
-          <div *ngFor="let opcionGroup of getOpciones(i).controls; let j=index" [formGroupName]="j"
-               class="opcion-container">
+          <div *ngFor="let opcionGroup of getOpciones(i).controls; let j=index" [formGroupName]="j" class="opcion-container">
             <input type="radio" class="opcion-radio" [name]="'correcta-opcion-' + i"
                    (change)="establecerRespuestaCorrecta(i, j)"
                    [checked]="opcionGroup.get('esCorrecta')?.value ?? false">
-            <input type="text" pInputText formControlName="texto" class="dialog-form-input opcion-texto">
+            <input type="text" pInputText formControlName="texto" class="opcion-texto">
           </div>
         </div>
       </div>
     </div>
+    <button type="button" pButton label="Agregar Pregunta" icon="pi pi-plus" (click)="agregarPregunta()"
+            class="dialog-add-question-button"></button>
     <p-footer>
       <button type="button" pButton label="Guardar" icon="pi pi-check" (click)="guardarEvaluacion()"
               class="dialog-footer-button"></button>

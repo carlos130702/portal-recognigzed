@@ -1,4 +1,6 @@
-<div class="p-fluid form-container mt-5">
+<div class="register-container">
+<span class="back-arrow" (click)="goBack()">&larr;</span>
+<div class="p-fluid form-container mt-3">
   <h2>Registrar Nuevo Trabajador</h2>
   <form #trabajadorForm="ngForm" (ngSubmit)="registrarTrabajador(trabajadorForm)" class="trabajador-form">
     <div class="field">
@@ -38,4 +40,5 @@
     <button type="submit" pButton label="Registrar" [disabled]="trabajadorForm.invalid || !selectedFile"></button>
   </form>
   <p-toast></p-toast>
+</div>
 </div>

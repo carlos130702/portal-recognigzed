@@ -212,13 +212,15 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
       this.messageService.add({severity: 'error', summary: 'Error', detail: 'No hay un trabajador activo.'});
       return;
     }
-    this.exam.preguntas.forEach((pregunta, index) => {
-      const selectedOption = this.userAnswers[index];
-      const correctOption = pregunta.opciones.find(opcion => opcion.esCorrecta);
-      if (selectedOption === correctOption?.texto) {
-        puntuacion += pregunta.valor;
-      }
-    });
+    if (estadoVerificacion) {
+      this.exam.preguntas.forEach((pregunta, index) => {
+        const selectedOption = this.userAnswers[index];
+        const correctOption = pregunta.opciones.find(opcion => opcion.esCorrecta);
+        if (selectedOption === correctOption?.texto) {
+          puntuacion += pregunta.valor;
+        }
+      });
+    }
     if (this.trabajadorActual.id === undefined || this.exam.id === undefined) {
       console.error('ID de trabajador o evaluación no definido');
       return;
@@ -232,11 +234,13 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
 
     this.resultadosService.submitEvaluacionResultado(resultado)
       .then(docRef => {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Success',
-          detail: 'Examen enviado correctamente.'
-        });
+        if (estadoVerificacion) {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: 'Examen enviado correctamente.'
+          });
+        }
         setTimeout(() => {
           this.router.navigate(['/worker/examenes']).then(r => console.log('Redireccionamiento exitoso', r));
         }, 2000);
@@ -361,7 +365,7 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
         } else {
           this.handleFaceMatch(resizedDetections);
         }
-      }, 5000);
+      }, 4000);
     });
   }
 

@@ -22,6 +22,7 @@ export class RegistroExamenComponent implements OnDestroy {
   preguntaActualIndex: number = 0;
   tituloEsUnico: boolean = true;
   private subscriptions: Subscription[] = [];
+  private evaluacionesSubscription: Subscription | undefined;
 
   constructor(
     private evaluacionesService: EvaluacionesService,
@@ -66,43 +67,17 @@ export class RegistroExamenComponent implements OnDestroy {
       return false;
     }
 
-    if (this.tieneEnunciadosDuplicados()) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'No puede haber enunciados de pregunta duplicados en el examen.'
-      });
-      return false;
-    }
-
     return true;
   }
-
+  goBack() {
+    this.router.navigate(['admin/examenes-registrados']).then(r => console.log(r));
+  }
   anteriorPregunta(): void {
     if (this.preguntaActualIndex > 0) {
       this.preguntaActualIndex--;
     }
   }
 
-  agregarPregunta() {
-    console.log(this.evaluacion.id)
-    if (!this.evaluacion.id) {
-      console.error('Error: La evaluación no tiene un ID válido.');
-      return;
-    }
-    if (Array.isArray(this.evaluacion.preguntas)) {
-      const nuevaPregunta: Pregunta = {
-        enunciado: '',
-        opciones: [],
-        valor: 0
-      };
-      this.evaluacion.preguntas.push(nuevaPregunta);
-      this.preguntaActualIndex = this.evaluacion.preguntas.length - 1;
-    } else {
-      console.error('Error: La propiedad preguntas no está definida como un array.');
-    }
-  }
-  private evaluacionesSubscription: Subscription | undefined;
 
   async guardarEvaluacionCompleta() {
     if (this.evaluacionesSubscription) {

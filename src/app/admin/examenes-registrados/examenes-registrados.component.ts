@@ -89,6 +89,7 @@ export class ExamenesRegistradosComponent implements OnInit {
     this.setPreguntas(evaluacion.preguntas);
     this.displayEditDialog = true;
   }
+
   validarPreguntasDuplicadas(preguntas: any[]): boolean {
     const enunciados = preguntas.map(p => p.enunciado.trim().toLowerCase());
     const duplicados = new Set(enunciados).size !== enunciados.length;
@@ -106,6 +107,36 @@ export class ExamenesRegistradosComponent implements OnInit {
     return false;
   }
 
+  agregarPregunta(): void {
+    const preguntaGroup = this.fb.group({
+      enunciado: [''],
+      opciones: this.fb.array([
+        this.fb.group({ texto: '', esCorrecta: false }),
+        this.fb.group({ texto: '', esCorrecta: false }),
+        this.fb.group({ texto: '', esCorrecta: false }),
+        this.fb.group({ texto: '', esCorrecta: false })
+      ]),
+      valor: 0
+    });
+
+    this.preguntas.push(preguntaGroup);
+    this.recalcularValores();
+  }
+  eliminarPregunta(index: number): void {
+    this.preguntas.removeAt(index);
+    this.recalcularValores();
+  }
+  recalcularValores(): void {
+    const valorPorPregunta = 20 / this.preguntas.length;
+    this.preguntas.controls.forEach(pregunta => {
+      pregunta.get('valor')?.setValue(valorPorPregunta);
+    });
+  }
+  validarOpcionCorrecta(preguntas: Pregunta[]): boolean {
+    return preguntas.every(pregunta =>
+      pregunta.opciones.some(opcion => opcion.esCorrecta)
+    );
+  }
   guardarEvaluacion() {
     if (this.evaluacionForm.valid) {
       const evaluacion: Evaluacion = this.evaluacionForm.value;
@@ -127,7 +158,14 @@ export class ExamenesRegistradosComponent implements OnInit {
         });
         return;
       }
-
+      if (!this.validarOpcionCorrecta(evaluacion.preguntas)) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Cada pregunta debe tener una opción marcada como correcta.'
+        });
+        return;
+      }
       if (!evaluacion.id || evaluacion.id.trim() === '') {
         this.messageService.add({
           severity: 'error',
@@ -155,8 +193,6 @@ export class ExamenesRegistradosComponent implements OnInit {
       });
     }
   }
-
-
 
   getOpciones(preguntaIndex: number): FormArray {
     return this.preguntas.at(preguntaIndex).get('opciones') as FormArray;

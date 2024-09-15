@@ -37,15 +37,18 @@
         </div>
 
         <div class="buttons flex justify-content-between w-full">
-          <button type="button" pButton label="Previous" (click)="goToPreviousQuestion()"
+          <button type="button" pButton label="Anterior" (click)="goToPreviousQuestion()"
                   [disabled]="currentQuestionIndex === 0" class="p-button-text"></button>
-          <button type="button" pButton label="Next" (click)="goToNextQuestion()"
+          <button type="button" pButton label="Siguiente" (click)="goToNextQuestion()"
                   [disabled]="currentQuestionIndex === exam.preguntas.length - 1" class="p-button-text"></button>
         </div>
 
-        <button type="submit" pButton label="Submit Exam"
-                [disabled]="currentQuestionIndex !== exam.preguntas.length - 1"
-                class="p-button-rounded p-button-success mt-3"></button>
+        <div class="submit-button-container">
+          <button type="submit" pButton label="Enviar Examen"
+                  [disabled]="currentQuestionIndex !== exam.preguntas.length - 1"
+                  class="p-button-rounded p-button-success mt-3"></button>
+        </div>
+
       </form>
     </div>
   </div>

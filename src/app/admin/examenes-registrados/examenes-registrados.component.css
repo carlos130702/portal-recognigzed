@@ -426,3 +426,38 @@ p-dialog p-footer p-button {
   pointer-events: none;
   transform: translateY(-50%);
 }
+.pregunta-container {
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+.pregunta-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.pregunta-label {
+  font-weight: bold;
+}
+
+.pregunta-input {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.opcion-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.opcion-radio {
+  margin-right: 10px;
+}
+
+.opcion-texto {
+  width: calc(100% - 30px);
+}

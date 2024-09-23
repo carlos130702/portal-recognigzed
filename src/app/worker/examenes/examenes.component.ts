@@ -14,8 +14,11 @@ import {AuthService} from "../../core/services/auth.service";
 })
 export class ExamenesComponent implements OnInit {
   evaluaciones: Evaluacion[] = [];
+  evaluacionesConPreguntas: Evaluacion[] = [];
   resultadosEvaluaciones: ResultadoDeEvaluacion[] = [];
   idUsuarioActual: string | undefined;
+  filtroSinRendir: boolean = false;
+  evaluacionesMostradas: Evaluacion[] = [];
 
   constructor(
     private evaluacionesService: EvaluacionesService,
@@ -44,9 +47,31 @@ export class ExamenesComponent implements OnInit {
       )
       .subscribe(
         (data) => {
-          this.evaluaciones = data;
+          this.evaluacionesConPreguntas = data.filter(evaluacion =>
+            evaluacion.preguntas &&
+            evaluacion.preguntas.length > 0 &&
+            evaluacion.preguntas.some(pregunta => pregunta.enunciado.trim() !== '' && pregunta.opciones.length > 0)
+          );
+          this.evaluacionesMostradas = [...this.evaluacionesConPreguntas];
         }
       );
+  }
+
+  evaluacionesFiltradas(): Evaluacion[] {
+    return this.evaluacionesConPreguntas.filter(evaluacion => {
+      if (evaluacion.id !== undefined && evaluacion.id !== null) {
+        return this.obtenerCalificacion(evaluacion.id) === null;
+      }
+      return false;
+    });
+  }
+
+  actualizarLista() {
+    if (this.filtroSinRendir) {
+      this.evaluacionesMostradas = this.evaluacionesFiltradas();
+    } else {
+      this.evaluacionesMostradas = [...this.evaluacionesConPreguntas];
+    }
   }
 
 
@@ -72,8 +97,6 @@ export class ExamenesComponent implements OnInit {
     const resultado = this.resultadosEvaluaciones.find(resultado => resultado.ID_Evaluacion === idEvaluacion);
     return resultado ? resultado.Puntuacion : null;
   }
-
-
 
   tieneCalificacion(idEvaluacion: string): boolean {
     return this.obtenerCalificacion(idEvaluacion) !== null;

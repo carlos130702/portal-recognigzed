@@ -1,8 +1,17 @@
-<div class="text-center mb-5 mt-6 ">
+<div class="text-center mb-5 mt-6">
   <h1>Exámenes Disponibles</h1>
 </div>
+
+<p class="info-text mb-3">
+  Solo se mostrarán exámenes completamente configurados que contengan preguntas válidas.
+</p>
+
+<div class="filter-container mb-4">
+  <p-checkbox label="Mostrar solo exámenes sin rendir" [(ngModel)]="filtroSinRendir" binary="true" (onChange)="actualizarLista()"></p-checkbox>
+</div>
+
 <div class="table-container">
-  <p-table [value]="evaluaciones" [rows]="10" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[5,10,20]"
+  <p-table *ngIf="evaluacionesMostradas.length > 0" [value]="evaluacionesMostradas" [rows]="10" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[5,10,20]" responsiveLayout="scroll">
            responsiveLayout="scroll">
     <ng-template pTemplate="header">
       <tr>
@@ -19,9 +28,10 @@
       <tr>
         <td>{{ evaluacion.titulo | upperCamelCase }}</td>
         <td>{{ evaluacion.descripcion }}</td>
-        <td [ngClass]="{'red-cell': (obtenerCalificacion(evaluacion.id) ?? 0) < 11}">
-          {{ obtenerCalificacion(evaluacion.id) !== null ? obtenerCalificacion(evaluacion.id) : '-' }}
+        <td [ngClass]="{'red-cell': (obtenerCalificacion(evaluacion.id) ?? 0 ) < 11}">
+          {{ obtenerCalificacion(evaluacion.id) !== null ? (obtenerCalificacion(evaluacion.id) | number:'1.0-2') : '-' }}
         </td>
+
         <td>
           <button type="button" pButton icon="pi pi-pencil" *ngIf="!tieneCalificacion(evaluacion.id)"
                   (click)="rendirEvaluacion(evaluacion.id)" class="p-button-rounded p-button-success"
@@ -30,6 +40,7 @@
       </tr>
     </ng-template>
   </p-table>
+  <p *ngIf="evaluacionesMostradas.length === 0" class="no-exams-text">No hay exámenes para mostrar.</p>
 </div>
 <p-toast></p-toast>
 <p-confirmDialog header="Confirmar eliminación" icon="pi pi-exclamation-triangle" class="custom-confirm-dialog"></p-confirmDialog>

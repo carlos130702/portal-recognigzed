@@ -3,7 +3,7 @@
   max-width: 100%;
 }
 .registro-evaluacion {
-  margin: 40px auto;
+  margin: 20px auto;
   padding: 30px;
   border: 1px solid #ccc;
   animation: fadeIn 1s ease-out;
@@ -102,7 +102,7 @@ p-button:not(:last-child) {
   margin-right: 10px;
 }
 .option-container {
-  margin-bottom: 15px;
+  margin-bottom: 1.5rem;
 }
 
 .option-title {
@@ -116,7 +116,6 @@ p-button:not(:last-child) {
 .option-inputs {
   display: flex;
   align-items: center;
-  gap: 15px;
 }
 button[pButton] {
   margin-top: 20px;
@@ -132,6 +131,7 @@ button[pButton] {
   cursor: pointer;
   outline: none;
   transition: border 0.3s ease, background-color 0.3s ease;
+  margin-right: 10px;
 }
 
 .option-radio:checked {
@@ -194,7 +194,8 @@ button[pButton] {
 .error-message {
   color: #ff3333;
   display: block;
-  margin-top: 5px;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
 }
 .navigation-buttons {
   display: flex;
@@ -291,4 +292,14 @@ button[pButton] {
   .distinct-button {
     width: 100%;
   }
+}
+.sugerencia-titulo {
+  cursor: pointer;
+  color: #007bff;
+  margin-top: 5px;
+}
+
+.sugerencia-titulo:hover {
+  text-decoration: underline;
+  color: #0056b3;
 }

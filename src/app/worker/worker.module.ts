@@ -17,28 +17,30 @@ import {SharedModule} from "../shared/shared.module";
 import {ConfirmDialogModule} from "primeng/confirmdialog";
 import { IndicationComponent } from './indication/indication.component';
 import {DragDropModule} from "@angular/cdk/drag-drop";
+import {CheckboxModule} from "primeng/checkbox";
 
 @NgModule({
   declarations: [
     HomeComponent,
     ExamenesComponent,
     VistaExamenComponent,
-    IndicationComponent
+    IndicationComponent,
   ],
-    imports: [
-        CommonModule,
-        WorkerRoutingModule,
-        MenubarModule,
-        TableModule,
-        ButtonModule,
-        FormsModule,
-        RadioButtonModule,
-        ToastModule,
-        ProgressSpinnerModule,
-        SharedModule,
-        ConfirmDialogModule,
-      DragDropModule
-    ],
+  imports: [
+    CommonModule,
+    WorkerRoutingModule,
+    MenubarModule,
+    TableModule,
+    ButtonModule,
+    FormsModule,
+    RadioButtonModule,
+    ToastModule,
+    ProgressSpinnerModule,
+    SharedModule,
+    ConfirmDialogModule,
+    DragDropModule,
+    CheckboxModule
+  ],
   providers: [
     MessageService
   ]

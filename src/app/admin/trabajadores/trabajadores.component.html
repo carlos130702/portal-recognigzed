@@ -66,13 +66,15 @@
           <tr>
             <th>Título de Evaluación</th>
             <th>Puntuación</th>
+            <th>Tipo de Error</th>
             <th>Acciones</th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-resultado>
           <tr [ngClass]="{'red-row': !resultado.estado_Verificacion}">
             <td>{{ getEvaluacionTitulo(resultado.ID_Evaluacion) }}</td>
-            <td>{{ resultado.Puntuacion }}</td>
+            <td>{{ resultado.Puntuacion | number:'1.0-2' }}</td>
+            <td>{{ resultado.tipoDeError || 'No se detectaron errores' }}</td>
             <td>
               <button pButton icon="pi pi-trash" class="p-button-rounded p-button-danger" (click)="confirmarEliminarResultado(resultado.id)" style="margin-right: 0.5rem;">
                 <span style="margin-right: 0.5rem;"></span>

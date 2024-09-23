@@ -125,4 +125,11 @@ export class RegistroTrabajadoresComponent {
       }
     });
   }
+  validateUser(usuario: any) {
+    if (usuario.value.toLowerCase() === 'admin') {
+      usuario.control.setErrors({ adminUser: true });
+    } else {
+      usuario.control.setErrors(null);
+    }
+  }
 }

@@ -41,6 +41,7 @@ export class ExamenesRegistradosComponent implements OnInit {
     }
   }
 
+
   anterior() {
     if (this.indiceActual > 0) {
       this.indiceActual--;
@@ -137,6 +138,19 @@ export class ExamenesRegistradosComponent implements OnInit {
       pregunta.opciones.some(opcion => opcion.esCorrecta)
     );
   }
+  validarCamposVacios(preguntas: Pregunta[]): boolean {
+    for (const pregunta of preguntas) {
+      if (!pregunta.enunciado || pregunta.enunciado.trim() === '') {
+        return true;
+      }
+      for (const opcion of pregunta.opciones) {
+        if (!opcion.texto || opcion.texto.trim() === '') {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
   guardarEvaluacion() {
     if (this.evaluacionForm.valid) {
       const evaluacion: Evaluacion = this.evaluacionForm.value;
@@ -163,6 +177,14 @@ export class ExamenesRegistradosComponent implements OnInit {
           severity: 'error',
           summary: 'Error',
           detail: 'Cada pregunta debe tener una opción marcada como correcta.'
+        });
+        return;
+      }
+      if (this.validarCamposVacios(evaluacion.preguntas)) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Ningún campo puede estar vacío o contener solo espacios.'
         });
         return;
       }
@@ -245,6 +267,9 @@ export class ExamenesRegistradosComponent implements OnInit {
       message: '¿Estás seguro de que quieres eliminar esta evaluación?',
       header: 'Confirmación',
       icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Sí',
+      rejectLabel: 'No',
+      defaultFocus: 'reject',
       accept: () => {
         this.evaluacionService.deleteEvaluacion(evaluacion.id).then(() => {
           this.evaluaciones = this.evaluaciones.filter(e => e.id !== evaluacion.id);

@@ -1,32 +1,53 @@
+<p-steps [model]="steps" [(activeIndex)]="activeIndex"></p-steps>
+<p-confirmDialog></p-confirmDialog>
 <div class="register-container">
   <span class="back-arrow" (click)="goBack()">&larr;</span>
   <div class="registro-evaluacion">
-    <h2>Registrar Evaluación</h2>
-    <div *ngIf="!evaluacion.id" class="p-fluid">
-      <div class="field">
-        <label for="titulo">Título de la Evaluación</label>
-        <input type="text" id="titulo" [(ngModel)]="evaluacion.titulo" autocomplete="off"/>
-      </div>
+    <h2 *ngIf="activeIndex === 0">Registrar Evaluación</h2>
+    <h2 *ngIf="activeIndex === 1">Agregar Preguntas</h2>
 
-      <div class="field">
-        <label for="descripcion">Descripción de la Evaluación</label>
-        <textarea rows="5" pInputTextarea id="descripcion" [(ngModel)]="evaluacion.descripcion" required
-                  placeholder="Ingrese la descripción" autocomplete="off"></textarea>
-      </div>
+    <div *ngIf="activeIndex === 0" class="p-fluid">
+        <div class="field">
+          <label for="titulo">Título de la Evaluación</label>
+          <input type="text" id="titulo" [(ngModel)]="evaluacion.titulo" autocomplete="off"
+                 (ngModelChange)="validarTitulo()" #tituloInput="ngModel"/>
+          <small *ngIf="tituloInvalido && tituloInput.touched" class="error-message">
+            El título no puede estar vacío ni contener solo espacios.
+          </small>
+          <small *ngIf="!tituloEsUnico && tituloInput.touched" class="error-message">
+            El título ya existe. Prueba uno de los siguientes:
+          </small>
+          <ul *ngIf="!tituloEsUnico && sugerenciasTitulo.length > 0">
+            <li *ngFor="let sugerencia of sugerenciasTitulo"
+                class="sugerencia-titulo"
+                (click)="selectSugerencia(sugerencia)">
+              {{ sugerencia }}
+            </li>
+          </ul>
+        </div>
 
-      <div class="field">
-        <label for="numPreguntas">Número de Preguntas (1-20)</label>
-        <input type="number" pInputText id="numPreguntas" [(ngModel)]="numPreguntas" required
-               placeholder="Ingrese el número de preguntas" min="1" max="20"/>
-        <small *ngIf="numPreguntasInvalido()" class="error-message">El número de preguntas debe ser entre 1 y 20.</small>
-      </div>
+        <div class="field">
+          <label for="descripcion">Descripción de la Evaluación</label>
+          <textarea rows="5" pInputTextarea id="descripcion" [(ngModel)]="evaluacion.descripcion" required
+                    placeholder="Ingrese la descripción" autocomplete="off" (ngModelChange)="validarDescripcion()" #descripcionInput="ngModel"></textarea>
+          <small *ngIf="descripcionInvalida && descripcionInput.touched" class="error-message">
+            La descripción no puede estar vacía ni contener solo espacios.
+          </small>
+        </div>
 
-      <button pButton type="button" label="Agregar Preguntas"
-              (click)="guardarEvaluacionSinPreguntas()"
-              [disabled]="botonDeshabilitado() || !tituloEsUnico"></button>
+        <div class="field">
+          <label for="numPreguntas">Número de Preguntas (1-20)</label>
+          <input type="number" pInputText id="numPreguntas" [(ngModel)]="numPreguntas" required
+                 placeholder="Ingrese el número de preguntas" min="1" max="20"/>
+          <small *ngIf="numPreguntasInvalido()" class="error-message">El número de preguntas debe ser entre 1 y 20.</small>
+        </div>
+
+        <button pButton type="button" label="Agregar Preguntas"
+                (click)="guardarEvaluacionSinPreguntas()"
+                [disabled]="botonDeshabilitado() || !tituloEsUnico"></button>
     </div>
 
-    <div *ngIf="evaluacion.id">
+    <div *ngIf="activeIndex === 1">
       <h3>Preguntas</h3>
       <p>{{ preguntaValida() ? '' : 'Debe marcar al menos una opción como correcta y agregar 4 opciones.' }}</p>
 
@@ -41,7 +62,11 @@
               <input type="radio" [attr.name]="'opcion-' + pregunta.id" [value]="opcion.esCorrecta"
                      (click)="seleccionarOpcion(pregunta, opcion)" class="option-radio">
               <input type="text" pInputText [attr.id]="'opcion-' + pregunta.id + '-' + j" [(ngModel)]="opcion.texto"
-                     required placeholder="Ingrese el texto de la opción" class="option-text" autocomplete="off"/>
+                     (ngModelChange)="validarOpcion(opcion)" required placeholder="Ingrese el texto de la opción"
+                     class="option-text" autocomplete="off" #opcionTexto="ngModel"/>
+            </div>
+            <div *ngIf="opcionTexto.invalid && opcionTexto.touched && opcionInvalida(opcion)" class="error-message">
+              El texto de la opción no puede estar vacío.
             </div>
           </div>
           <button *ngIf="pregunta.opciones.length < maxOpciones" pButton type="button" label="Agregar Opciones"
@@ -52,15 +77,19 @@
       <div class="navigation-buttons">
         <button pButton type="button" label="Anterior" (click)="anteriorPregunta()"
                 [disabled]="preguntaActualIndex <= 0"></button>
-        <button pButton type="button" label="Siguiente" (click)="siguientePregunta()"
-                [disabled]="preguntaActualIndex >= evaluacion.preguntas.length - 1"></button>
+        <button pButton type="button" label="Siguiente"
+                (click)="siguientePregunta()"
+                [disabled]="!preguntaCompleta(evaluacion.preguntas[preguntaActualIndex]) || preguntaActualIndex >= evaluacion.preguntas.length - 1">
+        </button>
       </div>
+
     </div>
 
-    <button *ngIf="evaluacion.titulo && evaluacion.descripcion && numPreguntas > 0 && todasLasPreguntasCompletas()"
+    <button *ngIf="evaluacion.titulo && evaluacion.descripcion && todasLasPreguntasCompletas()"
             pButton type="button" class="center-button distinct-button"
             label="Guardar Evaluación" (click)="guardarEvaluacionCompleta()">
     </button>
+
     <p-toast></p-toast>
   </div>
 </div>

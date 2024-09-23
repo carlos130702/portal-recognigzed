@@ -11,10 +11,10 @@
   <div class="main-content">
     <div cdkDrag cdkDragBoundary=".drag-boundary" [cdkDragFreeDragPosition]="{x: 0, y: 0}" class="camera-container">
       <div class="camera-header p-3 text-center shadow-1" *ngIf="cameraLoaded">
-        <span class="toggle-camera" (click)="toggleCamera()">
-          {{ isCameraMinimized ? 'Mostrar Cámara' : 'Ocultar Cámara' }}
-          <i class="pi ml-3" [ngClass]="isCameraMinimized ? 'pi-window-maximize' : 'pi-window-minimize'"></i>
-        </span>
+      <span class="toggle-camera" (click)="toggleCamera()">
+        {{ isCameraMinimized ? 'Mostrar Cámara' : 'Ocultar Cámara' }}
+        <i class="pi ml-3" [ngClass]="isCameraMinimized ? 'pi-window-maximize' : 'pi-window-minimize'"></i>
+      </span>
       </div>
       <div class="video-container">
         <video #videoElement width="180" height="150" id="video" autoplay muted
@@ -26,8 +26,10 @@
     <div class="form-container" *ngIf="cameraLoaded">
       <form (ngSubmit)="onSubmit()" class="card">
         <div *ngIf="exam.preguntas[currentQuestionIndex]" class="mb-4">
-          <h3>{{ currentQuestionIndex + 1 }}. {{ exam.preguntas[currentQuestionIndex].enunciado }}
-            ({{ exam.preguntas[currentQuestionIndex].valor | number:'1.0-1' }} puntos)</h3>
+          <h3>
+            {{ currentQuestionIndex + 1 }}. {{ exam.preguntas[currentQuestionIndex].enunciado }}
+            ({{ exam.preguntas[currentQuestionIndex].valor | number:'1.0-1' }} puntos)
+          </h3>
           <div class="flex flex-column">
             <div *ngFor="let opcion of exam.preguntas[currentQuestionIndex].opciones" class="field-radiobutton">
               <p-radioButton name="pregunta" [value]="opcion.texto" label="{{ opcion.texto }}"
@@ -45,12 +47,11 @@
 
         <div class="submit-button-container">
           <button type="submit" pButton label="Enviar Examen"
-                  [disabled]="currentQuestionIndex !== exam.preguntas.length - 1"
+                  [disabled]="!allQuestionsAnswered() || currentQuestionIndex !== exam.preguntas.length - 1 || areAlertsVisible"
                   class="p-button-rounded p-button-success mt-3"></button>
         </div>
-
       </form>
     </div>
   </div>
 </div>
-<p-toast></p-toast>
+<p-toast (onClose)="clearToast()"></p-toast>

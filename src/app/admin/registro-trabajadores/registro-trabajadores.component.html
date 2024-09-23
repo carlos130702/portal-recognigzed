@@ -5,14 +5,22 @@
   <form #trabajadorForm="ngForm" (ngSubmit)="registrarTrabajador(trabajadorForm)" class="trabajador-form">
     <div class="field">
       <label for="nombre">Nombre</label>
-      <input type="text" pInputText id="nombre" [(ngModel)]="trabajador.name" name="nombre" required autocomplete="off" #nombre="ngModel">
-      <div *ngIf="nombre.invalid && nombre.touched" class="error-message">El nombre es requerido.</div>
+      <input type="text" pInputText id="nombre" [(ngModel)]="trabajador.name" name="nombre"
+             required pattern="^[a-zA-ZÀ-ÿ\u00f1\u00d1\s]+$" autocomplete="off" #nombre="ngModel">
+      <div *ngIf="nombre.invalid && nombre.touched" class="error-message">
+        <div *ngIf="nombre.errors?.['required']">El nombre es requerido.</div>
+        <div *ngIf="nombre.errors?.['pattern']">El nombre solo debe contener letras y espacios.</div>
+      </div>
     </div>
 
     <div class="field">
       <label for="apellidos">Apellidos</label>
-      <input type="text" pInputText id="apellidos" [(ngModel)]="trabajador.lastName" name="apellidos" required autocomplete="off" #apellidos="ngModel">
-      <div *ngIf="apellidos.invalid && apellidos.touched" class="error-message">Los apellidos son requeridos.</div>
+      <input type="text" pInputText id="apellidos" [(ngModel)]="trabajador.lastName" name="apellidos"
+             required pattern="^[a-zA-ZÀ-ÿ\u00f1\u00d1\s]+$" autocomplete="off" #apellidos="ngModel">
+      <div *ngIf="apellidos.invalid && apellidos.touched" class="error-message">
+        <div *ngIf="apellidos.errors?.['required']">Los apellidos son requeridos.</div>
+        <div *ngIf="apellidos.errors?.['pattern']">Los apellidos solo deben contener letras y espacios.</div>
+      </div>
     </div>
 
     <div class="field">
@@ -25,13 +33,18 @@
 
     <div class="field">
       <label for="usuario">Usuario</label>
-      <input type="text" pInputText id="usuario" [(ngModel)]="trabajador.user" name="usuario" required autocomplete="off" #usuario="ngModel">
-      <div *ngIf="usuario.invalid && usuario.touched" class="error-message">El usuario es requerido.</div>
+      <input type="text" pInputText id="usuario" [(ngModel)]="trabajador.user" name="usuario"
+             required autocomplete="off" #usuario="ngModel" (ngModelChange)="validateUser(usuario)">
+      <div *ngIf="usuario.invalid && usuario.touched" class="error-message">
+        <div *ngIf="usuario.errors?.['required']">El usuario es requerido.</div>
+        <div *ngIf="usuario.errors?.['adminUser']">No se puede usar "admin" como nombre de usuario para un trabajador.</div>
+      </div>
     </div>
 
     <div class="field">
       <label for="contrasena">Contraseña</label>
-      <input type="password" pInputText id="contrasena" [(ngModel)]="trabajador.password" name="contrasena" required autocomplete="off" #contrasena="ngModel" minlength="6">
+      <input type="password" pInputText id="contrasena" [(ngModel)]="trabajador.password" name="contrasena"
+             required autocomplete="off" #contrasena="ngModel" minlength="6">
       <div *ngIf="contrasena.invalid && contrasena.touched" class="error-message">
         La contraseña es requerida y debe tener al menos 6 caracteres.
       </div>

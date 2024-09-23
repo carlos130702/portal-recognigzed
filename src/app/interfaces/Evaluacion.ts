@@ -24,4 +24,5 @@ export interface ResultadoDeEvaluacion {
   ID_Evaluacion: string;
   Puntuacion: number;
   estado_Verificacion: boolean;
+  tipoDeError?: string;
 }

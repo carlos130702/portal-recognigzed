@@ -27,11 +27,13 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
   private failedMultipleFacesDetectedAttempts = 0;
   tabSwitchCount: number = 0;
   private visibilityChangeHandler: (() => void) | undefined;
-
+  isCameraMinimized = false;
   errorMessage: string | null = null;
-
+  @ViewChild('videoElement') videoElement!: ElementRef<HTMLVideoElement>;
+  @ViewChild('canvasElement') canvasElement!: ElementRef<HTMLCanvasElement>;
   private verificationActive = true;
   cameraLoaded = false;
+  areAlertsVisible: boolean = false;
 
   onCameraLoad() {
     this.cameraLoaded = true;
@@ -50,11 +52,7 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
     private authService: AuthService,
     private messageService: MessageService
   ) {
-
   }
-
-  @ViewChild('videoElement') videoElement!: ElementRef<HTMLVideoElement>;
-  @ViewChild('canvasElement') canvasElement!: ElementRef<HTMLCanvasElement>;
 
   ngAfterViewInit(): void {
     setTimeout(() => {
@@ -65,34 +63,31 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
     }, 1000);
   }
 
-
+  clearToast() {
+    this.messageService.clear();
+    setTimeout(() => {
+      this.areAlertsVisible = false;
+    }, 2000);
+  }
 
   ngOnInit(): void {
     const examId = this.route.snapshot.params['id'];
     this.loadExam(examId);
     const usuarioActual = this.authService.getCurrentUser();
 
-      this.visibilityChangeHandler = () => {
-        if (document.hidden) {
-          this.tabSwitchCount++;
-          if (this.tabSwitchCount < 3) {
-            this.showWarningToast('Has cambiado de pestaña. Intento ' + this.tabSwitchCount + ' de 3.');
-          } else {
-            this.finishExamDueToTabSwitch();
-          }
-        }
-      };
     this.visibilityChangeHandler = () => {
       if (document.hidden) {
         this.tabSwitchCount++;
+
         if (this.tabSwitchCount < 3) {
-          this.showWarningToast('Has cambiado de pestaña. Intento ' + this.tabSwitchCount + ' de 3.');
-        } else if (this.tabSwitchCount === 3) {
+          this.showWarningToast(`Has cambiado de pestaña. Intento ${this.tabSwitchCount} de 3.`);
+        } else {
           this.showWarningToast('Has cambiado de pestaña. Intento 3 de 3.');
           setTimeout(() => {
-            this.finishExamDueToTabSwitch();
+            this.finishExamDueToTabSwitch('Cambio de Pestaña');
           }, 2000);
         }
+        this.areAlertsVisible = true;
       }
     };
       document.addEventListener('visibilitychange', this.visibilityChangeHandler);
@@ -117,6 +112,8 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
       } else {
         this.showError('Usuario actual no es un trabajador o no está definido');
       }
+
+
   }
   showWarningToast(message: string) {
     this.messageService.add({severity:'error', summary: 'Error', detail: message});
@@ -195,14 +192,13 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-
   goToPreviousQuestion(): void {
     if (this.currentQuestionIndex > 0) {
       this.currentQuestionIndex--;
     }
   }
 
-  onSubmit(puntuacion: number = 0, estadoVerificacion: boolean = true) {
+  onSubmit(puntuacion: number = 0, estadoVerificacion: boolean = true, tipoDeError: string = '') {
     this.changeDetectorRef.detectChanges();
     if (!this.exam) {
       this.messageService.add({severity: 'error', summary: 'Error', detail: 'No hay un examen cargado.'});
@@ -229,7 +225,8 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
       ID_Trabajador: this.trabajadorActual.id,
       ID_Evaluacion: this.exam.id,
       Puntuacion: puntuacion,
-      estado_Verificacion: estadoVerificacion
+      estado_Verificacion: estadoVerificacion,
+      tipoDeError
     };
 
     this.resultadosService.submitEvaluacionResultado(resultado)
@@ -243,7 +240,7 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
         }
         setTimeout(() => {
           this.router.navigate(['/worker/examenes']).then(r => console.log('Redireccionamiento exitoso', r));
-        }, 2000);
+        }, 1000);
       })
       .catch(error => {
         console.error('Error al enviar los resultados del examen:', error);
@@ -281,7 +278,6 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
     return canvas;
   }
 
-
   startVideo() {
     navigator.mediaDevices.getUserMedia({video: {}})
       .then(stream => {
@@ -298,8 +294,6 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
         });
       });
   }
-
-  isCameraMinimized = false;
 
   toggleCamera() {
     this.isCameraMinimized = !this.isCameraMinimized;
@@ -340,29 +334,35 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
         const resizedDetections = faceapi.resizeResults(detections, displaySize);
         context.clearRect(0, 0, canvas.width, canvas.height);
         faceapi.draw.drawDetections(canvas, resizedDetections);
+        //this.checkFaceMovement(resizedDetections);
+        if (detections.length === 0) {
+          this.failedNoFaceDetectedAttempts++;
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'No se detectó un rostro. Intento ' + this.failedNoFaceDetectedAttempts + ' de 3.'
+          });
+          this.areAlertsVisible = true;
 
-        if (detections.length === 0 || detections.length > 1) {
-          if (detections.length === 0) {
-            this.failedNoFaceDetectedAttempts++;
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'No se detectó un rostro. Intento ' + this.failedNoFaceDetectedAttempts + ' de 3.'
-            });
-          } else if (detections.length > 1) {
-            this.failedMultipleFacesDetectedAttempts++;
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Se detectó más de un rostro en la cámara. Asegúrate de que solo haya una persona visible. Intento ' + this.failedMultipleFacesDetectedAttempts + ' de 3.'
-            });
-          }
-
-          if (this.verificationActive && (this.failedNoFaceDetectedAttempts >= 3 || this.failedMultipleFacesDetectedAttempts >= 3)) {
+          if (this.verificationActive && this.failedNoFaceDetectedAttempts >= 3) {
             clearInterval(this.intervalId);
-            this.finishExamWithZero();
+            this.finishExamWithZero('Rostro no detectado');
           }
-        } else {
+        } else if (detections.length > 1) {
+          this.failedMultipleFacesDetectedAttempts++;
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Se detectó más de un rostro en la cámara. Asegúrate de que solo haya una persona visible. Intento ' + this.failedMultipleFacesDetectedAttempts + ' de 3.'
+          });
+          this.areAlertsVisible = true;
+
+          if (this.verificationActive && this.failedMultipleFacesDetectedAttempts >= 3) {
+            clearInterval(this.intervalId);
+            this.finishExamWithZero('Más de un rostro detectado');
+          }
+        }
+        else {
           this.handleFaceMatch(resizedDetections);
         }
       }, 4000);
@@ -388,10 +388,11 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
         summary: 'Error',
         detail: 'No es la misma persona. Intento ' + this.failedIncorrectFaceDetectedAttempts + ' de 3.'
       });
+      this.areAlertsVisible = true;
 
       if (this.verificationActive && this.failedIncorrectFaceDetectedAttempts >= 3) {
         clearInterval(this.intervalId);
-        this.finishExamWithZero();
+        this.finishExamWithZero('Identidad no Verificada');
       }
     } else {
       this.resetFaceDetectionCounters();
@@ -418,7 +419,7 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
       });
   }
 
-  finishExamWithZero() {
+  finishExamWithZero(tipoDeError: string) {
     this.verificationActive = false;
 
     this.messageService.add({
@@ -426,18 +427,103 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
       summary: 'Error',
       detail: 'Identidad no verificada. Terminando el examen con puntuación de cero.'
     });
-
+    this.areAlertsVisible = true;
     setTimeout(() => {
-      this.onSubmit(0, false);
+      this.onSubmit(0, false, tipoDeError);
       if (this.trabajadorActual && this.exam) {
         this.sendSecurityAlertEmail(this.trabajadorActual.name, this.exam.titulo);
       } else {
         console.error('Trabajador o examen no definido');
       }
-    }, 3000);
+      this.clearToast();
+    }, 1000);
   }
 
-  finishExamDueToTabSwitch() {
+  /*
+  private movementDetectedCount = 0;
+  private lastFaceCenter: { x: number; y: number } | null = null;
+  private lastMovementTime: number | null = null;
+  private readonly MOVEMENT_THRESHOLD = 5;
+  private readonly MOVEMENT_COUNT_THRESHOLD = 3;
+  private readonly MOVEMENT_DELAY_MS = 2000;
+  private readonly EYE_BLINK_THRESHOLD = 0.2;
+
+  private checkEyeBlink(detections: any): boolean {
+    if (detections.length === 0) return false;
+
+    const face = detections[0];
+    const landmarks = face.landmarks;
+
+    if (landmarks) {
+      const leftEye = landmarks.getLeftEye();
+      const rightEye = landmarks.getRightEye();
+      const leftEyeBlinking = this.calculateEyeAspectRatio(leftEye) < this.EYE_BLINK_THRESHOLD;
+      const rightEyeBlinking = this.calculateEyeAspectRatio(rightEye) < this.EYE_BLINK_THRESHOLD;
+
+      return leftEyeBlinking || rightEyeBlinking;
+    }
+    return false;
+  }
+  private calculateEyeAspectRatio(eye: faceapi.Point[]): number {
+    const A = this.calculateDistance(eye[1], eye[5]);
+    const B = this.calculateDistance(eye[2], eye[4]);
+    const C = this.calculateDistance(eye[0], eye[3]);
+
+    return (A + B) / (2.0 * C);
+  }
+
+  private calculateDistance(p1: faceapi.Point, p2: faceapi.Point): number {
+    return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
+  }
+  checkFaceMovement(detections: any) {
+    if (detections.length === 0) return;
+
+    const face = detections[0];
+    const { x, y, width, height } = face.detection.box;
+
+    const faceCenter = {
+      x: x + width / 2,
+      y: y + height / 2
+    };
+
+    const currentTime = Date.now();
+
+    if (this.lastFaceCenter) {
+      const dx = Math.abs(faceCenter.x - this.lastFaceCenter.x);
+      const dy = Math.abs(faceCenter.y - this.lastFaceCenter.y);
+
+      if (dx <= this.MOVEMENT_THRESHOLD && dy <= this.MOVEMENT_THRESHOLD) {
+        if (!this.checkEyeBlink(detections)) { // Verificar parpadeo
+          if (!this.lastMovementTime || (currentTime - this.lastMovementTime) > this.MOVEMENT_DELAY_MS) {
+            this.movementDetectedCount++;
+            this.lastMovementTime = currentTime;
+
+            if (this.movementDetectedCount <= this.MOVEMENT_COUNT_THRESHOLD) {
+              this.messageService.add({
+                severity: 'warn',
+                summary: 'Advertencia',
+                detail: `No se detecta movimiento en la persona. Puede ser una imagen fija. Intento ${this.movementDetectedCount} de ${this.MOVEMENT_COUNT_THRESHOLD}.`
+              });
+            }
+
+            if (this.movementDetectedCount >= this.MOVEMENT_COUNT_THRESHOLD) {
+              this.finishExamWithZero();
+              return;
+            }
+          }
+        } else {
+          this.movementDetectedCount = 0;
+          this.lastMovementTime = null;
+        }
+      } else {
+        this.movementDetectedCount = 0;
+        this.lastMovementTime = null;
+      }
+    }
+    this.lastFaceCenter = faceCenter;
+  }
+*/
+  finishExamDueToTabSwitch(tipoDeError: string) {
     this.verificationActive = false;
 
     this.messageService.add({
@@ -445,14 +531,20 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
       summary: 'Error',
       detail: 'Has excedido el limite de intentos al cambiar de ventana. El examen se finalizará con una puntuación de cero.'
     });
+    this.areAlertsVisible = true;
 
     setTimeout(() => {
-      this.onSubmit(0, false);
+      this.onSubmit(0, false, tipoDeError);
       if (this.trabajadorActual && this.exam) {
         this.sendSecurityAlertEmail(this.trabajadorActual.name, this.exam.titulo);
       } else {
         console.error('Trabajador o examen no definido');
       }
-    }, 3000);
+      this.clearToast();
+    }, 2000);
   }
+  allQuestionsAnswered(): boolean {
+    return this.exam?.preguntas.every((_, index) => this.userAnswers[index]) ?? false;
+  }
+
 }

@@ -1,16 +1,16 @@
-import {Component, OnDestroy} from '@angular/core';
-import {Evaluacion, Pregunta} from "../../interfaces/Evaluacion";
-import {MessageService} from "primeng/api";
-import {Router} from "@angular/router";
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Evaluacion, Opcion, Pregunta} from "../../interfaces/Evaluacion";
+import {ConfirmationService, MessageService} from "primeng/api";
+import {ActivatedRoute, Router} from "@angular/router";
 import {EvaluacionesService} from "../../services/evaluaciones.service";
-import {firstValueFrom,Subscription} from "rxjs";
+import {firstValueFrom, Subscription} from "rxjs";
 
 @Component({
   selector: 'app-registro-examen',
   templateUrl: './registro-examen.component.html',
   styleUrls: ['./registro-examen.component.css']
 })
-export class RegistroExamenComponent implements OnDestroy {
+export class RegistroExamenComponent implements OnDestroy , OnInit {
   evaluacion: Evaluacion = {
     titulo: '',
     descripcion: '',
@@ -23,17 +23,39 @@ export class RegistroExamenComponent implements OnDestroy {
   tituloEsUnico: boolean = true;
   private subscriptions: Subscription[] = [];
   private evaluacionesSubscription: Subscription | undefined;
+  tituloInvalido: boolean = false;
+  descripcionInvalida: boolean = false;
+  evaluacionCompletada = false;
+  sugerenciasTitulo: string[] = [];
+  isAddingQuestions: boolean = false;
+  activeIndex = 0;
+  steps = [
+    { label: 'Registrar Evaluación' },
+    { label: 'Agregar Preguntas' }
+  ];
 
   constructor(
     private evaluacionesService: EvaluacionesService,
     private messageService: MessageService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute,
+    private confirmationService: ConfirmationService
   ) {
   }
+  ngOnInit(): void {
+    this.route.queryParams.subscribe(params => {
+      if (params['titulo']) {
+        this.evaluacion.titulo = params['titulo'];
+      }
+      if (params['descripcion']) {
+        this.evaluacion.descripcion = params['descripcion'];
+      }
+    });
+  }
+
   ngOnDestroy() {
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
   }
-
 
   siguientePregunta(): void {
     if (this.validarPreguntaActual()) {
@@ -69,15 +91,28 @@ export class RegistroExamenComponent implements OnDestroy {
 
     return true;
   }
-  goBack() {
-    this.router.navigate(['admin/examenes-registrados']).then(r => console.log(r));
+  goBack(): void {
+    if (this.evaluacion.id) {
+      this.confirmationService.confirm({
+        message: '¿Estás seguro de que deseas salir antes de terminar de configurar tu examen?',
+        header: 'Confirmación',
+        icon: 'pi pi-exclamation-triangle',
+        acceptLabel: 'Sí',
+        rejectLabel: 'No',
+        accept: () => {
+          this.router.navigate(['admin/examenes-registrados']);
+        }
+      });
+    } else {
+      this.router.navigate(['admin/examenes-registrados']);
+    }
   }
+
   anteriorPregunta(): void {
     if (this.preguntaActualIndex > 0) {
       this.preguntaActualIndex--;
     }
   }
-
 
   async guardarEvaluacionCompleta() {
     if (this.evaluacionesSubscription) {
@@ -137,6 +172,7 @@ export class RegistroExamenComponent implements OnDestroy {
     }
     try {
       await this.evaluacionesService.actualizarEvaluacion(this.evaluacion);
+      this.evaluacionCompletada = true;
       setTimeout(async () => {
         await this.router.navigate(['/admin/examenes-registrados']);
       }, 1500);
@@ -149,23 +185,76 @@ export class RegistroExamenComponent implements OnDestroy {
       });
     }
   }
+  async validarTitulo() {
+    this.tituloInvalido = this.evaluacion.titulo.trim().length === 0;
+
+    if (!this.tituloInvalido) {
+      try {
+        this.tituloEsUnico = await firstValueFrom(this.evaluacionesService.checkTituloUnico(this.evaluacion.titulo));
+
+        if (!this.tituloEsUnico) {
+          this.generarSugerenciasTitulo(this.evaluacion.titulo);
+        } else {
+          this.sugerenciasTitulo = [];
+        }
+      } catch (error) {
+        console.error('Error checking title uniqueness:', error);
+        this.tituloEsUnico = true;
+        this.sugerenciasTitulo = [];
+      }
+    } else {
+      this.tituloEsUnico = true;
+      this.sugerenciasTitulo = [];
+    }
+  }
+
+  selectSugerencia(sugerencia: string) {
+    this.evaluacion.titulo = sugerencia;
+    this.validarTitulo();
+  }
+
+  generarSugerenciasTitulo(tituloBase: string) {
+    const palabrasExtra = ['Examen', 'Prueba', 'Final', 'Revisión', 'Edición', 'Versión', 'Evaluación', 'Test'];
+    const sugerencias = new Set<string>();
+
+    while (sugerencias.size < 5) {
+      const randomWord = palabrasExtra[Math.floor(Math.random() * palabrasExtra.length)];
+      const randomSuffix = Math.floor(Math.random() * 100) + 1;
+
+      sugerencias.add(`${tituloBase} ${randomWord}`);
+      sugerencias.add(`${tituloBase} - ${randomWord} ${randomSuffix}`);
+      sugerencias.add(`${randomWord} de ${tituloBase}`);
+      sugerencias.add(`${tituloBase} ${randomSuffix}`);
+    }
+    this.sugerenciasTitulo = Array.from(sugerencias).slice(0, 5);
+  }
+
+
+  validarDescripcion(): void {
+    this.descripcionInvalida = this.evaluacion.descripcion.trim().length === 0;
+  }
 
   numPreguntasInvalido(): boolean {
     return this.numPreguntas < 1 || this.numPreguntas > 20;
   }
 
   botonDeshabilitado(): boolean {
-    return !this.evaluacion.titulo || !this.evaluacion.descripcion || this.numPreguntasInvalido();
+    const tituloValido = this.evaluacion.titulo.trim().length > 0;
+    const descripcionValida = this.evaluacion.descripcion.trim().length > 0;
+    return !tituloValido || !descripcionValida || this.numPreguntasInvalido() || !this.tituloEsUnico || this.isAddingQuestions;
   }
 
-
   async guardarEvaluacionSinPreguntas() {
+    this.isAddingQuestions = true;
+    this.tituloEsUnico = true;
+
     if (!this.evaluacion || !this.evaluacion.titulo || !this.evaluacion.descripcion) {
       this.messageService.add({
         severity: 'warn',
         summary: 'Atención',
         detail: 'Debe ingresar un título y una descripción.'
       });
+      this.isAddingQuestions = false;
       return;
     }
 
@@ -179,6 +268,8 @@ export class RegistroExamenComponent implements OnDestroy {
         summary: 'Error',
         detail: 'Ya existe una evaluación con el mismo título.'
       });
+      this.isAddingQuestions = false;
+      this.tituloEsUnico = false;
       return;
     }
 
@@ -191,8 +282,9 @@ export class RegistroExamenComponent implements OnDestroy {
       };
       this.evaluacion.preguntas.push(nuevaPregunta);
     }
-
     await this.procederConGuardarEvaluacionSinPreguntas();
+    this.activeIndex = 1;
+    this.isAddingQuestions = false;
   }
 
 
@@ -209,7 +301,6 @@ export class RegistroExamenComponent implements OnDestroy {
       this.messageService.add({severity: 'error', summary: 'Error', detail: 'No se pudo guardar la evaluación.'});
     }
   }
-
 
 
   preguntaValida(): boolean {
@@ -230,30 +321,50 @@ export class RegistroExamenComponent implements OnDestroy {
     }
   }
 
-  seleccionarOpcion(pregunta: Pregunta, opcionSeleccionada: any) {
+  seleccionarOpcion(pregunta: Pregunta, opcionSeleccionada: Opcion) {
     pregunta.opciones.forEach((op: { esCorrecta: boolean; }) => {
       op.esCorrecta = false;
     });
     opcionSeleccionada.esCorrecta = true;
   }
 
+  validarOpcion(opcion: any) {
+    opcion.texto = opcion.texto.trim();
+  }
+
+  opcionInvalida(opcion: any): boolean {
+    return !opcion.texto || opcion.texto.trim().length === 0;
+  }
 
   todasLasPreguntasCompletas(): boolean {
-    if (this.evaluacion.preguntas.length === 0) {
+    if (!this.evaluacion.preguntas || this.evaluacion.preguntas.length === 0) {
+      return false;
+    }
+    return this.evaluacion.preguntas.every(pregunta => this.preguntaCompleta(pregunta));
+  }
+
+
+
+  preguntaCompleta(pregunta: Pregunta): boolean {
+    if (!pregunta.enunciado || pregunta.enunciado.trim() === '') {
       return false;
     }
 
-    for (const pregunta of this.evaluacion.preguntas) {
-      if (!this.preguntaCompleta(pregunta)) {
+    if (!pregunta.opciones || pregunta.opciones.length < 4) {
+      return false;
+    }
+
+    for (const opcion of pregunta.opciones) {
+      if (!opcion.texto || opcion.texto.trim() === '') {
         return false;
       }
+    }
+
+    if (!pregunta.opciones.some(opcion => opcion.esCorrecta)) {
+      return false;
     }
     return true;
   }
 
-
-  preguntaCompleta(pregunta: Pregunta): boolean {
-    return pregunta.opciones && pregunta.opciones.length >= 4 && pregunta.opciones.some(opcion => opcion.texto && opcion.texto.trim() !== '' && opcion.esCorrecta);
-  }
 
 }

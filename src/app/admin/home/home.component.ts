@@ -39,6 +39,9 @@ export class HomeComponent {
       message: '¿Estás seguro de que quieres cerrar sesión?',
       header: 'Confirmación',
       icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Sí',
+      rejectLabel: 'No',
+      defaultFocus: 'reject',
       accept: () => {
         this.authService.logout();
         this.router.navigate(['/login']).then(r => {

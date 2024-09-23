@@ -206,6 +206,9 @@ export class TrabajadoresComponent implements OnInit, AfterViewInit{
       message: '¿Estás seguro de que quieres eliminar a este trabajador?',
       header: 'Confirmación de Eliminación',
       icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Sí',
+      rejectLabel: 'No',
+      defaultFocus: 'reject',
       accept: () => {
         this.trabajadoresService.eliminarTrabajador(trabajador.id).then(() => {
           this.trabajadores = this.trabajadores.filter(t => t.id !== trabajador.id);

@@ -57,10 +57,13 @@
         <h4>{{ trabajadorSeleccionado.name + ' ' + trabajadorSeleccionado.lastName | upperCamelCase }}</h4>
       </div>
     </div>
-    <div class="legend mb-3">
-      <div><span class="color-box"></span> Suplantación encontrada</div>
-    </div>
     <div *ngIf="resultadosEvaluacion.length > 0; else noEvaluaciones">
+      <div class="legend mb-3">
+        <div class="legend-item">
+          <span class="color-box"></span>
+          <span class="legend-text">Evaluaciones Anuladas</span>
+        </div>
+      </div>
       <p-table [value]="resultadosEvaluacion" [autoLayout]="true" responsiveLayout="scroll" class="p-table-custom">
         <ng-template pTemplate="header">
           <tr>
@@ -71,7 +74,7 @@
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-resultado>
-          <tr [ngClass]="{'red-row': !resultado.estado_Verificacion}">
+          <tr [ngClass]="{'canceled-row': !resultado.estado_Verificacion}">
             <td>{{ getEvaluacionTitulo(resultado.ID_Evaluacion) }}</td>
             <td>{{ resultado.Puntuacion | number:'1.0-2' }}</td>
             <td>{{ resultado.tipoDeError || 'No se detectaron errores' }}</td>

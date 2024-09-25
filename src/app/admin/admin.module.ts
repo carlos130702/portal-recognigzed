@@ -21,6 +21,7 @@ import {SafePipe} from "safe-pipe";
 import {ConfirmDialogModule} from "primeng/confirmdialog";
 import {SharedModule} from "../shared/shared.module";
 import {StepsModule} from "primeng/steps";
+import {ProgressSpinnerModule} from "primeng/progressspinner";
 
 @NgModule({
   declarations: [
@@ -30,25 +31,26 @@ import {StepsModule} from "primeng/steps";
     RegistroExamenComponent,
     ExamenesRegistradosComponent,
   ],
-    imports: [
-        CommonModule,
-        AdminRoutingModule,
-        MenubarModule,
-        TableModule,
-        DialogModule,
-        ButtonModule,
-        InputTextModule,
-        FormsModule,
-        ToastModule,
-        CheckboxModule,
-        InputTextareaModule,
-        ReactiveFormsModule,
-        FileUploadModule,
-        SafePipe,
-        ConfirmDialogModule,
-        SharedModule,
-        StepsModule
-    ],
+  imports: [
+    CommonModule,
+    AdminRoutingModule,
+    MenubarModule,
+    TableModule,
+    DialogModule,
+    ButtonModule,
+    InputTextModule,
+    FormsModule,
+    ToastModule,
+    CheckboxModule,
+    InputTextareaModule,
+    ReactiveFormsModule,
+    FileUploadModule,
+    SafePipe,
+    ConfirmDialogModule,
+    SharedModule,
+    StepsModule,
+    ProgressSpinnerModule
+  ],
   providers: [
     MessageService
   ]

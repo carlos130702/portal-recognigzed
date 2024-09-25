@@ -1,17 +1,18 @@
-import {Component, ViewChild} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {TrabajadoresService} from "../../services/trabajadores.service";
 import {Trabajador} from "../../interfaces/Trabajador";
 import {MessageService} from "primeng/api";
 import {Router} from "@angular/router";
 import {FileSelectEvent, FileUpload, FileUploadEvent} from "primeng/fileupload";
 import {take} from "rxjs";
+import * as faceapi from 'face-api.js';
 
 @Component({
   selector: 'app-registro-trabajadores',
   templateUrl: './registro-trabajadores.component.html',
   styleUrl: './registro-trabajadores.component.css'
 })
-export class RegistroTrabajadoresComponent {
+export class RegistroTrabajadoresComponent implements OnInit{
   @ViewChild('fileUpload', { static: false }) fileUpload!: FileUpload;
   isChecking: boolean = false;
 
@@ -22,29 +23,74 @@ export class RegistroTrabajadoresComponent {
     user: '',
     password: ''
   };
-
+  fileError: string | null = null;
   selectedFile: File | null = null;
   selectedFileUrl: string | null = null;
   isLoading: boolean = false;
+  spinner: boolean = false;
   errorMessage: string | null = null;
+  successMessage: string | null = null;
 
   constructor(
     private trabajadoresService: TrabajadoresService,
     private messageService: MessageService,
     private router: Router
   ) { }
+
+
+  ngOnInit() {
+    this.loadFaceApiModels().then(r => r);
+  }
+
+  async loadFaceApiModels() {
+    await faceapi.nets.ssdMobilenetv1.loadFromUri('/assets/models');
+    await faceapi.nets.faceLandmark68Net.loadFromUri('/assets/models');
+    await faceapi.nets.faceRecognitionNet.loadFromUri('/assets/models');
+  }
+
   goBack() {
     this.router.navigate(['admin/trabajadores']).then(r => console.log(r));
   }
-  onFileSelected(event: any): void {
-    const file = event.files[0];
 
-    if (file) {
+  onFileSelected(event: any) {
+    const file = event.files[0];
+    this.fileError = null;
+    this.successMessage = null;
+    this.spinner = true;
+
+    if (file && file.type.startsWith('image/')) {
       this.selectedFile = file;
       this.previewFile(file);
+      if (this.selectedFile) {
+        this.validateImage(this.selectedFile);
+      }
+    } else {
+      this.fileError = 'Debe subir un archivo de imagen válido.';
+      this.spinner = false;
     }
   }
 
+  async validateImage(file: File) {
+    try {
+      const img = new Image();
+      img.src = URL.createObjectURL(file);
+
+      img.onload = async () => {
+        const detection = await faceapi.detectSingleFace(img);
+
+        if (!detection) {
+          this.fileError = 'La imagen no contiene un rostro válido. Por favor, suba una foto del rostro del trabajador.';
+        } else {
+          this.successMessage = '¡Rostro detectado exitosamente!';
+          console.log('Rostro detectado:', detection);
+        }
+        this.spinner = false;
+      };
+    } catch (error) {
+      this.fileError = 'Error al procesar la imagen. Intente de nuevo.';
+      this.spinner = false;
+    }
+  }
   previewFile(file: File): void {
     const reader = new FileReader();
     reader.onload = () => {
@@ -61,7 +107,9 @@ export class RegistroTrabajadoresComponent {
   resetFile(): void {
     this.selectedFile = null;
     this.selectedFileUrl = null;
-
+    this.successMessage = null;
+    this.fileError = null;
+    this.spinner = false;
     if (this.fileUpload) {
       this.fileUpload.clear();
     }

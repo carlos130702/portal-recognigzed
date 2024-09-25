@@ -2,13 +2,12 @@
   <span class="back-arrow" (click)="goBack()">&larr;</span>
   <div class="indication p-4">
     <h2>Instrucciones para el Examen</h2>
-    <p>Por favor, sigue las indicaciones para validar tu examen:</p>
+    <p>Sigue las instrucciones para evitar que el examen se cierre automáticamente:</p>
     <ul>
-      <li>La cámara verificará continuamente tu identidad. Mantente visible en todo momento.</li>
-      <li>Evita cambiar de pestaña. Al tercer aviso, el examen se terminará automáticamente.</li>
-      <li>Si no se detecta ningún rostro, recibirás avisos. Al tercer aviso, el examen se finalizará.</li>
-      <li>Si se detecta más de un rostro, recibirás avisos. Al tercer aviso, el examen se terminará.</li>
-      <li>Si el rostro no coincide con el registrado, recibirás avisos. Al tercer aviso, el examen se finalizará.</li>
+      <li>Tu identidad será verificada continuamente a través de la cámara. Mantén tu rostro visible en todo momento.</li>
+      <li>Cambiar de pestaña generará una alerta. Tras 3 alertas, el examen se cerrará automáticamente con una nota de 0.</li>
+      <li>Si no se detecta un rostro o se detectan varios, también se generarán alertas. Al tercer aviso, el examen se finalizará con nota de 0.</li>
+      <li>Si el rostro detectado no coincide con el registrado, recibirás alertas y el examen se cerrará tras 3 alertas.</li>
     </ul>
     <p class="advice">Asegúrate de estar solo en un entorno tranquilo y bien iluminado.</p>
     <button pButton label="Comenzar Examen" (click)="startExam()"

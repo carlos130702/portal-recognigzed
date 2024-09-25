@@ -1,4 +1,3 @@
-/* Menubar Styles */
 .p-menubar {
   border-radius: 12px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -54,9 +53,10 @@
     padding: 8px 15px;
   }
 }
+
 .user-details {
   font-weight: bold;
-  color: #004085;
+    color: #004085;
   border-color: #b8daff;
   padding: 0.5rem 1rem;
   margin-right: 0.5rem;

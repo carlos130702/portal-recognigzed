@@ -3,9 +3,10 @@ import {TrabajadoresService} from "../../services/trabajadores.service";
 import {Trabajador} from "../../interfaces/Trabajador";
 import {MessageService} from "primeng/api";
 import {Router} from "@angular/router";
-import {FileSelectEvent, FileUpload, FileUploadEvent} from "primeng/fileupload";
+import {FileUpload} from "primeng/fileupload";
 import {take} from "rxjs";
 import * as faceapi from 'face-api.js';
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 
 @Component({
   selector: 'app-registro-trabajadores',
@@ -15,31 +16,35 @@ import * as faceapi from 'face-api.js';
 export class RegistroTrabajadoresComponent implements OnInit{
   @ViewChild('fileUpload', { static: false }) fileUpload!: FileUpload;
   isChecking: boolean = false;
-
-  trabajador: Trabajador = {
-    name: '',
-    lastName: '',
-    photo: '',
-    user: '',
-    password: ''
-  };
+  trabajadorForm!: FormGroup;
   fileError: string | null = null;
   selectedFile: File | null = null;
   selectedFileUrl: string | null = null;
   isLoading: boolean = false;
   spinner: boolean = false;
-  errorMessage: string | null = null;
   successMessage: string | null = null;
 
   constructor(
+    private fb: FormBuilder,
     private trabajadoresService: TrabajadoresService,
     private messageService: MessageService,
     private router: Router
-  ) { }
-
+  ) {}
 
   ngOnInit() {
+    this.initializeForm();
     this.loadFaceApiModels().then(r => r);
+    this.trabajadorForm.get('user')?.valueChanges.subscribe(value => this.validateUser(value));
+  }
+
+  initializeForm() {
+    this.trabajadorForm = this.fb.group({
+      name: ['', [Validators.required, Validators.pattern('^[a-zA-ZÀ-ÿ\\u00f1\\u00d1\\s]+$')]],
+      lastName: ['', [Validators.required, Validators.pattern('^[a-zA-ZÀ-ÿ\\u00f1\\u00d1\\s]+$')]],
+      user: ['', Validators.required],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      photo: [null, Validators.required]
+    });
   }
 
   async loadFaceApiModels() {
@@ -61,9 +66,8 @@ export class RegistroTrabajadoresComponent implements OnInit{
     if (file && file.type.startsWith('image/')) {
       this.selectedFile = file;
       this.previewFile(file);
-      if (this.selectedFile) {
-        this.validateImage(this.selectedFile);
-      }
+      if (this.selectedFile)
+      this.validateImage(this.selectedFile);
     } else {
       this.fileError = 'Debe subir un archivo de imagen válido.';
       this.spinner = false;
@@ -76,14 +80,26 @@ export class RegistroTrabajadoresComponent implements OnInit{
       img.src = URL.createObjectURL(file);
 
       img.onload = async () => {
-        const detection = await faceapi.detectSingleFace(img);
+        const detections = await faceapi.detectAllFaces(img)
+          .withFaceLandmarks()
+          .withFaceDescriptors();
 
-        if (!detection) {
-          this.fileError = 'La imagen no contiene un rostro válido. Por favor, suba una foto del rostro del trabajador.';
+        if (detections.length !== 1) {
+          this.fileError = 'La imagen debe contener exactamente un rostro válido.';
         } else {
-          this.successMessage = '¡Rostro detectado exitosamente!';
-          console.log('Rostro detectado:', detection);
+          const confidence = detections[0].detection.score;
+          if (confidence < 0.5) {
+            this.fileError = 'La imagen no parece ser un rostro claro. Por favor, suba una foto del rostro del trabajador.';
+          } else {
+            this.successMessage = '¡Rostro detectado exitosamente!';
+            this.trabajadorForm.patchValue({ photo: file });
+          }
         }
+        this.spinner = false;
+      };
+
+      img.onerror = () => {
+        this.fileError = 'Error al cargar la imagen. Intente de nuevo.';
         this.spinner = false;
       };
     } catch (error) {
@@ -91,6 +107,7 @@ export class RegistroTrabajadoresComponent implements OnInit{
       this.spinner = false;
     }
   }
+
   previewFile(file: File): void {
     const reader = new FileReader();
     reader.onload = () => {
@@ -98,7 +115,6 @@ export class RegistroTrabajadoresComponent implements OnInit{
     };
     reader.onerror = error => {
       console.error('Error loading the image: ', error);
-      this.errorMessage = 'Error loading preview.';
       this.selectedFileUrl = null;
     };
     reader.readAsDataURL(file);
@@ -110,13 +126,14 @@ export class RegistroTrabajadoresComponent implements OnInit{
     this.successMessage = null;
     this.fileError = null;
     this.spinner = false;
+    this.trabajadorForm.patchValue({ photo: null });
     if (this.fileUpload) {
       this.fileUpload.clear();
     }
   }
 
-  registrarTrabajador(trabajadorForm: any): void {
-    if (trabajadorForm.invalid || !this.selectedFile) {
+  registrarTrabajador(): void {
+    if (this.trabajadorForm.invalid || !this.selectedFile) {
       this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Por favor complete todos los campos requeridos y seleccione una foto.' });
       return;
     }
@@ -124,7 +141,7 @@ export class RegistroTrabajadoresComponent implements OnInit{
 
     this.isChecking = true;
 
-    this.trabajadoresService.checkIfUserExists(this.trabajador.user).pipe(take(1)).subscribe({
+    this.trabajadoresService.checkIfUserExists(this.trabajadorForm.value.user).pipe(take(1)).subscribe({
       next: (exists) => {
         this.isChecking = false;
 
@@ -136,11 +153,11 @@ export class RegistroTrabajadoresComponent implements OnInit{
           this.trabajadoresService.uploadFile(this.selectedFile!).subscribe({
             next: (url) => {
               const nuevoTrabajador: Omit<Trabajador, 'id'> = {
-                name: this.trabajador.name,
-                lastName: this.trabajador.lastName,
+                name: this.trabajadorForm.value.name,
+                lastName: this.trabajadorForm.value.lastName,
                 photo: url,
-                user: this.trabajador.user,
-                password: this.trabajador.password
+                user: this.trabajadorForm.value.user,
+                password: this.trabajadorForm.value.password
               };
               this.trabajadoresService.addTrabajador(nuevoTrabajador).then(() => {
                 this.messageService.clear();
@@ -173,11 +190,12 @@ export class RegistroTrabajadoresComponent implements OnInit{
       }
     });
   }
-  validateUser(usuario: any) {
-    if (usuario.value.toLowerCase() === 'admin') {
-      usuario.control.setErrors({ adminUser: true });
+
+  validateUser(usuario: string) {
+    if (usuario.toLowerCase() === 'admin') {
+      this.trabajadorForm.get('user')?.setErrors({ adminUser: true });
     } else {
-      usuario.control.setErrors(null);
+      this.trabajadorForm.get('user')?.setErrors(null);
     }
   }
 }

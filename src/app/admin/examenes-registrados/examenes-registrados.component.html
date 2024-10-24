@@ -98,7 +98,7 @@
         </div>
       </div>
     </div>
-    <button type="button" pButton label="Agregar Pregunta" icon="pi pi-plus" (click)="agregarPregunta()"
+      <button type="button" pButton label="Agregar Pregunta" icon="pi pi-plus" (click)="agregarPregunta(evaluacionSeleccionada?.numOpciones ?? 4)"
             class="dialog-add-question-button"></button>
     <p-footer>
       <button type="button" pButton label="Guardar" icon="pi pi-check" (click)="guardarEvaluacion()"

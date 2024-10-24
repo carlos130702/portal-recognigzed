@@ -42,6 +42,13 @@
           <small *ngIf="numPreguntasInvalido()" class="error-message">El número de preguntas debe ser entre 1 y 20.</small>
         </div>
 
+      <div class="field">
+        <label for="numPreguntas">Número de Opciones por Preguntas (2-5)</label>
+        <input type="number" pInputText id="numOpciones" [(ngModel)]="evaluacion.numOpciones" required
+               placeholder="Ingrese el número de opciones por Pregunta" min="1" max="20"/>
+        <small *ngIf="numOpcionesInvalido()" class="error-message">El número de opciones debe ser entre 2 y 5.</small>
+      </div>
+
         <button pButton type="button" label="Agregar Preguntas"
                 (click)="guardarEvaluacionSinPreguntas()"
                 [disabled]="botonDeshabilitado() || !tituloEsUnico"></button>
@@ -49,7 +56,7 @@
 
     <div *ngIf="activeIndex === 1">
       <h3>Preguntas</h3>
-      <p>{{ preguntaValida() ? '' : 'Debe marcar al menos una opción como correcta y agregar 4 opciones.' }}</p>
+      <p *ngIf="!preguntaValida()">Debe marcar al menos una opción como correcta y agregar {{ evaluacion.numOpciones }} opciones por cada pregunta</p>
 
       <ng-container *ngFor="let pregunta of evaluacion.preguntas; let i = index">
         <div *ngIf="preguntaActualIndex === i" class="field">
@@ -69,7 +76,7 @@
               El texto de la opción no puede estar vacío.
             </div>
           </div>
-          <button *ngIf="pregunta.opciones.length < maxOpciones" pButton type="button" label="Agregar Opciones"
+          <button *ngIf="pregunta.opciones.length < evaluacion.numOpciones" pButton type="button" label="Agregar Opciones"
                   (click)="agregarOpciones(pregunta)"></button>
         </div>
       </ng-container>

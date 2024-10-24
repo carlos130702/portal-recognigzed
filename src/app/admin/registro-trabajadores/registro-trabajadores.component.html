@@ -2,29 +2,28 @@
   <span class="back-arrow" (click)="goBack()">&larr;</span>
   <div class="p-fluid form-container mt-3">
     <h2>Registrar Nuevo Trabajador</h2>
-    <form #trabajadorForm="ngForm" (ngSubmit)="registrarTrabajador(trabajadorForm)" class="trabajador-form">
+    <form [formGroup]="trabajadorForm" (ngSubmit)="registrarTrabajador()" class="trabajador-form">
+
       <div class="field">
         <label for="nombre">Nombre</label>
-        <input type="text" pInputText id="nombre" [(ngModel)]="trabajador.name" name="nombre"
-               required pattern="^[a-zA-ZÀ-ÿ\u00f1\u00d1\s]+$" autocomplete="off" #nombre="ngModel">
-        <div *ngIf="nombre.invalid && nombre.touched" class="error-message">
-          <div *ngIf="nombre.errors?.['required']">El nombre es requerido.</div>
-          <div *ngIf="nombre.errors?.['pattern']">El nombre solo debe contener letras y espacios.</div>
+        <input type="text" pInputText id="nombre" formControlName="name" autocomplete="off">
+        <div *ngIf="trabajadorForm.get('name')?.invalid && trabajadorForm.get('name')?.touched" class="error-message">
+          <div *ngIf="trabajadorForm.get('name')?.errors?.['required']">El nombre es requerido.</div>
+          <div *ngIf="trabajadorForm.get('name')?.errors?.['pattern']">El nombre solo debe contener letras y espacios.</div>
         </div>
       </div>
 
       <div class="field">
         <label for="apellidos">Apellidos</label>
-        <input type="text" pInputText id="apellidos" [(ngModel)]="trabajador.lastName" name="apellidos"
-               required pattern="^[a-zA-ZÀ-ÿ\u00f1\u00d1\s]+$" autocomplete="off" #apellidos="ngModel">
-        <div *ngIf="apellidos.invalid && apellidos.touched" class="error-message">
-          <div *ngIf="apellidos.errors?.['required']">Los apellidos son requeridos.</div>
-          <div *ngIf="apellidos.errors?.['pattern']">Los apellidos solo deben contener letras y espacios.</div>
+        <input type="text" pInputText id="apellidos" formControlName="lastName" autocomplete="off">
+        <div *ngIf="trabajadorForm.get('lastName')?.invalid && trabajadorForm.get('lastName')?.touched" class="error-message">
+          <div *ngIf="trabajadorForm.get('lastName')?.errors?.['required']">Los apellidos son requeridos.</div>
+          <div *ngIf="trabajadorForm.get('lastName')?.errors?.['pattern']">Los apellidos solo deben contener letras y espacios.</div>
         </div>
       </div>
 
       <div class="field">
-        <label for="foto">Foto <span class="required">*</span></label>
+        <label for="foto">Foto </label>
         <p-fileUpload #fileUpload id="foto" mode="basic" name="foto" accept="image/*"
                       (onSelect)="onFileSelected($event)" chooseLabel="Seleccionar foto"
                       class="clean-file-upload"></p-fileUpload>
@@ -33,7 +32,7 @@
         <button *ngIf="selectedFile" type="button" (click)="resetFile()" pButton label="Volver a Subir una Foto"
                 class="p-button-secondary small-reset-button mt-2"></button>
 
-        <p *ngIf="!selectedFile && trabajadorForm.submitted" class="error-message">Debe seleccionar una foto.</p>
+        <p *ngIf="trabajadorForm.get('photo')?.invalid && trabajadorForm.touched" class="error-message">Debe seleccionar una foto.</p>
         <p-progressSpinner *ngIf="spinner" styleClass="mt-3"></p-progressSpinner>
         <p *ngIf="fileError" class="error-message">{{ fileError }}</p>
         <p *ngIf="successMessage" class="success-message">{{ successMessage }}</p>
@@ -41,29 +40,23 @@
 
       <div class="field">
         <label for="usuario">Usuario</label>
-        <input type="text" pInputText id="usuario" [(ngModel)]="trabajador.user" name="usuario"
-               required autocomplete="off" #usuario="ngModel" (ngModelChange)="validateUser(usuario)">
-        <div *ngIf="usuario.invalid && usuario.touched" class="error-message">
-          <div *ngIf="usuario.errors?.['required']">El usuario es requerido.</div>
-          <div *ngIf="usuario.errors?.['adminUser']">No se puede usar "admin" como nombre de usuario para un
-            trabajador.
-          </div>
+        <input type="text" pInputText id="usuario" formControlName="user" autocomplete="off">
+        <div *ngIf="trabajadorForm.get('user')?.invalid && trabajadorForm.get('user')?.touched" class="error-message">
+          <div *ngIf="trabajadorForm.get('user')?.errors?.['required']">El usuario es requerido.</div>
+          <div *ngIf="trabajadorForm.get('user')?.errors?.['adminUser']">No se puede usar "admin" como nombre de usuario para un trabajador.</div>
         </div>
       </div>
 
       <div class="field">
         <label for="contrasena">Contraseña</label>
-        <input type="password" pInputText id="contrasena" [(ngModel)]="trabajador.password" name="contrasena"
-               required autocomplete="off" #contrasena="ngModel" minlength="6">
-        <div *ngIf="contrasena.invalid && contrasena.touched" class="error-message">
+        <input type="password" pInputText id="contrasena" formControlName="password" autocomplete="off">
+        <div *ngIf="trabajadorForm.get('password')?.invalid && trabajadorForm.get('password')?.touched" class="error-message">
           La contraseña es requerida y debe tener al menos 6 caracteres.
         </div>
       </div>
 
-      <button type="submit" pButton label="Registrar"
-              [disabled]="trabajadorForm.invalid || !selectedFile || fileError"></button>
+      <button type="submit" pButton label="Registrar" [disabled]="trabajadorForm.invalid || fileError"></button>
     </form>
-
   </div>
 </div>
 <p-toast></p-toast>

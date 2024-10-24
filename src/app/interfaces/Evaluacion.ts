@@ -3,6 +3,7 @@ export interface Evaluacion {
   titulo: string;
   descripcion: string;
   preguntas: Pregunta[];
+  numOpciones: number;
 }
 
 export interface Pregunta {

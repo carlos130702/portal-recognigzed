@@ -34,6 +34,7 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
   private verificationActive = true;
   cameraLoaded = false;
   areAlertsVisible: boolean = false;
+  isSubmitting: boolean = false;
 
   onCameraLoad() {
     this.cameraLoaded = true;
@@ -199,6 +200,9 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   onSubmit(puntuacion: number = 0, estadoVerificacion: boolean = true, tipoDeError: string = '') {
+    this.areAlertsVisible = false;
+    this.isSubmitting = true;
+
     this.changeDetectorRef.detectChanges();
     if (!this.exam) {
       this.messageService.add({severity: 'error', summary: 'Error', detail: 'No hay un examen cargado.'});
@@ -279,7 +283,7 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   startVideo() {
-    navigator.mediaDevices.getUserMedia({video: {}})
+    navigator.mediaDevices.getUserMedia({ video: {} })
       .then(stream => {
         this.videoElement.nativeElement.srcObject = stream;
         this.videoElement.nativeElement.play().then(r => console.log(r));
@@ -287,11 +291,16 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
       })
       .catch(err => {
         console.error("Error accessing the webcam: ", err);
+
         this.messageService.add({
           severity: 'error',
           summary: 'Cámara no disponible',
           detail: 'No se pudo acceder a la cámara. Asegúrate de que la cámara esté conectada y no esté siendo utilizada por otra aplicación.'
         });
+
+        setTimeout(() => {
+          this.router.navigate(['/worker/examenes']);
+        }, 3000);
       });
   }
 
@@ -315,6 +324,7 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
         if (!this.labeledFaceDescriptors) {
           console.error('No labeled face descriptors available.');
           clearInterval(this.intervalId);
+          this.isSubmitting = false;
           return;
         }
 
@@ -322,6 +332,7 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
         if (!context) {
           console.error('Context is null.');
           clearInterval(this.intervalId);
+          this.isSubmitting = false;
           return;
         }
 
@@ -334,7 +345,6 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
         const resizedDetections = faceapi.resizeResults(detections, displaySize);
         context.clearRect(0, 0, canvas.width, canvas.height);
         faceapi.draw.drawDetections(canvas, resizedDetections);
-        //this.checkFaceMovement(resizedDetections);
         if (detections.length === 0) {
           this.failedNoFaceDetectedAttempts++;
           this.messageService.add({
@@ -419,15 +429,18 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
       });
   }
 
+
   finishExamWithZero(tipoDeError: string) {
     this.verificationActive = false;
+    this.isSubmitting = true;
+    this.areAlertsVisible = true;
 
     this.messageService.add({
       severity: 'error',
       summary: 'Error',
       detail: 'Identidad no verificada. Terminando el examen con puntuación de cero.'
     });
-    this.areAlertsVisible = true;
+
     setTimeout(() => {
       this.onSubmit(0, false, tipoDeError);
       if (this.trabajadorActual && this.exam) {
@@ -436,101 +449,20 @@ export class VistaExamenComponent implements OnInit, OnDestroy, AfterViewInit {
         console.error('Trabajador o examen no definido');
       }
       this.clearToast();
-    }, 1000);
+    }, 2000);
   }
 
-  /*
-  private movementDetectedCount = 0;
-  private lastFaceCenter: { x: number; y: number } | null = null;
-  private lastMovementTime: number | null = null;
-  private readonly MOVEMENT_THRESHOLD = 5;
-  private readonly MOVEMENT_COUNT_THRESHOLD = 3;
-  private readonly MOVEMENT_DELAY_MS = 2000;
-  private readonly EYE_BLINK_THRESHOLD = 0.2;
-
-  private checkEyeBlink(detections: any): boolean {
-    if (detections.length === 0) return false;
-
-    const face = detections[0];
-    const landmarks = face.landmarks;
-
-    if (landmarks) {
-      const leftEye = landmarks.getLeftEye();
-      const rightEye = landmarks.getRightEye();
-      const leftEyeBlinking = this.calculateEyeAspectRatio(leftEye) < this.EYE_BLINK_THRESHOLD;
-      const rightEyeBlinking = this.calculateEyeAspectRatio(rightEye) < this.EYE_BLINK_THRESHOLD;
-
-      return leftEyeBlinking || rightEyeBlinking;
-    }
-    return false;
-  }
-  private calculateEyeAspectRatio(eye: faceapi.Point[]): number {
-    const A = this.calculateDistance(eye[1], eye[5]);
-    const B = this.calculateDistance(eye[2], eye[4]);
-    const C = this.calculateDistance(eye[0], eye[3]);
-
-    return (A + B) / (2.0 * C);
-  }
-
-  private calculateDistance(p1: faceapi.Point, p2: faceapi.Point): number {
-    return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
-  }
-  checkFaceMovement(detections: any) {
-    if (detections.length === 0) return;
-
-    const face = detections[0];
-    const { x, y, width, height } = face.detection.box;
-
-    const faceCenter = {
-      x: x + width / 2,
-      y: y + height / 2
-    };
-
-    const currentTime = Date.now();
-
-    if (this.lastFaceCenter) {
-      const dx = Math.abs(faceCenter.x - this.lastFaceCenter.x);
-      const dy = Math.abs(faceCenter.y - this.lastFaceCenter.y);
-
-      if (dx <= this.MOVEMENT_THRESHOLD && dy <= this.MOVEMENT_THRESHOLD) {
-        if (!this.checkEyeBlink(detections)) { // Verificar parpadeo
-          if (!this.lastMovementTime || (currentTime - this.lastMovementTime) > this.MOVEMENT_DELAY_MS) {
-            this.movementDetectedCount++;
-            this.lastMovementTime = currentTime;
-
-            if (this.movementDetectedCount <= this.MOVEMENT_COUNT_THRESHOLD) {
-              this.messageService.add({
-                severity: 'warn',
-                summary: 'Advertencia',
-                detail: `No se detecta movimiento en la persona. Puede ser una imagen fija. Intento ${this.movementDetectedCount} de ${this.MOVEMENT_COUNT_THRESHOLD}.`
-              });
-            }
-
-            if (this.movementDetectedCount >= this.MOVEMENT_COUNT_THRESHOLD) {
-              this.finishExamWithZero();
-              return;
-            }
-          }
-        } else {
-          this.movementDetectedCount = 0;
-          this.lastMovementTime = null;
-        }
-      } else {
-        this.movementDetectedCount = 0;
-        this.lastMovementTime = null;
-      }
-    }
-    this.lastFaceCenter = faceCenter;
-  }
-*/
   finishExamDueToTabSwitch(tipoDeError: string) {
     this.verificationActive = false;
+    this.areAlertsVisible = true;
+    this.isSubmitting = true;
 
     this.messageService.add({
       severity: 'error',
       summary: 'Error',
       detail: 'Has excedido el limite de intentos al cambiar de ventana. El examen se finalizará con una puntuación de cero.'
     });
+
     this.areAlertsVisible = true;
 
     setTimeout(() => {

@@ -45,9 +45,9 @@
                   [disabled]="currentQuestionIndex === exam.preguntas.length - 1" class="p-button-text"></button>
         </div>
 
-        <div class="submit-button-container">
+        <div class="submit-button-container" [ngClass]="{ 'no-pointer-events': isSubmitting }">
           <button type="submit" pButton label="Enviar Examen"
-                  [disabled]="!allQuestionsAnswered() || currentQuestionIndex !== exam.preguntas.length - 1 || areAlertsVisible"
+                  [disabled]="!allQuestionsAnswered() || currentQuestionIndex !== exam.preguntas.length - 1 || areAlertsVisible || isSubmitting"
                   class="p-button-rounded p-button-success mt-3"></button>
         </div>
       </form>

@@ -5,13 +5,11 @@
     <form (ngSubmit)="onSubmit()" class="flex flex-column">
       <div class="field">
         <i class="fa fa-user"></i>
-        <label for="username" [class.active]="usernameFocused || user">Username</label>
-        <input type="text" [(ngModel)]="user" (focus)="usernameFocused=true" (blur)="usernameFocused=false" id="username" name="username" required pInputText autocomplete="off">
+        <input type="text" [(ngModel)]="user" (focus)="usernameFocused=true" (blur)="usernameFocused=false" id="username" name="username" required placeholder="Usuario" pInputText autocomplete="off">
       </div>
       <div class="field">
         <i class="fa fa-lock"></i>
-        <label for="password" [class.active]="passwordFocused || password">Contraseña</label>
-        <input type="password" [(ngModel)]="password" (focus)="passwordFocused=true" (blur)="passwordFocused=false" id="password" name="password" required pInputText [type]="mostrar ? 'text' : 'password'">
+        <input type="password" [(ngModel)]="password" (focus)="passwordFocused=true" (blur)="passwordFocused=false" id="password" name="password" required placeholder="Contraseña" pInputText [type]="mostrar ? 'text' : 'password'">
         <i class="fa" [ngClass]="mostrar ? 'fa-eye' : 'fa-eye-slash'" (click)="toggleMostrar()"></i>
       </div>
       <button type="submit" class="login-button" [disabled]="!user || !password || isLocked">LOGIN</button>

@@ -14,10 +14,10 @@ export class RegistroExamenComponent implements OnDestroy , OnInit {
   evaluacion: Evaluacion = {
     titulo: '',
     descripcion: '',
+    numOpciones: 0,
     preguntas: []
   };
   numPreguntas: number = 0;
-  maxOpciones: number = 4;
   mostrarFormulario: boolean = true;
   preguntaActualIndex: number = 0;
   tituloEsUnico: boolean = true;
@@ -118,7 +118,7 @@ export class RegistroExamenComponent implements OnDestroy , OnInit {
     if (this.evaluacionesSubscription) {
       this.evaluacionesSubscription.unsubscribe();
     }
-    if (!this.evaluacion || !this.evaluacion.titulo || !this.evaluacion.descripcion || this.evaluacion.preguntas.length === 0) {
+    if (!this.evaluacion || !this.evaluacion.titulo || !this.evaluacion.descripcion || !this.evaluacion.numOpciones || this.evaluacion.preguntas.length === 0) {
       this.messageService.add({
         severity: 'warn',
         summary: 'Atención',
@@ -238,17 +238,21 @@ export class RegistroExamenComponent implements OnDestroy , OnInit {
     return this.numPreguntas < 1 || this.numPreguntas > 20;
   }
 
+  numOpcionesInvalido(): boolean {
+    return this.evaluacion.numOpciones < 2 || this.evaluacion.numOpciones > 5;
+  }
+
   botonDeshabilitado(): boolean {
     const tituloValido = this.evaluacion.titulo.trim().length > 0;
     const descripcionValida = this.evaluacion.descripcion.trim().length > 0;
-    return !tituloValido || !descripcionValida || this.numPreguntasInvalido() || !this.tituloEsUnico || this.isAddingQuestions;
+    return !tituloValido || !descripcionValida || this.numPreguntasInvalido() || this.numOpcionesInvalido() || !this.tituloEsUnico || this.isAddingQuestions;
   }
 
   async guardarEvaluacionSinPreguntas() {
     this.isAddingQuestions = true;
     this.tituloEsUnico = true;
 
-    if (!this.evaluacion || !this.evaluacion.titulo || !this.evaluacion.descripcion) {
+    if (!this.evaluacion || !this.evaluacion.titulo || !this.evaluacion.descripcion || !this.evaluacion.numOpciones) {
       this.messageService.add({
         severity: 'warn',
         summary: 'Atención',
@@ -309,11 +313,11 @@ export class RegistroExamenComponent implements OnDestroy , OnInit {
     }
     const ultimaPregunta = this.evaluacion.preguntas[this.evaluacion.preguntas.length - 1];
     const opcionesCorrectas = ultimaPregunta.opciones.filter(opcion => opcion.esCorrecta);
-    return opcionesCorrectas.length > 0 && ultimaPregunta.opciones.length === this.maxOpciones;
+    return opcionesCorrectas.length > 0 && ultimaPregunta.opciones.length === this.evaluacion.numOpciones;
   }
 
   agregarOpciones(pregunta: Pregunta) {
-    while (pregunta.opciones.length < this.maxOpciones) {
+    while (pregunta.opciones.length < this.evaluacion.numOpciones) {
       pregunta.opciones.push({
         texto: '',
         esCorrecta: false
@@ -350,7 +354,7 @@ export class RegistroExamenComponent implements OnDestroy , OnInit {
       return false;
     }
 
-    if (!pregunta.opciones || pregunta.opciones.length < 4) {
+    if (!pregunta.opciones || pregunta.opciones.length < this.evaluacion.numOpciones) {
       return false;
     }
 

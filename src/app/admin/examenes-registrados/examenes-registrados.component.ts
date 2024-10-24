@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {Evaluacion,Pregunta} from "../../interfaces/Evaluacion";
+import {Evaluacion, Pregunta} from "../../interfaces/Evaluacion";
 import {EvaluacionesService} from "../../services/evaluaciones.service";
 import {ConfirmationService, MessageService} from "primeng/api";
 import {FormArray, FormBuilder, FormControl, FormGroup} from "@angular/forms";
@@ -27,6 +27,7 @@ export class ExamenesRegistradosComponent implements OnInit {
       id: [null],
       titulo: [''],
       descripcion: [''],
+      numOpciones: [0],
       preguntas: this.fb.array([])
     });
   }
@@ -86,6 +87,7 @@ export class ExamenesRegistradosComponent implements OnInit {
       id: evaluacion.id,
       titulo: evaluacion.titulo,
       descripcion: evaluacion.descripcion,
+      numOpciones: evaluacion.numOpciones
     });
     this.setPreguntas(evaluacion.preguntas);
     this.displayEditDialog = true;
@@ -93,8 +95,7 @@ export class ExamenesRegistradosComponent implements OnInit {
 
   validarPreguntasDuplicadas(preguntas: any[]): boolean {
     const enunciados = preguntas.map(p => p.enunciado.trim().toLowerCase());
-    const duplicados = new Set(enunciados).size !== enunciados.length;
-    return duplicados;
+    return new Set(enunciados).size !== enunciados.length;
   }
 
   validarOpcionesDuplicadas(preguntas: any[]): boolean {
@@ -108,21 +109,27 @@ export class ExamenesRegistradosComponent implements OnInit {
     return false;
   }
 
-  agregarPregunta(): void {
+  agregarPregunta(numOpciones: number): void {
+    const opcionesArray = this.fb.array(
+      Array.from({ length: numOpciones }, () =>
+        this.fb.group({
+          texto: [''],
+          esCorrecta: [false]
+        })
+      )
+    );
+
     const preguntaGroup = this.fb.group({
       enunciado: [''],
-      opciones: this.fb.array([
-        this.fb.group({ texto: '', esCorrecta: false }),
-        this.fb.group({ texto: '', esCorrecta: false }),
-        this.fb.group({ texto: '', esCorrecta: false }),
-        this.fb.group({ texto: '', esCorrecta: false })
-      ]),
-      valor: 0
+      opciones: opcionesArray, // Añadir el FormArray dinámico de FormGroups
+      valor: [0]
     });
 
     this.preguntas.push(preguntaGroup);
     this.recalcularValores();
   }
+
+
   eliminarPregunta(index: number): void {
     this.preguntas.removeAt(index);
     this.recalcularValores();

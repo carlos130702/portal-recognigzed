@@ -189,7 +189,6 @@ p-paginator p-paginator-page {
   margin: auto;
   box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
-  overflow: hidden;
 }
 .titulo-evaluacion {
   font-size: 1.5em;
